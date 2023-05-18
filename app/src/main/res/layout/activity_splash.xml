@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:background="#fff"
+    android:orientation="vertical"
+    tools:context=".Splash">
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="300dp"
+        android:layout_height="140dp"
+        android:src="@drawable/smartel_noback_logo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.299" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:layout_marginBottom="88dp"
+        android:gravity="center"
+        android:text="(주)스마텔\n대표 : 고명수 사업자등록번호 : 220-81-53532 통신판매업신고번호 : 제2011-서울강남-00344호  \n해외휴대폰(미국, 캐나다, 일본) : 1566-4200 국내알뜰폰(SKT, LGU+) : 1566-0212\n고객플라자 :  서울시 강남구 강남대로 438 스타플렉스 2층 205호, 206호 스마텔고객플라자\n개인정보관리자 : 김봉준  메일 : smartel@smartel.co.kr\n\n\nCOPYRIGHT (C) 2021 SMARTEL ALL RIGHT RESERVED."
+        android:textAlignment="center"
+        android:textSize="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:layout_editor_absoluteX="0dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

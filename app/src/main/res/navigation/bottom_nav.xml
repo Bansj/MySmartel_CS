@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bottom_nav"
+    app:startDestination="@id/myInfoFragment">
+
+    <fragment
+        android:id="@+id/myInfoFragment"
+        android:name="com.example.mysmartel_ver_1.MyInfoFragment"
+        android:label="fragment_my_info"
+        tools:layout="@layout/fragment_my_info" >
+        <action
+            android:id="@+id/action_myInfoFragment_to_benefitFragment"
+            app:destination="@id/benefitFragment" />
+        <action
+            android:id="@+id/action_myInfoFragment_to_menuFragment"
+            app:destination="@id/menuFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/benefitFragment"
+        android:name="com.example.mysmartel_ver_1.BenefitFragment"
+        android:label="fragment_benefit"
+        tools:layout="@layout/fragment_benefit" >
+        <action
+            android:id="@+id/action_benefitFragment_to_myInfoFragment"
+            app:destination="@id/myInfoFragment" />
+        <action
+            android:id="@+id/action_benefitFragment_to_menuFragment"
+            app:destination="@id/menuFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/menuFragment"
+        android:name="com.example.mysmartel_ver_1.MenuFragment"
+        android:label="fragment_menu"
+        tools:layout="@layout/fragment_menu" >
+        <action
+            android:id="@+id/action_menuFragment_to_myInfoFragment"
+            app:destination="@id/myInfoFragment" />
+        <action
+            android:id="@+id/action_menuFragment_to_benefitFragment"
+            app:destination="@id/benefitFragment" />
+    </fragment>
+</navigation>

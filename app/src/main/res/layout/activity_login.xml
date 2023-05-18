@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".LoginActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#FFFAFA"
+        android:layout_gravity="center">
+
+        <LinearLayout
+            android:background="#FFFAFA"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_height="120dp">
+
+            <ImageView
+                android:layout_marginTop="15dp"
+                android:layout_marginHorizontal="85dp"
+                android:layout_gravity="center"
+                android:id="@+id/img_fragment2"
+                android:layout_width="230dp"
+                android:layout_height="80dp"
+                android:src="@drawable/smartel_noback_logo" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="15dp"
+            android:background="#FFFAFA"
+            android:orientation="vertical"
+            tools:layout_editor_absoluteY="80dp">
+
+            <EditText
+                android:id="@+id/edit_id"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="50dp"
+                android:layout_marginHorizontal="20dp"
+                android:background="@drawable/editbox_action_shape"
+                android:hint="      📱 (ex. 01012345678)"
+                android:inputType="number"
+                android:textSize="14dp" />
+
+            <EditText
+                android:id="@+id/edit_password"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginHorizontal="20dp"
+                android:background="@drawable/editbox_action_shape"
+                android:hint="      🔒 비밀번호"
+                android:inputType="textPassword"
+                android:textSize="14dp" />
+
+            <Button
+                android:id="@+id/btn_login"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="30dp"
+                android:background="@drawable/btn_rectangle_orange"
+                android:text="로그인"
+                android:textColor="#fff"
+                android:textSize="20dp" />
+
+            <Button
+                android:id="@+id/btn_signUp"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/btn_rectangle_orange"
+                android:text="회원가입"
+                android:textColor="#fff"
+                android:textSize="20dp" />
+
+            <TextView
+                android:id="@+id/txt_findPW"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:layout_width="120dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:text="비밀번호 찾기"
+                android:textStyle="bold"
+                android:textSize="12dp"
+                android:textColor="#FF7F50" />
+
+            <TextView
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:layout_width="120dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:text="또는"
+                android:textSize="13dp"
+                android:textColor="#F26925"
+                android:visibility="invisible"/>
+
+            <Button
+                android:id="@+id/btn_prepaidPhoneEasyCheck"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginHorizontal="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/btn_rectangle_orange"
+                android:text="선불폰 간편조회"
+                android:textColor="#fff"
+                android:textSize="17dp"
+                android:visibility="invisible"/>
+
+            <!--<TextView
+                android:gravity="center_vertical"
+                android:layout_marginTop="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:text="❗선불 잔액 조회의 경우,\n     네트워크 상황에 따라 최대 1분 이상 소요될 수 있으니\n     조회가 완료될 때까지기다려 주시기 바랍니다. "
+                android:textColor="#F15B5B"
+                android:background="#F5F5F5"/>-->
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
