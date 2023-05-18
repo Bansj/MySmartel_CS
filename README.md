@@ -1,1 +1,1 @@
-# smartep-aos
+# smartel-aos
