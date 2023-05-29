@@ -12,11 +12,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="#FFFAFA"
+        android:background="#fff"
         android:layout_gravity="center">
 
         <LinearLayout
-            android:background="#FFFAFA"
+            android:background="#fff"
             android:layout_width="match_parent"
             android:orientation="horizontal"
             android:gravity="center"
@@ -37,7 +37,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginHorizontal="15dp"
-            android:background="#FFFAFA"
+            android:background="#fff"
             android:orientation="vertical"
             tools:layout_editor_absoluteY="80dp">
 
@@ -48,7 +48,7 @@
                 android:layout_marginTop="50dp"
                 android:layout_marginHorizontal="20dp"
                 android:background="@drawable/editbox_action_shape"
-                android:hint="      📱 (ex. 01012345678)"
+                android:hint=" Phone Number (ex. 01012345678)"
                 android:inputType="number"
                 android:textSize="14dp" />
 
@@ -59,7 +59,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginHorizontal="20dp"
                 android:background="@drawable/editbox_action_shape"
-                android:hint="      🔒 비밀번호"
+                android:hint=" PassWords"
                 android:inputType="textPassword"
                 android:textSize="14dp" />
 

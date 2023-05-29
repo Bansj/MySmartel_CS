@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#FFFAFA"
+    android:id="@+id/myInfoFragment"
     tools:context=".MyInfoFragment">
 
     <LinearLayout
@@ -217,7 +218,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="170dp"
+                    android:layout_height="270dp"
                     android:layout_marginTop="20dp"
                     android:layout_marginHorizontal="3dp"
                     android:background="@drawable/box_whitesmoke"
@@ -251,6 +252,54 @@
 
                     <ProgressBar
                         android:id="@+id/progressBar_leftData"
+                        android:layout_marginTop="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_height="8dp"
+                        android:max="100"
+                        android:progress="82"
+                        android:indeterminate="false"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:progressDrawable="@drawable/progressbar_coralpink"/>
+
+                    <ProgressBar
+                        android:id="@+id/progressBar_leftData2"
+                        android:layout_marginTop="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_height="8dp"
+                        android:max="100"
+                        android:progress="82"
+                        android:indeterminate="false"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:progressDrawable="@drawable/progressbar_coralpink"/>
+
+                    <ProgressBar
+                        android:id="@+id/progressBar_leftData3"
+                        android:layout_marginTop="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_height="8dp"
+                        android:max="100"
+                        android:progress="82"
+                        android:indeterminate="false"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:progressDrawable="@drawable/progressbar_coralpink"/>
+
+                    <ProgressBar
+                        android:id="@+id/progressBar_leftData4"
+                        android:layout_marginTop="10dp"
+                        android:layout_width="match_parent"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_height="8dp"
+                        android:max="100"
+                        android:progress="82"
+                        android:indeterminate="false"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:progressDrawable="@drawable/progressbar_coralpink"/>
+
+                    <ProgressBar
+                        android:id="@+id/progressBar_leftData5"
                         android:layout_marginTop="10dp"
                         android:layout_width="match_parent"
                         android:layout_marginHorizontal="20dp"
@@ -381,7 +430,7 @@
             android:src="@drawable/ic_menu_24" />
 
         <ImageButton
-            android:tint="@color/orange"
+            app:tint="@color/orange"
             android:id="@+id/btn_myInfo"
             android:layout_width="wrap_content"
             android:layout_height="60dp"

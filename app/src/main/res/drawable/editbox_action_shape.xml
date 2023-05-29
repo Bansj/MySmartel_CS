@@ -12,7 +12,7 @@
                 android:color="#C0C0C0" />
             <corners android:radius="1dp"/>
             <solid
-                android:color="#FFE4E1" />
+                android:color="#fffafa" />
             <corners
                 android:bottomLeftRadius="10dp"
                 android:bottomRightRadius="10dp"
