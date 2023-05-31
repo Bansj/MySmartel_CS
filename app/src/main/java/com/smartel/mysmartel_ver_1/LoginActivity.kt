@@ -1,0 +1,213 @@
+package com.smartel.mysmartel_ver_1
+
+import android.app.AlertDialog
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.ProgressBar
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import com.android.volley.Request
+import com.android.volley.RequestQueue
+import com.android.volley.Response
+import com.android.volley.toolbox.HurlStack
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
+import com.example.mysmartel_ver_1.R
+import org.json.JSONException
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
+import java.security.cert.X509Certificate
+import javax.net.ssl.HttpsURLConnection
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
+
+class LoginActivity : AppCompatActivity() {
+    private lateinit var phoneNumberEditText: EditText
+    private lateinit var passwordEditText: EditText
+    private lateinit var loginButton: Button
+    private lateinit var loadingDialog: AlertDialog
+
+    private lateinit var requestQueue: RequestQueue
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_login)
+
+        phoneNumberEditText = findViewById(R.id.edit_id)
+        passwordEditText = findViewById(R.id.edit_password)
+        loginButton = findViewById(R.id.btn_login)
+
+        loadingDialog = createLoadingDialog()
+
+        requestQueue = Volley.newRequestQueue(this, ignoreSslErrorHurlStack())
+
+        loginButton.setOnClickListener { loginUser() }
+    }
+
+    private fun createLoadingDialog(): AlertDialog {
+        val dialogBuilder = AlertDialog.Builder(this)
+        val dialogView = layoutInflater.inflate(R.layout.loading_dialog, null)
+        val progressBar = dialogView.findViewById<ProgressBar>(R.id.loading_spinner)
+        progressBar.indeterminateDrawable.setColorFilter(
+            ContextCompat.getColor(this, R.color.orange),
+            android.graphics.PorterDuff.Mode.SRC_IN
+        )
+        dialogBuilder.setView(dialogView)
+        dialogBuilder.setCancelable(false)
+        return dialogBuilder.create()
+    }
+
+    private fun loginUser() {
+        val phoneNumber = phoneNumberEditText.text.toString()
+        val password = passwordEditText.text.toString()
+
+        val loginParams = JSONObject()
+        loginParams.put("log_id", phoneNumber)
+        loginParams.put("log_pwd", password)
+
+        showLoadingDialog()
+
+        val loginUrl = "https://www.mysmartel.com/smartel/api_mysmartel_login.php"
+        val loginRequest = JsonObjectRequest(
+            Request.Method.POST, loginUrl, loginParams,
+            Response.Listener { response ->
+                handleLoginResponse(response)
+            },
+            Response.ErrorListener { error ->
+                hideLoadingDialog()
+                showErrorDialog("An error occurred: ${error.message}")
+            }
+        )
+        requestQueue.add(loginRequest)
+    }
+
+    private fun handleLoginResponse(response: JSONObject) {
+        try {
+            val loginResult = response.getString("resultCd")
+
+            if (loginResult == "true") {
+                val phoneNumber = phoneNumberEditText.text.toString()
+                fetchUserInfo(phoneNumber)
+            } else {
+                hideLoadingDialog()
+                showErrorDialog("Login failed")
+            }
+        } catch (e: JSONException) {
+            hideLoadingDialog()
+            showErrorDialog("Failed to parse login response")
+        }
+    }
+
+    private fun fetchUserInfo(phoneNumber: String) {
+        val infoParams = JSONObject()
+        infoParams.put("serviceNum", phoneNumber)
+
+        val infoUrl = "https://www.mysmartel.com/smartel/api_getinfo.php"
+        val infoRequest = JsonObjectRequest(
+            Request.Method.POST, infoUrl, infoParams,
+            Response.Listener { response ->
+                handleInfoResponse(response)
+            },
+            Response.ErrorListener { error ->
+                hideLoadingDialog()
+                showErrorDialog("An error occurred while fetching user info: ${error.message}")
+            }
+        )
+        requestQueue.add(infoRequest)
+    }
+
+    private fun handleInfoResponse(response: JSONObject) {
+        hideLoadingDialog()
+        try {
+            val telecom = response.getString("telecom")
+            val custName = response.getString("custNm")
+            navigateToMainActivity(telecom, custName)
+        } catch (e: JSONException) {
+            showErrorDialog("Failed to parse user info response")
+        }
+    }
+
+    private fun navigateToMainActivity(telecom: String, custName: String) {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.putExtra("telecom", telecom)
+        intent.putExtra("custName", custName)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun showLoadingDialog() {
+        loadingDialog.show()
+    }
+
+    private fun hideLoadingDialog() {
+        loadingDialog.dismiss()
+    }
+
+    private fun showErrorDialog(message: String) {
+        val dialogBuilder = AlertDialog.Builder(this)
+        dialogBuilder.setMessage(message)
+            .setCancelable(false)
+            .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+
+        val alert = dialogBuilder.create()
+        alert.show()
+    }
+
+    // https통신 허용
+    private fun ignoreSslErrorHurlStack(): HurlStack {
+        return object : HurlStack() {
+            override fun createConnection(url: URL): HttpURLConnection {
+                val connection = super.createConnection(url)
+                if (connection is HttpsURLConnection) {
+                    connection.setHostnameVerifier { _, _ -> true }
+                    val trustAllCerts: Array<TrustManager> = arrayOf(object : X509TrustManager {
+                        override fun getAcceptedIssuers(): Array<X509Certificate> {
+                            return arrayOf()
+                        }
+
+                        override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
+
+                        override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
+                    })
+
+                    try {
+                        val sc = SSLContext.getInstance("SSL")
+                        sc.init(null, trustAllCerts, java.security.SecureRandom())
+                        connection.sslSocketFactory = sc.socketFactory
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+                return connection
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+/*// 메인메뉴로 이동하는 로그인 버튼 클릭 이벤트
+        val btnLogIn = findViewById<Button>(R.id.btn_login)
+        btnLogIn.setOnClickListener {
+            Toast.makeText(this, "해당 회선으로 로그인 합니다. ", Toast.LENGTH_SHORT).show()
+
+            var intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
+
+        // 선불폰 간편조회 액티비티로 이동하는 버튼 클릭 이벤트
+        val btnFindPW = findViewById<Button>(R.id.btn_prepaidPhoneEasyCheck)
+        btnFindPW.setOnClickListener {
+            Toast.makeText(this, "선불폰 간편조회 페이지로 이동합니다. ", Toast.LENGTH_SHORT).show()
+
+            var intent = Intent(this, PrepaidPhoneEasyCheck::class.java)
+            startActivity(intent)
+        }*/

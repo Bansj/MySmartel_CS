@@ -61,6 +61,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
                     <TextView
+                        android:id="@+id/txt_cust_nm"
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:layout_gravity="center"
@@ -73,6 +74,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/txt_telecom"
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:layout_gravity="center"
@@ -81,6 +83,18 @@
                         android:gravity="center_vertical"
                         android:text="    010-7524-4523 (SKT 망)"
                         android:textColor="@color/black"
+                        android:textSize="15dp" />
+                    <TextView
+                        android:id="@+id/txt_service_acct"
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center"
+                        android:layout_marginHorizontal="5dp"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center_vertical"
+                        android:text=""
+                        android:textColor="@color/black"
+                        android:visibility="gone"
                         android:textSize="15dp" />
 
                 </LinearLayout>
@@ -414,7 +428,6 @@
     </LinearLayout>
 
 
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -434,7 +447,6 @@
             android:id="@+id/btn_myInfo"
             android:layout_width="wrap_content"
             android:layout_height="60dp"
-            android:outlineSpotShadowColor="@color/teal_200"
             android:layout_weight="1"
             android:background="#F5F5F5"
             android:src="@drawable/ic_my_info_24" />
