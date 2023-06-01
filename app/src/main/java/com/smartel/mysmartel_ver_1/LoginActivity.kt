@@ -3,6 +3,7 @@ package com.smartel.mysmartel_ver_1
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
@@ -25,6 +26,7 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
+
 class LoginActivity : AppCompatActivity() {
     private lateinit var phoneNumberEditText: EditText
     private lateinit var passwordEditText: EditText
@@ -45,7 +47,10 @@ class LoginActivity : AppCompatActivity() {
 
         requestQueue = Volley.newRequestQueue(this, ignoreSslErrorHurlStack())
 
-        loginButton.setOnClickListener { loginUser() }
+        loginButton.setOnClickListener {
+            Log.d("LoginActivity", "Login button clicked")
+            loginUser()
+        }
     }
 
     private fun createLoadingDialog(): AlertDialog {
@@ -64,6 +69,8 @@ class LoginActivity : AppCompatActivity() {
     private fun loginUser() {
         val phoneNumber = phoneNumberEditText.text.toString()
         val password = passwordEditText.text.toString()
+
+        Log.d("LoginActivity", "Login User - Phone number: $phoneNumber, Password: $password")
 
         val loginParams = JSONObject()
         loginParams.put("log_id", phoneNumber)
@@ -91,6 +98,7 @@ class LoginActivity : AppCompatActivity() {
 
             if (loginResult == "true") {
                 val phoneNumber = phoneNumberEditText.text.toString()
+                Log.d("LoginActivity", "Login successful - Phone number: $phoneNumber")
                 fetchUserInfo(phoneNumber)
             } else {
                 hideLoadingDialog()
@@ -125,16 +133,19 @@ class LoginActivity : AppCompatActivity() {
         try {
             val telecom = response.getString("telecom")
             val custName = response.getString("custNm")
-            navigateToMainActivity(telecom, custName)
+            val serviceAcct = response.getString("serviceAcct")
+            Log.d("LoginActivity", "User info - Telecom: $telecom, CustName: $custName, ServiceAccount: $serviceAcct")
+            navigateToMainActivity(telecom, custName, serviceAcct)
         } catch (e: JSONException) {
             showErrorDialog("Failed to parse user info response")
         }
     }
 
-    private fun navigateToMainActivity(telecom: String, custName: String) {
+    private fun navigateToMainActivity(telecom: String, custName: String, serviceAcct: String) {
         val intent = Intent(this, MainActivity::class.java)
         intent.putExtra("telecom", telecom)
         intent.putExtra("custName", custName)
+        intent.putExtra("serviceAcct", serviceAcct)
         startActivity(intent)
         finish()
     }
@@ -157,7 +168,7 @@ class LoginActivity : AppCompatActivity() {
         alert.show()
     }
 
-    // https통신 허용
+    // https 통신 허용
     private fun ignoreSslErrorHurlStack(): HurlStack {
         return object : HurlStack() {
             override fun createConnection(url: URL): HttpURLConnection {
@@ -187,27 +198,3 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 }
-
-
-
-
-
-
-
-/*// 메인메뉴로 이동하는 로그인 버튼 클릭 이벤트
-        val btnLogIn = findViewById<Button>(R.id.btn_login)
-        btnLogIn.setOnClickListener {
-            Toast.makeText(this, "해당 회선으로 로그인 합니다. ", Toast.LENGTH_SHORT).show()
-
-            var intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-        }
-
-        // 선불폰 간편조회 액티비티로 이동하는 버튼 클릭 이벤트
-        val btnFindPW = findViewById<Button>(R.id.btn_prepaidPhoneEasyCheck)
-        btnFindPW.setOnClickListener {
-            Toast.makeText(this, "선불폰 간편조회 페이지로 이동합니다. ", Toast.LENGTH_SHORT).show()
-
-            var intent = Intent(this, PrepaidPhoneEasyCheck::class.java)
-            startActivity(intent)
-        }*/

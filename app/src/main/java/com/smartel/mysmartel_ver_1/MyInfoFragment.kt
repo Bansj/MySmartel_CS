@@ -2,7 +2,6 @@ package com.smartel.mysmartel_ver_1
 
 import android.os.Bundle
 import android.os.Handler
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +9,7 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
@@ -18,10 +18,12 @@ import com.tbuonomo.viewpagerdotsindicator.DotsIndicator
 import java.util.*
 import kotlin.collections.ArrayList
 
-class MyInfoFragment : Fragment() {
 
-    private lateinit var telecomData: TelcoLookupResponse
-    //private lateinit var telecomData: UserInfoResponse
+
+class MyInfoFragment : Fragment() {
+    private lateinit var telecomTextView: TextView
+    private lateinit var custNameTextView: TextView
+    private lateinit var serviceAcctTextView: TextView
 
     private lateinit var viewPager2: ViewPager2
     private lateinit var dotsIndicator: DotsIndicator
@@ -35,15 +37,9 @@ class MyInfoFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val rootView = inflater.inflate(R.layout.fragment_my_info, container, false)
-
-        // Find the ProgressBar by ID
-        val progressBar = rootView.findViewById<ProgressBar>(R.id.progressBar_leftData)
-
-        // Load the fade-in animation from res/anim folder
-        val anim = AnimationUtils.loadAnimation(requireContext(), R.anim.fade_in_anim)
-
-        // Start the animation on the ProgressBar
-        progressBar.startAnimation(anim)
+        telecomTextView = rootView.findViewById(R.id.txt_telecom)
+        custNameTextView = rootView.findViewById(R.id.txt_cust_nm)
+        serviceAcctTextView = rootView.findViewById(R.id.txt_service_acct)
 
         viewPager2 = rootView.findViewById(R.id.viewPager2)
         dotsIndicator = rootView.findViewById(R.id.dotsIndicator)
@@ -104,13 +100,30 @@ class MyInfoFragment : Fragment() {
                 }
             }
         }, 2000, 2000)
-
         return rootView
     }
-
-    override fun onDestroyView() {
+        override fun onDestroyView() {
         super.onDestroyView()
         // Cancel the timer when the view is destroyed to avoid memory leaks
         timer.cancel()
     }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        updateUserInfo()
+    }
+
+    private fun updateUserInfo() {
+        val telecom = activity?.intent?.getStringExtra("telecom")
+        val custName = activity?.intent?.getStringExtra("custName")
+        val serviceAcct = activity?.intent?.getStringExtra("serviceAcct")
+
+        val formattedCustName = "$custName 님 안녕하세요." // "님 안녕하세요."를 추가
+
+        telecomTextView.text = telecom
+        custNameTextView.text = formattedCustName
+        serviceAcctTextView.text = serviceAcct
+    }
 }
+
+

@@ -7,7 +7,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="#FFFAFA"
     android:id="@+id/myInfoFragment"
-    tools:context=".MyInfoFragment">
+    >
 
     <LinearLayout
         android:id="@+id/linearLayout4"
@@ -53,7 +53,7 @@
                     android:id="@+id/linearLayout2"
                     android:layout_width="match_parent"
                     android:layout_marginHorizontal="3dp"
-                    android:layout_height="100dp"
+                    android:layout_height="wrap_content"
                     android:background="@drawable/box_whitesmoke"
                     android:elevation="4dp"
                     android:orientation="vertical"
@@ -80,6 +80,7 @@
                         android:layout_gravity="center"
                         android:layout_marginHorizontal="5dp"
                         android:layout_marginTop="10dp"
+                        android:layout_marginStart="10dp"
                         android:gravity="center_vertical"
                         android:text="    010-7524-4523 (SKT 망)"
                         android:textColor="@color/black"
@@ -206,6 +207,7 @@
                     android:background="@drawable/box_whitesmoke"
                     android:elevation="4dp"
                     android:outlineProvider="background"
+                    android:visibility="gone"
                     app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
 
                     <androidx.viewpager2.widget.ViewPager2
@@ -232,7 +234,7 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="270dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="20dp"
                     android:layout_marginHorizontal="3dp"
                     android:background="@drawable/box_whitesmoke"
@@ -264,53 +266,109 @@
                         android:textSize="22dp"
                         android:textStyle="bold" />
 
-                    <ProgressBar
-                        android:id="@+id/progressBar_leftData"
-                        android:layout_marginTop="10dp"
-                        android:layout_width="match_parent"
-                        android:layout_marginHorizontal="20dp"
-                        android:layout_height="8dp"
-                        android:max="100"
-                        android:progress="82"
-                        android:indeterminate="false"
-                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                        android:progressDrawable="@drawable/progressbar_coralpink"/>
+                    <TextView
+                        android:id="@+id/txtRecordCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Record Count" />
 
+                    <TextView
+                        android:id="@+id/txtPlanId"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Plan ID" />
                     <ProgressBar
-                        android:id="@+id/progressBar_leftData2"
-                        android:layout_marginTop="10dp"
+                        android:id="@+id/progressBarPlanId"
                         android:layout_width="match_parent"
-                        android:layout_marginHorizontal="20dp"
-                        android:layout_height="8dp"
-                        android:max="100"
-                        android:progress="82"
-                        android:indeterminate="false"
+                        android:layout_height="wrap_content"
                         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                        android:progressDrawable="@drawable/progressbar_coralpink"/>
+                        android:max="100" />
 
+                    <TextView
+                        android:id="@+id/txtPlanName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Plan Name" />
                     <ProgressBar
-                        android:id="@+id/progressBar_leftData3"
-                        android:layout_marginTop="10dp"
+                        android:id="@+id/progressBarPlanName"
                         android:layout_width="match_parent"
-                        android:layout_marginHorizontal="20dp"
-                        android:layout_height="8dp"
-                        android:max="100"
-                        android:progress="82"
-                        android:indeterminate="false"
+                        android:layout_height="wrap_content"
                         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                        android:progressDrawable="@drawable/progressbar_coralpink"/>
+                        android:max="100" />
 
+                    <TextView
+                        android:id="@+id/txtSkipCode"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Skip Code" />
                     <ProgressBar
-                        android:id="@+id/progressBar_leftData4"
-                        android:layout_marginTop="10dp"
+                        android:id="@+id/progressBarSkipCode"
                         android:layout_width="match_parent"
-                        android:layout_marginHorizontal="20dp"
-                        android:layout_height="8dp"
-                        android:max="100"
-                        android:progress="82"
-                        android:indeterminate="false"
+                        android:layout_height="wrap_content"
                         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                        android:progressDrawable="@drawable/progressbar_coralpink"/>
+                        android:max="100" />
+
+                    <TextView
+                        android:id="@+id/txtFreePlanName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Free Plan Name" />
+                    <ProgressBar
+                        android:id="@+id/progressBarFreePlanName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:max="100" />
+
+                    <TextView
+                        android:id="@+id/txtTotalQty"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Total Quantity" />
+                    <ProgressBar
+                        android:id="@+id/progressBarTotalQuantity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:max="100" />
+
+                    <TextView
+                        android:id="@+id/txtUseQty"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Usage Quantity" />
+                    <ProgressBar
+                        android:id="@+id/progressBarUsageQuantity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:max="100" />
+
+                    <TextView
+                        android:id="@+id/txtRemQty"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Remaining Quantity" />
+                    <ProgressBar
+                        android:id="@+id/progressBarRemainingQuantity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:max="100" />
+
+                    <TextView
+                        android:id="@+id/txtUnitCd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Unit Code" />
+                    <ProgressBar
+                        android:id="@+id/progressBarUnitCode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:max="100" />
+
+
 
                     <ProgressBar
                         android:id="@+id/progressBar_leftData5"
@@ -331,7 +389,7 @@
                         android:layout_marginHorizontal="30dp"
                         android:layout_marginBottom="15dp"
                         android:background="@drawable/box_silver"
-                        android:text="최근 사용량 조회"
+                        android:text="상세보"
                         android:textSize="15dp"
                         app:layout_constraintBottom_toBottomOf="parent" />
 
