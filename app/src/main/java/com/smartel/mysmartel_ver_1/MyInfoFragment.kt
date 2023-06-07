@@ -44,6 +44,7 @@ class MyInfoFragment : Fragment() {
         viewPager2 = rootView.findViewById(R.id.viewPager2)
         dotsIndicator = rootView.findViewById(R.id.dotsIndicator)
 
+
         // Declare fragments
         val fragment1 = banner1Fragment()
         val fragment2 = banner2Fragment()
@@ -100,6 +101,63 @@ class MyInfoFragment : Fragment() {
                 }
             }
         }, 2000, 2000)
+
+
+        val deductRecordCount = arguments?.getString("deductRecordCount")
+        val planId = arguments?.getString("planId")
+        val planName = arguments?.getString("planName")
+        val skipCode = arguments?.getString("skipCode")
+        val freePlanName = arguments?.getString("freePlanName")
+        val totalQuantity = arguments?.getString("totalQuantity")
+        val useQuantity = arguments?.getString("useQuantity")
+        val remainingQuantity = arguments?.getString("remainingQuantity")
+        val unitCode = arguments?.getString("unitCode")
+
+        // Set the deduct information to the corresponding views
+        val deductRecordCountTextView = view?.findViewById<TextView>(R.id.txtRecordCount)
+        if (deductRecordCountTextView != null) {
+            deductRecordCountTextView.text = deductRecordCount
+        }
+
+        val planIdTextView = view?.findViewById<TextView>(R.id.txtPlanId)
+        if (planIdTextView != null) {
+            planIdTextView.text = planId
+        }
+
+        val planNameTextView = view?.findViewById<TextView>(R.id.txtPlanName)
+        if (planNameTextView != null) {
+            planNameTextView.text = planName
+        }
+
+        val skipCodeTextView = view?.findViewById<TextView>(R.id.txtSkipCode)
+        if (skipCodeTextView != null) {
+            skipCodeTextView.text = skipCode
+        }
+
+        val freePlanNameTextView = view?.findViewById<TextView>(R.id.txtFreePlanName)
+        if (freePlanNameTextView != null) {
+            freePlanNameTextView.text = freePlanName
+        }
+
+        val totalQuantityTextView = view?.findViewById<TextView>(R.id.txtTotalQty)
+        if (totalQuantityTextView != null) {
+            totalQuantityTextView.text = totalQuantity
+        }
+
+        val useQuantityTextView = view?.findViewById<TextView>(R.id.txtUseQty)
+        if (useQuantityTextView != null) {
+            useQuantityTextView.text = useQuantity
+        }
+
+        val remainingQuantityTextView = view?.findViewById<TextView>(R.id.txtRemQty)
+        if (remainingQuantityTextView != null) {
+            remainingQuantityTextView.text = remainingQuantity
+        }
+
+        val unitCodeTextView = view?.findViewById<TextView>(R.id.txtUnitCd)
+        if (unitCodeTextView != null) {
+            unitCodeTextView.text = unitCode
+        }
         return rootView
     }
         override fun onDestroyView() {

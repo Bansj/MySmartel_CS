@@ -389,7 +389,7 @@
                         android:layout_marginHorizontal="30dp"
                         android:layout_marginBottom="15dp"
                         android:background="@drawable/box_silver"
-                        android:text="상세보"
+                        android:text="상세보기"
                         android:textSize="15dp"
                         app:layout_constraintBottom_toBottomOf="parent" />
 

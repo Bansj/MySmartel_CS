@@ -118,7 +118,7 @@ class LoginActivity : AppCompatActivity() {
         val infoRequest = JsonObjectRequest(
             Request.Method.POST, infoUrl, infoParams,
             Response.Listener { response ->
-                handleInfoResponse(response)
+                handleInfoResponse(response, phoneNumber)
             },
             Response.ErrorListener { error ->
                 hideLoadingDialog()
@@ -128,16 +128,82 @@ class LoginActivity : AppCompatActivity() {
         requestQueue.add(infoRequest)
     }
 
-    private fun handleInfoResponse(response: JSONObject) {
+    private fun handleInfoResponse(response: JSONObject, phoneNumber: String) {
         hideLoadingDialog()
         try {
             val telecom = response.getString("telecom")
             val custName = response.getString("custNm")
             val serviceAcct = response.getString("serviceAcct")
             Log.d("LoginActivity", "User info - Telecom: $telecom, CustName: $custName, ServiceAccount: $serviceAcct")
-            navigateToMainActivity(telecom, custName, serviceAcct)
+
+            if (telecom == "SKT") {
+                fetchDeductAmount(serviceAcct)
+            } else {
+                navigateToMainActivity(telecom, custName, serviceAcct)
+            }
         } catch (e: JSONException) {
             showErrorDialog("Failed to parse user info response")
+        }
+    }
+
+    private fun fetchDeductAmount(serviceAcct: String) {
+        val deductParams = JSONObject()
+        deductParams.put("sv_acnt_num", serviceAcct)
+
+        val deductUrl = "http://vacs.smartelmobile.com/SKTRealTime/GetDeductAmount.php"
+        val deductRequest = JsonObjectRequest(
+            Request.Method.POST, deductUrl, deductParams,
+            Response.Listener { response ->
+                handleDeductAmountResponse(response)
+            },
+            Response.ErrorListener { error ->
+                hideLoadingDialog()
+                showErrorDialog("An error occurred while fetching deduct amount: ${error.message}")
+            }
+        )
+        requestQueue.add(deductRequest)
+    }
+
+    private fun handleDeductAmountResponse(response: JSONObject) {
+        try {
+            val resultCode = response.getString("RC_CL_CD")
+
+            if (resultCode == "00") {
+                val deductRecordCount = response.getString("DEDT_REC_CNT")
+                val planId = response.getString("PLAN_ID")
+                val planName = response.getString("PLAN_NM")
+                val skipCode = response.getString("SKIP_CODE")
+                val freePlanName = response.getString("FREE_PLAN_NAME")
+                val totalQuantity = response.getString("TOTAL_QTY")
+                val useQuantity = response.getString("USE_QTY")
+                val remainingQuantity = response.getString("REM_QTY")
+                val unitCode = response.getString("UNIT_CD")
+
+                // Pass the deduct information to MyInfoFragment
+                val fragment = MyInfoFragment()
+                val bundle = Bundle()
+                bundle.putString("deductRecordCount", deductRecordCount)
+                bundle.putString("planId", planId)
+                bundle.putString("planName", planName)
+                bundle.putString("skipCode", skipCode)
+                bundle.putString("freePlanName", freePlanName)
+                bundle.putString("totalQuantity", totalQuantity)
+                bundle.putString("useQuantity", useQuantity)
+                bundle.putString("remainingQuantity", remainingQuantity)
+                bundle.putString("unitCode", unitCode)
+                fragment.arguments = bundle
+
+                // Replace the current fragment with MyInfoFragment
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.myInfoFragment, fragment)
+                    .commit()
+            } else {
+                hideLoadingDialog()
+                showErrorDialog("Failed to fetch deduct amount")
+            }
+        } catch (e: JSONException) {
+            hideLoadingDialog()
+            showErrorDialog("Failed to parse deduct amount response")
         }
     }
 
