@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-
-    <!--인터넷 권한 설정-->
-    <uses-permission android:name="android.permission.INTERNET" />
-
-    <!--인터넷 연결 확인-->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <!-- 인터넷 권한 설정 -->
+    <uses-permission android:name="android.permission.INTERNET" /> <!-- 인터넷 연결 확인 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -14,10 +11,14 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/appicon_smartel_original"
         android:label="스마텔 고객센터"
-
         android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
         android:theme="@style/Theme.MySmartel_ver_1"
         tools:targetApi="31">
+        <activity
+            android:name="com.smartel.mysmartel_ver_1.WebViewActivity"
+            android:label="Web View Activity"
+            android:exported="false" />
         <activity
             android:name="com.smartel.mysmartel_ver_1.Setting"
             android:exported="false" />

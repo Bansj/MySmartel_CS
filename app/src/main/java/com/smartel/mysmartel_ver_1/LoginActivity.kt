@@ -4,6 +4,9 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
@@ -35,9 +38,17 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var requestQueue: RequestQueue
 
+    private lateinit var signupButton: Button
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        val signUpButton: Button = findViewById(R.id.btn_signUp)
+        signUpButton.setOnClickListener {
+            val intent = Intent(this, WebViewActivity::class.java)
+            startActivity(intent)
+        }
 
         phoneNumberEditText = findViewById(R.id.edit_id)
         passwordEditText = findViewById(R.id.edit_password)
@@ -146,6 +157,42 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    private fun fetchDeductAmount(serviceAcct: Char) {
+        val deductParams = JSONObject()
+        deductParams.put("sv_acnt_num", serviceAcct)
+
+        val deductUrl = "http://vacs.smartelmobile.com/SKTRealTime/GetDeductAmount.php"
+        val deductRequest = JsonObjectRequest(
+            Request.Method.POST, deductUrl, deductParams,
+            Response.Listener { response ->
+                handleDeductAmountResponse(response)
+            },
+            Response.ErrorListener { error ->
+                hideLoadingDialog()
+                showErrorDialog("An error occurred while fetching deduct amount: ${error.message}")
+            }
+        )
+        requestQueue.add(deductRequest)
+    }
+
+    private fun handleInfoResponse(response: JSONObject) {
+        hideLoadingDialog()
+        try {
+            val telecom = response.getString("telecom")
+            val custName = response.getString("custNm")
+            val serviceAcct = response.getString("serviceAcct")
+            Log.d("LoginActivity", "User info - Telecom: $telecom, CustName: $custName, ServiceAccount: $serviceAcct")
+
+            if (telecom == "SKT") {
+                fetchDeductAmount(serviceAcct)
+            } else {
+                navigateToMainActivity(telecom, custName, serviceAcct)
+            }
+        } catch (e: JSONException) {
+            showErrorDialog("Failed to parse user info response")
+        }
+    }
+
     private fun fetchDeductAmount(serviceAcct: String) {
         val deductParams = JSONObject()
         deductParams.put("sv_acnt_num", serviceAcct)
@@ -169,34 +216,47 @@ class LoginActivity : AppCompatActivity() {
             val resultCode = response.getString("RC_CL_CD")
 
             if (resultCode == "00") {
-                val deductRecordCount = response.getString("DEDT_REC_CNT")
+                val deductRecCount = response.getString("DEDT_REC_CNT")
                 val planId = response.getString("PLAN_ID")
                 val planName = response.getString("PLAN_NM")
                 val skipCode = response.getString("SKIP_CODE")
                 val freePlanName = response.getString("FREE_PLAN_NAME")
-                val totalQuantity = response.getString("TOTAL_QTY")
-                val useQuantity = response.getString("USE_QTY")
-                val remainingQuantity = response.getString("REM_QTY")
-                val unitCode = response.getString("UNIT_CD")
+                val totalQty = response.getString("TOTAL_QTY")
+                val useQty = response.getString("USE_QTY")
+                val remQty = response.getString("REM_QTY")
+                val unitCd = response.getString("UNIT_CD")
 
-                // Pass the deduct information to MyInfoFragment
-                val fragment = MyInfoFragment()
+                Log.d("LoginActivity", "Deduct Amount Info:")
+
+                Log.d("LoginActivity", "Plan ID: $planId")
+                Log.d("LoginActivity", "Plan Name: $planName")
+                Log.d("LoginActivity", "Skip Code: $skipCode")
+                Log.d("LoginActivity", "Free Plan Name: $freePlanName")
+                Log.d("LoginActivity", "Total Quantity: $totalQty")
+                Log.d("LoginActivity", "Usage Quantity: $useQty")
+                Log.d("LoginActivity", "Remaining Quantity: $remQty")
+                Log.d("LoginActivity", "Unit Code: $unitCd")
+
+                // Pass the deduct amount data to MyInfoFragment
                 val bundle = Bundle()
-                bundle.putString("deductRecordCount", deductRecordCount)
+                bundle.putString("deductRecCount", deductRecCount)
                 bundle.putString("planId", planId)
                 bundle.putString("planName", planName)
                 bundle.putString("skipCode", skipCode)
                 bundle.putString("freePlanName", freePlanName)
-                bundle.putString("totalQuantity", totalQuantity)
-                bundle.putString("useQuantity", useQuantity)
-                bundle.putString("remainingQuantity", remainingQuantity)
-                bundle.putString("unitCode", unitCode)
+                bundle.putString("totalQty", totalQty)
+                bundle.putString("useQty", useQty)
+                bundle.putString("remQty", remQty)
+                bundle.putString("unitCd", unitCd)
+
+                val fragment = MyInfoFragment()
                 fragment.arguments = bundle
 
-                // Replace the current fragment with MyInfoFragment
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.myInfoFragment, fragment)
-                    .commit()
+                val fragmentManager = supportFragmentManager
+                val fragmentTransaction = fragmentManager.beginTransaction()
+                fragmentTransaction.replace(R.id.myInfoFragment, fragment)
+                fragmentTransaction.addToBackStack(null)
+                fragmentTransaction.commit()
             } else {
                 hideLoadingDialog()
                 showErrorDialog("Failed to fetch deduct amount")

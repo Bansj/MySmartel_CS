@@ -31,6 +31,16 @@ class MyInfoFragment : Fragment() {
     private val handler = Handler()
     private lateinit var timer: Timer
 
+    // Declare UI elements
+    private lateinit var planIdTextView: TextView
+    private lateinit var planNameTextView: TextView
+    private lateinit var skipCodeTextView: TextView
+    private lateinit var freePlanNameTextView: TextView
+    private lateinit var totalQtyTextView: TextView
+    private lateinit var useQtyTextView: TextView
+    private lateinit var remQtyTextView: TextView
+    private lateinit var unitCodeTextView: TextView
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -103,59 +113,36 @@ class MyInfoFragment : Fragment() {
         }, 2000, 2000)
 
 
-        val deductRecordCount = arguments?.getString("deductRecordCount")
-        val planId = arguments?.getString("planId")
-        val planName = arguments?.getString("planName")
-        val skipCode = arguments?.getString("skipCode")
-        val freePlanName = arguments?.getString("freePlanName")
-        val totalQuantity = arguments?.getString("totalQuantity")
-        val useQuantity = arguments?.getString("useQuantity")
-        val remainingQuantity = arguments?.getString("remainingQuantity")
-        val unitCode = arguments?.getString("unitCode")
+        // Initialize UI elements
+        planIdTextView = requireView().findViewById(R.id.txtPlanId)
+        planNameTextView = requireView().findViewById(R.id.txtPlanName)
+        skipCodeTextView = requireView().findViewById(R.id.txtSkipCode)
+        freePlanNameTextView = requireView().findViewById(R.id.txtFreePlanName)
+        totalQtyTextView = requireView().findViewById(R.id.txtTotalQty)
+        useQtyTextView = requireView().findViewById(R.id.txtUseQty)
+        remQtyTextView = requireView().findViewById(R.id.txtRemQty)
+        unitCodeTextView = requireView().findViewById(R.id.txtUnitCd)
 
-        // Set the deduct information to the corresponding views
-        val deductRecordCountTextView = view?.findViewById<TextView>(R.id.txtRecordCount)
-        if (deductRecordCountTextView != null) {
-            deductRecordCountTextView.text = deductRecordCount
-        }
+        // Retrieve data from arguments bundle
+        val arguments = arguments
+        if (arguments != null) {
+            val planId = arguments.getString("planId")
+            val planName = arguments.getString("planName")
+            val skipCode = arguments.getString("skipCode")
+            val freePlanName = arguments.getString("freePlanName")
+            val totalQty = arguments.getString("totalQty")
+            val useQty = arguments.getString("useQty")
+            val remQty = arguments.getString("remQty")
+            val unitCode = arguments.getString("unitCode")
 
-        val planIdTextView = view?.findViewById<TextView>(R.id.txtPlanId)
-        if (planIdTextView != null) {
+            // Display the SKT deduct amount information in the UI elements
             planIdTextView.text = planId
-        }
-
-        val planNameTextView = view?.findViewById<TextView>(R.id.txtPlanName)
-        if (planNameTextView != null) {
             planNameTextView.text = planName
-        }
-
-        val skipCodeTextView = view?.findViewById<TextView>(R.id.txtSkipCode)
-        if (skipCodeTextView != null) {
             skipCodeTextView.text = skipCode
-        }
-
-        val freePlanNameTextView = view?.findViewById<TextView>(R.id.txtFreePlanName)
-        if (freePlanNameTextView != null) {
             freePlanNameTextView.text = freePlanName
-        }
-
-        val totalQuantityTextView = view?.findViewById<TextView>(R.id.txtTotalQty)
-        if (totalQuantityTextView != null) {
-            totalQuantityTextView.text = totalQuantity
-        }
-
-        val useQuantityTextView = view?.findViewById<TextView>(R.id.txtUseQty)
-        if (useQuantityTextView != null) {
-            useQuantityTextView.text = useQuantity
-        }
-
-        val remainingQuantityTextView = view?.findViewById<TextView>(R.id.txtRemQty)
-        if (remainingQuantityTextView != null) {
-            remainingQuantityTextView.text = remainingQuantity
-        }
-
-        val unitCodeTextView = view?.findViewById<TextView>(R.id.txtUnitCd)
-        if (unitCodeTextView != null) {
+            totalQtyTextView.text = totalQty
+            useQtyTextView.text = useQty
+            remQtyTextView.text = remQty
             unitCodeTextView.text = unitCode
         }
         return rootView
