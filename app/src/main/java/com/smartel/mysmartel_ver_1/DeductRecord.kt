@@ -9,4 +9,5 @@ data class DeductRecord(
     val useQty: String,
     val remQty: String,
     val unitCode: String
+
 )

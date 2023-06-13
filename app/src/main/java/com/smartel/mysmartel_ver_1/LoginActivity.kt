@@ -38,8 +38,6 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var requestQueue: RequestQueue
 
-    private lateinit var signupButton: Button
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)

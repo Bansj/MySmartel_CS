@@ -38,6 +38,7 @@
         </LinearLayout>
 
         <ScrollView
+            android:visibility="visible"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout">
@@ -487,9 +488,10 @@
 
 
     <LinearLayout
+        android:id="@+id/bottom_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#D3D3D3"
+        android:background="#fffafa"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <ImageButton
@@ -498,24 +500,56 @@
             android:layout_width="wrap_content"
             android:layout_height="60dp"
             android:layout_weight="1"
+            android:layout_gravity="bottom"
             android:src="@drawable/ic_menu_24" />
 
-        <ImageButton
-            app:tint="@color/orange"
-            android:id="@+id/btn_myInfo"
-            android:layout_width="wrap_content"
-            android:layout_height="60dp"
-            android:layout_weight="1"
-            android:background="#F5F5F5"
-            android:src="@drawable/ic_my_info_24" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/bottom_conlayout"
+          android:layout_width="60dp"
+            android:layout_height="80dp"
+            android:background="@android:color/transparent"
+            android:layout_weight="0.5">
+
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/btn_myInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/orange"
+                android:src="@drawable/ic_home_24"
+                app:borderWidth="0dp"
+                app:fabCustomSize="56dp"
+                app:layout_anchor="@id/bottom_conlayout"
+                android:layout_alignParentTop="true"
+                app:layout_anchorGravity="center|bottom"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.492"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_gravity="bottom"
+                android:layout_weight="1"
+                android:background="#F5F5F5"
+                android:src="@drawable/ic_menu_24"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         <ImageButton
             android:id="@+id/btn_benefit"
             android:layout_width="wrap_content"
             android:layout_height="60dp"
             android:layout_weight="1"
+            android:layout_gravity="bottom"
             android:background="#F5F5F5"
-            android:src="@drawable/ic_gift_24" />
+            android:src="@drawable/ic_settings_24" />
 
     </LinearLayout>
 

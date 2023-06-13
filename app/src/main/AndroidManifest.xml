@@ -12,13 +12,16 @@
         android:icon="@mipmap/appicon_smartel_original"
         android:label="스마텔 고객센터"
         android:supportsRtl="true"
-        android:usesCleartextTraffic="true"
         android:theme="@style/Theme.MySmartel_ver_1"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name="com.smartel.mysmartel_ver_1.WebViewActivity"
-            android:label="Web View Activity"
+            android:name="com.smartel.mysmartel_ver_1.FindPWActivity"
             android:exported="false" />
+        <activity
+            android:name="com.smartel.mysmartel_ver_1.WebViewActivity"
+            android:exported="false"
+            android:label="Web View Activity" />
         <activity
             android:name="com.smartel.mysmartel_ver_1.Setting"
             android:exported="false" />
