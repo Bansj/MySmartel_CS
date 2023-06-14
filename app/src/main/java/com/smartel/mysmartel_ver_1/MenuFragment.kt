@@ -114,17 +114,15 @@ class MenuFragment : Fragment() {
             it.findNavController().navigate(R.id.action_menuFragment_to_myInfoFragment)
         }
 
-        binding.btnBenefit.setOnClickListener {
-            it.findNavController().navigate(R.id.action_menuFragment_to_benefitFragment)
+        binding.btnSetting.setOnClickListener {
+            it.findNavController().navigate(R.id.action_menuFragment_to_settingFragment)
         }
-
 
         // 톱니바퀴 버튼을 누르면 메뉴 프래그먼트 창에서 Setting 액티비티 창으로 화면전환 하는 클릭 이벤트
         val btnSetting = view.findViewById<ImageButton>(R.id.btn_setting)
         btnSetting.setOnClickListener {
             val intent = Intent(activity, Setting::class.java)
             startActivity(intent)
-
         }
     }
 

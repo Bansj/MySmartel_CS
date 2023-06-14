@@ -210,60 +210,45 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun handleDeductAmountResponse(response: JSONObject) {
-        try {
-            val resultCode = response.getString("RC_CL_CD")
+            try {
+                val resultCode = response.getString("RC_CL_CD")
 
-            if (resultCode == "00") {
-                val deductRecCount = response.getString("DEDT_REC_CNT")
-                val planId = response.getString("PLAN_ID")
-                val planName = response.getString("PLAN_NM")
-                val skipCode = response.getString("SKIP_CODE")
-                val freePlanName = response.getString("FREE_PLAN_NAME")
-                val totalQty = response.getString("TOTAL_QTY")
-                val useQty = response.getString("USE_QTY")
-                val remQty = response.getString("REM_QTY")
-                val unitCd = response.getString("UNIT_CD")
+                if (resultCode == "00") {
+                    val deductionCount = response.getString("DEDT_REC_CNT")
 
-                Log.d("LoginActivity", "Deduct Amount Info:")
+                    if (deductionCount.isNotBlank() && deductionCount != "0") {
+                        // Deduction amount records are available
+                        val productID = response.getString("PLAN_ID")
+                        val productName = response.getString("PLAN_NM")
+                        val deductionCode = response.getString("SKIP_CODE")
+                        val deductionName = response.getString("FREE_PLAN_NAME")
+                        val basicDeductionAmount = response.getString("TOTAL_QTY")
+                        val usage = response.getString("USE_QTY")
+                        val remainingAmount = response.getString("REM_QTY")
+                        val deductionUnitCode = response.getString("UNIT_CD")
 
-                Log.d("LoginActivity", "Plan ID: $planId")
-                Log.d("LoginActivity", "Plan Name: $planName")
-                Log.d("LoginActivity", "Skip Code: $skipCode")
-                Log.d("LoginActivity", "Free Plan Name: $freePlanName")
-                Log.d("LoginActivity", "Total Quantity: $totalQty")
-                Log.d("LoginActivity", "Usage Quantity: $useQty")
-                Log.d("LoginActivity", "Remaining Quantity: $remQty")
-                Log.d("LoginActivity", "Unit Code: $unitCd")
+                        // Pass the deduction amount details to MyInfoFragment
+                        val fragment = MyInfoFragment.newInstance(
+                            productID, productName, deductionCode, deductionName,
+                            basicDeductionAmount, usage, remainingAmount, deductionUnitCode
+                        )
 
-                // Pass the deduct amount data to MyInfoFragment
-                val bundle = Bundle()
-                bundle.putString("deductRecCount", deductRecCount)
-                bundle.putString("planId", planId)
-                bundle.putString("planName", planName)
-                bundle.putString("skipCode", skipCode)
-                bundle.putString("freePlanName", freePlanName)
-                bundle.putString("totalQty", totalQty)
-                bundle.putString("useQty", useQty)
-                bundle.putString("remQty", remQty)
-                bundle.putString("unitCd", unitCd)
-
-                val fragment = MyInfoFragment()
-                fragment.arguments = bundle
-
-                val fragmentManager = supportFragmentManager
-                val fragmentTransaction = fragmentManager.beginTransaction()
-                fragmentTransaction.replace(R.id.myInfoFragment, fragment)
-                fragmentTransaction.addToBackStack(null)
-                fragmentTransaction.commit()
-            } else {
-                hideLoadingDialog()
-                showErrorDialog("Failed to fetch deduct amount")
+                        supportFragmentManager.beginTransaction()
+                            .replace(R.id.myInfoFragment, fragment)
+                            .commit()
+                    } else {
+                        // No deduction amount records available
+                        showErrorDialog("No deduction amount records found")
+                    }
+                } else {
+                    // Error occurred in deduction amount request
+                    showErrorDialog("Failed to fetch deduction amount: $resultCode")
+                }
+            } catch (e: JSONException) {
+                showErrorDialog("Failed to parse deduction amount response")
             }
-        } catch (e: JSONException) {
-            hideLoadingDialog()
-            showErrorDialog("Failed to parse deduct amount response")
         }
-    }
+
 
     private fun navigateToMainActivity(telecom: String, custName: String, serviceAcct: String) {
         val intent = Intent(this, MainActivity::class.java)

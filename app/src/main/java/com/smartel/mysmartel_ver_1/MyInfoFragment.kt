@@ -32,14 +32,14 @@ class MyInfoFragment : Fragment() {
     private lateinit var timer: Timer
 
     // Declare UI elements
-    private lateinit var planIdTextView: TextView
-    private lateinit var planNameTextView: TextView
-    private lateinit var skipCodeTextView: TextView
-    private lateinit var freePlanNameTextView: TextView
-    private lateinit var totalQtyTextView: TextView
-    private lateinit var useQtyTextView: TextView
-    private lateinit var remQtyTextView: TextView
-    private lateinit var unitCodeTextView: TextView
+    private lateinit var productIDTextView: TextView
+    private lateinit var productNameTextView: TextView
+    private lateinit var deductionCodeTextView: TextView
+    private lateinit var deductionNameTextView: TextView
+    private lateinit var basicDeductionAmountTextView: TextView
+    private lateinit var usageTextView: TextView
+    private lateinit var remainingAmountTextView: TextView
+    private lateinit var deductionUnitCodeTextView: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -95,8 +95,8 @@ class MyInfoFragment : Fragment() {
         }
 
         // Set click listener for btn_benefit button
-        rootView.findViewById<ImageButton>(R.id.btn_benefit).setOnClickListener {
-            it.findNavController().navigate(R.id.action_myInfoFragment_to_benefitFragment)
+        rootView.findViewById<ImageButton>(R.id.btn_setting).setOnClickListener {
+            it.findNavController().navigate(R.id.action_myInfoFragment_to_settingFragment)
         }
 
         // Start auto sliding every 2 seconds
@@ -114,16 +114,34 @@ class MyInfoFragment : Fragment() {
 
 
         // Initialize UI elements
-        planIdTextView = requireView().findViewById(R.id.txtPlanId)
-        planNameTextView = requireView().findViewById(R.id.txtPlanName)
-        skipCodeTextView = requireView().findViewById(R.id.txtSkipCode)
-        freePlanNameTextView = requireView().findViewById(R.id.txtFreePlanName)
-        totalQtyTextView = requireView().findViewById(R.id.txtTotalQty)
-        useQtyTextView = requireView().findViewById(R.id.txtUseQty)
-        remQtyTextView = requireView().findViewById(R.id.txtRemQty)
-        unitCodeTextView = requireView().findViewById(R.id.txtUnitCd)
+        productIDTextView = requireView().findViewById(R.id.txtPlanId)
+        productNameTextView = requireView().findViewById(R.id.txtPlanName)
+        deductionCodeTextView = requireView().findViewById(R.id.txtSkipCode)
+        deductionNameTextView = requireView().findViewById(R.id.txtFreePlanName)
+        basicDeductionAmountTextView = requireView().findViewById(R.id.txtTotalQty)
+        usageTextView = requireView().findViewById(R.id.txtUseQty)
+        remainingAmountTextView = requireView().findViewById(R.id.txtRemQty)
+        deductionUnitCodeTextView = requireView().findViewById(R.id.txtUnitCd)
 
-        // Retrieve data from arguments bundle
+        val productID = arguments?.getString("productID") ?: ""
+        val productName = arguments?.getString("productName") ?: ""
+        val deductionCode = arguments?.getString("deductionCode") ?: ""
+        val deductionName = arguments?.getString("deductionName") ?: ""
+        val basicDeductionAmount = arguments?.getString("basicDeductionAmount") ?: ""
+        val usage = arguments?.getString("usage") ?: ""
+        val remainingAmount = arguments?.getString("remainingAmount") ?: ""
+        val deductionUnitCode = arguments?.getString("deductionUnitCode") ?: ""
+
+        productIDTextView.text = productID
+        productNameTextView.text = productName
+        deductionCodeTextView.text = deductionCode
+        deductionNameTextView.text = deductionName
+        basicDeductionAmountTextView.text = basicDeductionAmount
+        usageTextView.text = usage
+        remainingAmountTextView.text = remainingAmount
+        deductionUnitCodeTextView.text = deductionUnitCode
+
+  /*      // Retrieve data from arguments bundle
         val arguments = arguments
         if (arguments != null) {
             val planId = arguments.getString("planId")
@@ -143,9 +161,35 @@ class MyInfoFragment : Fragment() {
             totalQtyTextView.text = totalQty
             useQtyTextView.text = useQty
             remQtyTextView.text = remQty
-            unitCodeTextView.text = unitCode
-        }
+            unitCodeTextView.text = unitCode*/
+
         return rootView
+    }
+
+    companion object {
+        fun newInstance(
+            productID: String,
+            productName: String,
+            deductionCode: String,
+            deductionName: String,
+            basicDeductionAmount: String,
+            usage: String,
+            remainingAmount: String,
+            deductionUnitCode: String
+        ): MyInfoFragment {
+            val fragment = MyInfoFragment()
+            val args = Bundle()
+            args.putString("productID", productID)
+            args.putString("productName", productName)
+            args.putString("deductionCode", deductionCode)
+            args.putString("deductionName", deductionName)
+            args.putString("basicDeductionAmount", basicDeductionAmount)
+            args.putString("usage", usage)
+            args.putString("remainingAmount", remainingAmount)
+            args.putString("deductionUnitCode", deductionUnitCode)
+            fragment.arguments = args
+            return fragment
+        }
     }
         override fun onDestroyView() {
         super.onDestroyView()
