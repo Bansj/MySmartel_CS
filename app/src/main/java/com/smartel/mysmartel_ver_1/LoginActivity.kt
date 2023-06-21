@@ -4,9 +4,6 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.View
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
@@ -29,7 +26,6 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
-
 class LoginActivity : AppCompatActivity() {
     private lateinit var phoneNumberEditText: EditText
     private lateinit var passwordEditText: EditText
@@ -42,17 +38,13 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        val signUpButton: Button = findViewById(R.id.btn_signUp)
-        signUpButton.setOnClickListener {
-            val intent = Intent(this, WebViewActivity::class.java)
-            startActivity(intent)
-        }
-
         phoneNumberEditText = findViewById(R.id.edit_id)
         passwordEditText = findViewById(R.id.edit_password)
         loginButton = findViewById(R.id.btn_login)
 
         loadingDialog = createLoadingDialog()
+
+
 
         requestQueue = Volley.newRequestQueue(this, ignoreSslErrorHurlStack())
 
@@ -61,7 +53,6 @@ class LoginActivity : AppCompatActivity() {
             loginUser()
         }
     }
-
     private fun createLoadingDialog(): AlertDialog {
         val dialogBuilder = AlertDialog.Builder(this)
         val dialogView = layoutInflater.inflate(R.layout.loading_dialog, null)
@@ -74,7 +65,6 @@ class LoginActivity : AppCompatActivity() {
         dialogBuilder.setCancelable(false)
         return dialogBuilder.create()
     }
-
     private fun loginUser() {
         val phoneNumber = phoneNumberEditText.text.toString()
         val password = passwordEditText.text.toString()
@@ -127,7 +117,7 @@ class LoginActivity : AppCompatActivity() {
         val infoRequest = JsonObjectRequest(
             Request.Method.POST, infoUrl, infoParams,
             Response.Listener { response ->
-                handleInfoResponse(response, phoneNumber)
+                handleInfoResponse(response)
             },
             Response.ErrorListener { error ->
                 hideLoadingDialog()
@@ -135,42 +125,6 @@ class LoginActivity : AppCompatActivity() {
             }
         )
         requestQueue.add(infoRequest)
-    }
-
-    private fun handleInfoResponse(response: JSONObject, phoneNumber: String) {
-        hideLoadingDialog()
-        try {
-            val telecom = response.getString("telecom")
-            val custName = response.getString("custNm")
-            val serviceAcct = response.getString("serviceAcct")
-            Log.d("LoginActivity", "User info - Telecom: $telecom, CustName: $custName, ServiceAccount: $serviceAcct")
-
-            if (telecom == "SKT") {
-                fetchDeductAmount(serviceAcct)
-            } else {
-                navigateToMainActivity(telecom, custName, serviceAcct)
-            }
-        } catch (e: JSONException) {
-            showErrorDialog("Failed to parse user info response")
-        }
-    }
-
-    private fun fetchDeductAmount(serviceAcct: Char) {
-        val deductParams = JSONObject()
-        deductParams.put("sv_acnt_num", serviceAcct)
-
-        val deductUrl = "http://vacs.smartelmobile.com/SKTRealTime/GetDeductAmount.php"
-        val deductRequest = JsonObjectRequest(
-            Request.Method.POST, deductUrl, deductParams,
-            Response.Listener { response ->
-                handleDeductAmountResponse(response)
-            },
-            Response.ErrorListener { error ->
-                hideLoadingDialog()
-                showErrorDialog("An error occurred while fetching deduct amount: ${error.message}")
-            }
-        )
-        requestQueue.add(deductRequest)
     }
 
     private fun handleInfoResponse(response: JSONObject) {
@@ -181,82 +135,31 @@ class LoginActivity : AppCompatActivity() {
             val serviceAcct = response.getString("serviceAcct")
             Log.d("LoginActivity", "User info - Telecom: $telecom, CustName: $custName, ServiceAccount: $serviceAcct")
 
-            if (telecom == "SKT") {
-                fetchDeductAmount(serviceAcct)
-            } else {
-                navigateToMainActivity(telecom, custName, serviceAcct)
+            when (telecom) {
+                "SKT" -> {
+                    val intent = Intent(this, SktBaseActivity::class.java)
+                    intent.putExtra("serviceAcct", serviceAcct)
+                    startActivity(intent)
+                }
+                "LGT" -> {
+                    val intent = Intent(this, LgtBaseActivity::class.java)
+                    intent.putExtra("custName", custName)
+                    intent.putExtra("phoneNumber", phoneNumberEditText.text.toString())
+                    startActivity(intent)
+                }
+                "KT" -> {
+                    val intent = Intent(this, KtBaseActivity::class.java)
+                    intent.putExtra("phoneNumber", phoneNumberEditText.text.toString())
+                    startActivity(intent)
+                }
+                else -> {
+                    showErrorDialog("Invalid telecom value")
+                }
             }
+            finish()
         } catch (e: JSONException) {
             showErrorDialog("Failed to parse user info response")
         }
-    }
-
-    private fun fetchDeductAmount(serviceAcct: String) {
-        val deductParams = JSONObject()
-        deductParams.put("sv_acnt_num", serviceAcct)
-
-        val deductUrl = "http://vacs.smartelmobile.com/SKTRealTime/GetDeductAmount.php"
-        val deductRequest = JsonObjectRequest(
-            Request.Method.POST, deductUrl, deductParams,
-            Response.Listener { response ->
-                handleDeductAmountResponse(response)
-            },
-            Response.ErrorListener { error ->
-                hideLoadingDialog()
-                showErrorDialog("An error occurred while fetching deduct amount: ${error.message}")
-            }
-        )
-        requestQueue.add(deductRequest)
-    }
-
-    private fun handleDeductAmountResponse(response: JSONObject) {
-            try {
-                val resultCode = response.getString("RC_CL_CD")
-
-                if (resultCode == "00") {
-                    val deductionCount = response.getString("DEDT_REC_CNT")
-
-                    if (deductionCount.isNotBlank() && deductionCount != "0") {
-                        // Deduction amount records are available
-                        val productID = response.getString("PLAN_ID")
-                        val productName = response.getString("PLAN_NM")
-                        val deductionCode = response.getString("SKIP_CODE")
-                        val deductionName = response.getString("FREE_PLAN_NAME")
-                        val basicDeductionAmount = response.getString("TOTAL_QTY")
-                        val usage = response.getString("USE_QTY")
-                        val remainingAmount = response.getString("REM_QTY")
-                        val deductionUnitCode = response.getString("UNIT_CD")
-
-                        // Pass the deduction amount details to MyInfoFragment
-                        val fragment = MyInfoFragment.newInstance(
-                            productID, productName, deductionCode, deductionName,
-                            basicDeductionAmount, usage, remainingAmount, deductionUnitCode
-                        )
-
-                        supportFragmentManager.beginTransaction()
-                            .replace(R.id.myInfoFragment, fragment)
-                            .commit()
-                    } else {
-                        // No deduction amount records available
-                        showErrorDialog("No deduction amount records found")
-                    }
-                } else {
-                    // Error occurred in deduction amount request
-                    showErrorDialog("Failed to fetch deduction amount: $resultCode")
-                }
-            } catch (e: JSONException) {
-                showErrorDialog("Failed to parse deduction amount response")
-            }
-        }
-
-
-    private fun navigateToMainActivity(telecom: String, custName: String, serviceAcct: String) {
-        val intent = Intent(this, MainActivity::class.java)
-        intent.putExtra("telecom", telecom)
-        intent.putExtra("custName", custName)
-        intent.putExtra("serviceAcct", serviceAcct)
-        startActivity(intent)
-        finish()
     }
 
     private fun showLoadingDialog() {
@@ -276,7 +179,6 @@ class LoginActivity : AppCompatActivity() {
         val alert = dialogBuilder.create()
         alert.show()
     }
-
     // https 통신 허용
     private fun ignoreSslErrorHurlStack(): HurlStack {
         return object : HurlStack() {
@@ -307,3 +209,5 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 }
+
+

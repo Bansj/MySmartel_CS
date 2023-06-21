@@ -24,7 +24,7 @@ class SettingFragment : Fragment() {
             it.findNavController().navigate(R.id.action_settingFragment_to_menuFragment)
         }
 
-        // Set click listener for btn_setting button
+        // Set click listener for btn_home button
         rootView.findViewById<ImageButton>(R.id.btn_myInfo).setOnClickListener {
             it.findNavController().navigate(R.id.action_settingFragment_to_myInfoFragment)
         }

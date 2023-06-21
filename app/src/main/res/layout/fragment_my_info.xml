@@ -81,7 +81,7 @@
                         android:layout_gravity="center"
                         android:layout_marginHorizontal="5dp"
                         android:layout_marginTop="10dp"
-                        android:layout_marginStart="10dp"
+                        android:layout_marginStart="5dp"
                         android:gravity="center_vertical"
                         android:text="    010-7524-4523 (SKT 망)"
                         android:textColor="@color/black"
@@ -369,6 +369,11 @@
                         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                         android:max="100" />
 
+                    <TextView
+                        android:id="@+id/remainInfoTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
 
 
                     <ProgressBar
@@ -384,6 +389,7 @@
                         android:progressDrawable="@drawable/progressbar_coralpink"/>
 
                     <Button
+                        android:id="@+id/btn_detailDeduct"
                         android:layout_marginTop="20dp"
                         android:layout_width="match_parent"
                         android:layout_height="35dp"
@@ -500,7 +506,6 @@
             android:layout_width="wrap_content"
             android:layout_height="60dp"
             android:layout_weight="1"
-            android:layout_gravity="bottom"
             android:src="@drawable/ic_menu_24" />
 
         <ImageButton
@@ -508,8 +513,7 @@
             android:id="@+id/btn_myInfo2"
             android:layout_width="wrap_content"
             android:layout_height="60dp"
-            android:layout_weight="1"
-            android:layout_gravity="bottom" />
+            android:layout_weight="1" />
 
         <ImageButton
             android:id="@+id/btn_setting"
@@ -524,7 +528,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bottom_conlayout2"
-        android:layout_width="60dp"
+        android:layout_width="wrap_content"
         android:layout_height="80dp"
         android:background="@android:color/transparent"
         app:layout_constraintBottom_toBottomOf="@+id/linearLayout4"

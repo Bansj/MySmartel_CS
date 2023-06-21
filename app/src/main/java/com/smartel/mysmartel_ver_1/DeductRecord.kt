@@ -1,5 +1,7 @@
 package com.smartel.mysmartel_ver_1
 
+
+// SKT공제량
 data class DeductRecord(
     val planId: String,
     val planName: String,

@@ -19,7 +19,7 @@ import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
 abstract class BaseActivity : AppCompatActivity() {
-    private lateinit var requestQueue: RequestQueue
+    lateinit var requestQueue: RequestQueue
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,7 +75,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
     abstract fun handleSktDeductAmountResponse(response: JSONObject)
 
-    private fun showErrorDialog(message: String) {
+    fun showErrorDialog(message: String) {
         val dialogBuilder = AlertDialog.Builder(this)
         dialogBuilder.setMessage(message)
             .setCancelable(false)

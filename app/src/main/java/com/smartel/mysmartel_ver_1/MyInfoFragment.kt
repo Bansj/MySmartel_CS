@@ -1,45 +1,49 @@
 package com.smartel.mysmartel_ver_1
 
 import android.os.Bundle
-import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
+import android.widget.Button
 import android.widget.ImageButton
-import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import androidx.viewpager2.widget.ViewPager2
+import com.android.volley.RequestQueue
+import com.android.volley.toolbox.Volley
 import com.example.mysmartel_ver_1.R
-import com.tbuonomo.viewpagerdotsindicator.DotsIndicator
 import java.util.*
 import kotlin.collections.ArrayList
 
 
 
 class MyInfoFragment : Fragment() {
+    // 배너광고
+/*    private lateinit var viewPager2: ViewPager2
+    private lateinit var dotsIndicator: DotsIndicator
+    private var currentPage = 0
+    private val handler = Handler()
+    private lateinit var timer: Timer*/
+
     private lateinit var telecomTextView: TextView
     private lateinit var custNameTextView: TextView
     private lateinit var serviceAcctTextView: TextView
 
-    private lateinit var viewPager2: ViewPager2
-    private lateinit var dotsIndicator: DotsIndicator
-    private var currentPage = 0
-    private val handler = Handler()
-    private lateinit var timer: Timer
+    private lateinit var remainInfoTextView: TextView
 
-    // Declare UI elements
-    private lateinit var productIDTextView: TextView
-    private lateinit var productNameTextView: TextView
-    private lateinit var deductionCodeTextView: TextView
-    private lateinit var deductionNameTextView: TextView
-    private lateinit var basicDeductionAmountTextView: TextView
-    private lateinit var usageTextView: TextView
-    private lateinit var remainingAmountTextView: TextView
-    private lateinit var deductionUnitCodeTextView: TextView
+    private lateinit var telecom: String
+    private lateinit var custName: String
+    private lateinit var serviceAcct: String
+    private lateinit var requestQueue: RequestQueue
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            telecom = it.getString("telecom", "")
+            custName = it.getString("custName", "")
+            serviceAcct = it.getString("serviceAcct", "")
+        }
+        requestQueue = Volley.newRequestQueue(requireContext())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,11 +55,38 @@ class MyInfoFragment : Fragment() {
         custNameTextView = rootView.findViewById(R.id.txt_cust_nm)
         serviceAcctTextView = rootView.findViewById(R.id.txt_service_acct)
 
-        viewPager2 = rootView.findViewById(R.id.viewPager2)
-        dotsIndicator = rootView.findViewById(R.id.dotsIndicator)
+        remainInfoTextView = rootView.findViewById(R.id.remainInfoTextView)
+
+        // 버튼을 클릭시 아래에서 위로 올라오는 상세보기 페이지 클릭이벤트
+        val btnShowFragment = view?.findViewById<Button>(R.id.btn_detailDeduct)
+        btnShowFragment?.setOnClickListener {
+            val fragment = BottomSheetFragment()
+            requireFragmentManager().beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_in_up, // Animation for fragment enter
+                    R.anim.slide_out_down, // Animation for fragment exit
+                    R.anim.slide_in_up, // Animation for fragment pop-enter
+                    R.anim.slide_out_down // Animation for fragment pop-exit
+                )
+                .add(android.R.id.content, fragment)
+                .addToBackStack(null)
+                .commit()
+        }
+        // Set click listener for btn_menu button
+        rootView.findViewById<ImageButton>(R.id.btn_menu).setOnClickListener {
+            it.findNavController().navigate(R.id.action_myInfoFragment_to_menuFragment)
+        }
+
+        // Set click listener for btn_benefit button
+        rootView.findViewById<ImageButton>(R.id.btn_setting).setOnClickListener {
+            it.findNavController().navigate(R.id.action_myInfoFragment_to_settingFragment)
+        }
+        // 배너광고
+   /*     viewPager2 = rootView.findViewById(R.id.viewPager2)
+        dotsIndicator = rootView.findViewById(R.id.dotsIndicator)*/
 
 
-        // Declare fragments
+      /*  // Declare fragments
         val fragment1 = banner1Fragment()
         val fragment2 = banner2Fragment()
         val fragment3 = banner3Fragment()
@@ -70,9 +101,9 @@ class MyInfoFragment : Fragment() {
         fragments.add(fragment3)
         fragments.add(fragment4)
         fragments.add(fragment5)
-        fragments.add(fragment6)
+        fragments.add(fragment6)*/
 
-        // Create a FragmentStateAdapter to bind the fragments to ViewPager2
+   /*     // Create a FragmentStateAdapter to bind the fragments to ViewPager2
         val adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount(): Int {
                 return fragments.size
@@ -81,26 +112,16 @@ class MyInfoFragment : Fragment() {
             override fun createFragment(position: Int): Fragment {
                 return fragments[position]
             }
-        }
+        }*/
 
-        // Apply adapter to ViewPager2
-        viewPager2.adapter = adapter
+     // Apply adapter to ViewPager2
+         /*  viewPager2.adapter = adapter
 
         // Apply dotsIndicator to ViewPager2
-        dotsIndicator.setViewPager2(viewPager2)
-
-        // Set click listener for btn_menu button
-        rootView.findViewById<ImageButton>(R.id.btn_menu).setOnClickListener {
-            it.findNavController().navigate(R.id.action_myInfoFragment_to_menuFragment)
-        }
-
-        // Set click listener for btn_benefit button
-        rootView.findViewById<ImageButton>(R.id.btn_setting).setOnClickListener {
-            it.findNavController().navigate(R.id.action_myInfoFragment_to_settingFragment)
-        }
+        dotsIndicator.setViewPager2(viewPager2)*/
 
         // Start auto sliding every 2 seconds
-        timer = Timer()
+       /* timer = Timer()
         timer.schedule(object : TimerTask() {
             override fun run() {
                 handler.post {
@@ -110,92 +131,16 @@ class MyInfoFragment : Fragment() {
                     viewPager2.setCurrentItem(currentPage++, true)
                 }
             }
-        }, 2000, 2000)
-
-
-        // Initialize UI elements
-        productIDTextView = requireView().findViewById(R.id.txtPlanId)
-        productNameTextView = requireView().findViewById(R.id.txtPlanName)
-        deductionCodeTextView = requireView().findViewById(R.id.txtSkipCode)
-        deductionNameTextView = requireView().findViewById(R.id.txtFreePlanName)
-        basicDeductionAmountTextView = requireView().findViewById(R.id.txtTotalQty)
-        usageTextView = requireView().findViewById(R.id.txtUseQty)
-        remainingAmountTextView = requireView().findViewById(R.id.txtRemQty)
-        deductionUnitCodeTextView = requireView().findViewById(R.id.txtUnitCd)
-
-        val productID = arguments?.getString("productID") ?: ""
-        val productName = arguments?.getString("productName") ?: ""
-        val deductionCode = arguments?.getString("deductionCode") ?: ""
-        val deductionName = arguments?.getString("deductionName") ?: ""
-        val basicDeductionAmount = arguments?.getString("basicDeductionAmount") ?: ""
-        val usage = arguments?.getString("usage") ?: ""
-        val remainingAmount = arguments?.getString("remainingAmount") ?: ""
-        val deductionUnitCode = arguments?.getString("deductionUnitCode") ?: ""
-
-        productIDTextView.text = productID
-        productNameTextView.text = productName
-        deductionCodeTextView.text = deductionCode
-        deductionNameTextView.text = deductionName
-        basicDeductionAmountTextView.text = basicDeductionAmount
-        usageTextView.text = usage
-        remainingAmountTextView.text = remainingAmount
-        deductionUnitCodeTextView.text = deductionUnitCode
-
-  /*      // Retrieve data from arguments bundle
-        val arguments = arguments
-        if (arguments != null) {
-            val planId = arguments.getString("planId")
-            val planName = arguments.getString("planName")
-            val skipCode = arguments.getString("skipCode")
-            val freePlanName = arguments.getString("freePlanName")
-            val totalQty = arguments.getString("totalQty")
-            val useQty = arguments.getString("useQty")
-            val remQty = arguments.getString("remQty")
-            val unitCode = arguments.getString("unitCode")
-
-            // Display the SKT deduct amount information in the UI elements
-            planIdTextView.text = planId
-            planNameTextView.text = planName
-            skipCodeTextView.text = skipCode
-            freePlanNameTextView.text = freePlanName
-            totalQtyTextView.text = totalQty
-            useQtyTextView.text = useQty
-            remQtyTextView.text = remQty
-            unitCodeTextView.text = unitCode*/
+        }, 2000, 2000) 여기까지 배너광고 */
 
         return rootView
     }
 
-    companion object {
-        fun newInstance(
-            productID: String,
-            productName: String,
-            deductionCode: String,
-            deductionName: String,
-            basicDeductionAmount: String,
-            usage: String,
-            remainingAmount: String,
-            deductionUnitCode: String
-        ): MyInfoFragment {
-            val fragment = MyInfoFragment()
-            val args = Bundle()
-            args.putString("productID", productID)
-            args.putString("productName", productName)
-            args.putString("deductionCode", deductionCode)
-            args.putString("deductionName", deductionName)
-            args.putString("basicDeductionAmount", basicDeductionAmount)
-            args.putString("usage", usage)
-            args.putString("remainingAmount", remainingAmount)
-            args.putString("deductionUnitCode", deductionUnitCode)
-            fragment.arguments = args
-            return fragment
-        }
-    }
-        override fun onDestroyView() {
+    /*    override fun onDestroyView() {
         super.onDestroyView()
         // Cancel the timer when the view is destroyed to avoid memory leaks
         timer.cancel()
-    }
+    }*/
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)

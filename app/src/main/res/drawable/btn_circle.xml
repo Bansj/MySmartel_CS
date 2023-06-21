@@ -3,6 +3,6 @@
     android:shape="oval">
     <solid android:color="#FF7F50" /> <!-- Set the background color of the button -->
     <size
-        android:width="120dp"
-        android:height="120dp" />  <!-- Set the desired height of the button -->
+        android:width="125dp"
+        android:height="125dp" />  <!-- Set the desired height of the button -->
 </shape>
