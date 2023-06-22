@@ -44,8 +44,6 @@ class LoginActivity : AppCompatActivity() {
 
         loadingDialog = createLoadingDialog()
 
-
-
         requestQueue = Volley.newRequestQueue(this, ignoreSslErrorHurlStack())
 
         loginButton.setOnClickListener {
@@ -141,19 +139,17 @@ class LoginActivity : AppCompatActivity() {
                     intent.putExtra("serviceAcct", serviceAcct)
                     startActivity(intent)
                 }
+                "KT" -> {
+                    val intent = Intent(this, KtBaseActivity::class.java)
+                    intent.putExtra("custName", custName)
+                    intent.putExtra("serviceAcct", serviceAcct)
+                    startActivity(intent)
+                }
                 "LGT" -> {
                     val intent = Intent(this, LgtBaseActivity::class.java)
                     intent.putExtra("custName", custName)
-                    intent.putExtra("phoneNumber", phoneNumberEditText.text.toString())
+                    intent.putExtra("serviceAcct", serviceAcct)
                     startActivity(intent)
-                }
-                "KT" -> {
-                    val intent = Intent(this, KtBaseActivity::class.java)
-                    intent.putExtra("phoneNumber", phoneNumberEditText.text.toString())
-                    startActivity(intent)
-                }
-                else -> {
-                    showErrorDialog("Invalid telecom value")
                 }
             }
             finish()
