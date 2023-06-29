@@ -12,10 +12,6 @@ import androidx.navigation.findNavController
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
 import com.example.mysmartel_ver_1.R
-import java.util.*
-import kotlin.collections.ArrayList
-
-
 
 class MyInfoFragment : Fragment() {
     // 배너광고
@@ -28,6 +24,7 @@ class MyInfoFragment : Fragment() {
     private lateinit var telecomTextView: TextView
     private lateinit var custNameTextView: TextView
     private lateinit var serviceAcctTextView: TextView
+    private lateinit var phoneNumber: TextView
 
     private lateinit var remainInfoTextView: TextView
 
@@ -41,6 +38,7 @@ class MyInfoFragment : Fragment() {
             telecom = it.getString("telecom", "")
             custName = it.getString("custName", "")
             serviceAcct = it.getString("serviceAcct", "")
+            //phoneNumber= it.getString("phoneNumber","")
         }
         requestQueue = Volley.newRequestQueue(requireContext())
     }
@@ -55,12 +53,12 @@ class MyInfoFragment : Fragment() {
         custNameTextView = rootView.findViewById(R.id.txt_cust_nm)
         serviceAcctTextView = rootView.findViewById(R.id.txt_service_acct)
 
-        remainInfoTextView = rootView.findViewById(R.id.remainInfoTextView)
+//        remainInfoTextView = rootView.findViewById(R.id.remainInfoTextView)
 
         // 버튼을 클릭시 아래에서 위로 올라오는 상세보기 페이지 클릭이벤트
         val btnShowFragment = view?.findViewById<Button>(R.id.btn_detailDeduct)
         btnShowFragment?.setOnClickListener {
-            val fragment = BottomSheetFragment()
+            val fragment = LgtDeductDetailViewFragment()
             requireFragmentManager().beginTransaction()
                 .setCustomAnimations(
                     R.anim.slide_in_up, // Animation for fragment enter
@@ -89,7 +87,8 @@ class MyInfoFragment : Fragment() {
       /*  // Declare fragments
         val fragment1 = banner1Fragment()
         val fragment2 = banner2Fragment()
-        val fragment3 = banner3Fragment()
+        val fragment3 = banner3Fragment().
+
         val fragment4 = banner4Fragment()
         val fragment5 = banner5Fragment()
         val fragment6 = banner6Fragment()

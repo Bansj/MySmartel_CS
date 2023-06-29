@@ -11,7 +11,7 @@ import com.android.volley.toolbox.Volley
 import org.json.JSONException
 import org.json.JSONObject
 
-class SktBaseActivity: AppCompatActivity() {
+class SktActivity: AppCompatActivity() {
     private lateinit var requestQueue: RequestQueue
     private lateinit var serviceAcct: String
 

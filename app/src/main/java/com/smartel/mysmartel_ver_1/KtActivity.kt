@@ -1,6 +1,5 @@
 package com.smartel.mysmartel_ver_1
 
-
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -13,10 +12,9 @@ import org.json.JSONException
 import org.json.JSONObject
 
 
-class LgtBaseActivity : AppCompatActivity() {
+class KtActivity : AppCompatActivity() {
     private lateinit var requestQueue: RequestQueue
     private lateinit var phoneNumber: String
-    private lateinit var custName: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,19 +22,17 @@ class LgtBaseActivity : AppCompatActivity() {
         requestQueue = Volley.newRequestQueue(this)
 
         phoneNumber = intent.getStringExtra("phoneNumber") ?: ""
-        custName = intent.getStringExtra("custName") ?: ""
-        Log.d("LgtActivity", "Phone Number: $phoneNumber, CustName: $custName")
+        Log.d("KtActivity", "Phone Number: $phoneNumber")
 
         // Call the function to fetch the deduction amount
         fetchDeductAmount()
     }
 
     private fun fetchDeductAmount() {
-        val deductUrl = "http://61.41.9.34/lg_RealTime/getrealtime5.php"
+        val deductUrl = "https://kt-self.smartelmobile.com/common/api/selfcare/selfcareAPIServer.aspx"
 
         val deductParams = JSONObject()
         deductParams.put("serviceNum", phoneNumber)
-        deductParams.put("custNm", custName)
 
         val deductRequest = JsonObjectRequest(
             Request.Method.POST, deductUrl, deductParams,
@@ -44,7 +40,7 @@ class LgtBaseActivity : AppCompatActivity() {
                 handleDeductResponse(response)
             },
             Response.ErrorListener { error ->
-                Log.e("LgtActivity", "Error fetching deduction amount: ${error.message}")
+                Log.e("KtActivity", "Error fetching deduction amount: ${error.message}")
             }
         )
         requestQueue.add(deductRequest)
@@ -62,10 +58,11 @@ class LgtBaseActivity : AppCompatActivity() {
                 val prodTypeCd = remainInfo.getString("prodTypeCd")
 
                 // TODO: Display the deduction amount information as needed
-                Log.d("LgtActivity", "SvcNm: $svcNm, SvcTypNm: $svcTypNm, AlloValue: $alloValue, UseValue: $useValue, ProdTypeCd: $prodTypeCd")
+                Log.d("KtActivity", "SvcNm: $svcNm, SvcTypNm: $svcTypNm, AlloValue: $alloValue, UseValue: $useValue, ProdTypeCd: $prodTypeCd")
             }
         } catch (e: JSONException) {
-            Log.e("LgtActivity", "Error parsing deduction response: ${e.message}")
+            Log.e("KtActivity", "Error parsing deduction response: ${e.message}")
         }
     }
 }
+

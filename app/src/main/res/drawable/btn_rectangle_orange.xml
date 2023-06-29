@@ -3,7 +3,7 @@
     android:shape="rectangle" android:padding = "10dp">
 
     <!-- 버튼 색깔 -->
-    <solid android:color="#FF7F50"/>
+    <solid android:color="#F26925"/>
     <!-- 네 귀퉁이? 모양 -->
     <corners
         android:bottomLeftRadius="10dp"
@@ -12,5 +12,5 @@
         android:topRightRadius="10dp"/>
     <!-- 테두리 색깔 -->
     <stroke android:width="2dp"
-        android:color="#FF7F50"/>
+        android:color="#F26925"/>
 </shape>

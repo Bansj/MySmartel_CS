@@ -9,6 +9,7 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentManager
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.Response
@@ -25,6 +26,7 @@ import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
+import kotlin.concurrent.fixedRateTimer
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var phoneNumberEditText: EditText
@@ -47,7 +49,7 @@ class LoginActivity : AppCompatActivity() {
         requestQueue = Volley.newRequestQueue(this, ignoreSslErrorHurlStack())
 
         loginButton.setOnClickListener {
-            Log.d("LoginActivity", "Login button clicked")
+            Log.d("LoginActivity", "========================= Login button clicked =========================")
             loginUser()
         }
     }
@@ -67,7 +69,7 @@ class LoginActivity : AppCompatActivity() {
         val phoneNumber = phoneNumberEditText.text.toString()
         val password = passwordEditText.text.toString()
 
-        Log.d("LoginActivity", "Login User - Phone number: $phoneNumber, Password: $password")
+        Log.d("LoginActivity", "--------------------Login User - Phone number: $phoneNumber, Password: $password---------------------")
 
         val loginParams = JSONObject()
         loginParams.put("log_id", phoneNumber)
@@ -95,7 +97,7 @@ class LoginActivity : AppCompatActivity() {
 
             if (loginResult == "true") {
                 val phoneNumber = phoneNumberEditText.text.toString()
-                Log.d("LoginActivity", "Login successful - Phone number: $phoneNumber")
+                Log.d("LoginActivity", "--------------------Login successful - Phone number: $phoneNumber--------------------")
                 fetchUserInfo(phoneNumber)
             } else {
                 hideLoadingDialog()
@@ -131,24 +133,44 @@ class LoginActivity : AppCompatActivity() {
             val telecom = response.getString("telecom")
             val custName = response.getString("custNm")
             val serviceAcct = response.getString("serviceAcct")
-            Log.d("LoginActivity", "User info - Telecom: $telecom, CustName: $custName, ServiceAccount: $serviceAcct")
+            val phoneNumber = phoneNumberEditText.text.toString()
 
+            Log.d("LoginActivity", "\n ----------User info - Telecom: $telecom, CustName: $custName, ServiceAccount: $serviceAcct, phoneNumber : $phoneNumber ----------\n")
+
+            // Pass the data to MyInfoFragment
+            val myInfoFragment = MyInfoFragment()
+            val args = Bundle()
+            args.putString("telecom", telecom)
+            args.putString("custName", custName)
+            args.putString("serviceAcct", serviceAcct)
+            args.putString("userId", phoneNumber)
+            myInfoFragment.arguments = args
+
+            // Navigate to MyInfoFragment
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.myInfoFragment, myInfoFragment)
+                .commit()
+
+            // Pass the data to respective activities
             when (telecom) {
                 "SKT" -> {
-                    val intent = Intent(this, SktBaseActivity::class.java)
+                    val intent = Intent(this, SktActivity::class.java)
                     intent.putExtra("serviceAcct", serviceAcct)
+                    intent.putExtra("userId", phoneNumber)
                     startActivity(intent)
                 }
                 "KT" -> {
-                    val intent = Intent(this, KtBaseActivity::class.java)
+                    val intent = Intent(this, KtActivity::class.java)
                     intent.putExtra("custName", custName)
                     intent.putExtra("serviceAcct", serviceAcct)
+                    intent.putExtra("userId", phoneNumber)
                     startActivity(intent)
                 }
                 "LGT" -> {
-                    val intent = Intent(this, LgtBaseActivity::class.java)
+                    val intent = Intent(this, LgtActivity::class.java)
                     intent.putExtra("custName", custName)
                     intent.putExtra("serviceAcct", serviceAcct)
+                    intent.putExtra("userId", phoneNumber)
                     startActivity(intent)
                 }
             }
@@ -158,14 +180,13 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+
     private fun showLoadingDialog() {
         loadingDialog.show()
     }
-
     private fun hideLoadingDialog() {
         loadingDialog.dismiss()
     }
-
     private fun showErrorDialog(message: String) {
         val dialogBuilder = AlertDialog.Builder(this)
         dialogBuilder.setMessage(message)
@@ -186,7 +207,6 @@ class LoginActivity : AppCompatActivity() {
                         override fun getAcceptedIssuers(): Array<X509Certificate> {
                             return arrayOf()
                         }
-
                         override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
 
                         override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {}

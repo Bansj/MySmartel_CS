@@ -15,9 +15,9 @@
         android:theme="@style/Theme.MySmartel_ver_1"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-        <activity android:name="com.smartel.mysmartel_ver_1.LgtBaseActivity" />
-        <activity android:name="com.smartel.mysmartel_ver_1.SktBaseActivity" />
-        <activity android:name="com.smartel.mysmartel_ver_1.KtBaseActivity" />
+        <activity android:name="com.smartel.mysmartel_ver_1.LgtActivity" />
+        <activity android:name="com.smartel.mysmartel_ver_1.SktActivity" />
+        <activity android:name="com.smartel.mysmartel_ver_1.KtActivity" />
         <activity
             android:name="com.smartel.mysmartel_ver_1.FindPWActivity"
             android:exported="false" />
