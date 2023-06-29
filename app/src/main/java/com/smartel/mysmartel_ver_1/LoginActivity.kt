@@ -1,6 +1,7 @@
 package com.smartel.mysmartel_ver_1
 
 import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -36,6 +37,8 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var requestQueue: RequestQueue
 
+    private lateinit var signUpButton: Button
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -52,7 +55,33 @@ class LoginActivity : AppCompatActivity() {
             Log.d("LoginActivity", "========================= Login button clicked =========================")
             loginUser()
         }
+
+        signUpButton = findViewById(R.id.btn_signUp)
+        signUpButton.setOnClickListener{
+            val message = "회원가입 완료후에 로그인하기 버튼을 클릭하여 주십시오. "
+            showAlertDialog(message)
+        }
     }
+    private fun showAlertDialog(message: String) {
+        val alertDialog = AlertDialog.Builder(this)
+            .setMessage(message)
+            .setPositiveButton("확인") { dialog: DialogInterface, _: Int ->
+                dialog.dismiss()
+                navigateToSignupActivity()
+            }
+            .create()
+        // AlertDialog 확인버튼 글자색 변경 코드
+        alertDialog.setOnShowListener {
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(resources.getColor(R.color.orange))
+        }
+
+        alertDialog.show()
+    }
+    private fun navigateToSignupActivity() {
+        val intent = Intent(this, WebViewActivity::class.java)
+        startActivity(intent)
+    }
+
     private fun createLoadingDialog(): AlertDialog {
         val dialogBuilder = AlertDialog.Builder(this)
         val dialogView = layoutInflater.inflate(R.layout.loading_dialog, null)
@@ -135,50 +164,28 @@ class LoginActivity : AppCompatActivity() {
             val serviceAcct = response.getString("serviceAcct")
             val phoneNumber = phoneNumberEditText.text.toString()
 
-            Log.d("LoginActivity", "\n ----------User info - Telecom: $telecom, CustName: $custName, ServiceAccount: $serviceAcct, phoneNumber : $phoneNumber ----------\n")
+            val infoBundle = Bundle()
+            infoBundle.putString("telecom", telecom)
+            infoBundle.putString("custName", custName)
+            infoBundle.putString("serviceAcct", serviceAcct)
+            infoBundle.putString("userId", phoneNumber)
 
-            // Pass the data to MyInfoFragment
+            Log.d("LoginActivity", "Retrieved User Information: Telecom: $telecom, CustName: $custName, ServiceAccount: $serviceAcct, UserId: $phoneNumber")
+
             val myInfoFragment = MyInfoFragment()
-            val args = Bundle()
-            args.putString("telecom", telecom)
-            args.putString("custName", custName)
-            args.putString("serviceAcct", serviceAcct)
-            args.putString("userId", phoneNumber)
-            myInfoFragment.arguments = args
+            myInfoFragment.arguments = infoBundle
 
-            // Navigate to MyInfoFragment
             supportFragmentManager.beginTransaction()
                 .replace(R.id.myInfoFragment, myInfoFragment)
                 .commit()
 
-            // Pass the data to respective activities
-            when (telecom) {
-                "SKT" -> {
-                    val intent = Intent(this, SktActivity::class.java)
-                    intent.putExtra("serviceAcct", serviceAcct)
-                    intent.putExtra("userId", phoneNumber)
-                    startActivity(intent)
-                }
-                "KT" -> {
-                    val intent = Intent(this, KtActivity::class.java)
-                    intent.putExtra("custName", custName)
-                    intent.putExtra("serviceAcct", serviceAcct)
-                    intent.putExtra("userId", phoneNumber)
-                    startActivity(intent)
-                }
-                "LGT" -> {
-                    val intent = Intent(this, LgtActivity::class.java)
-                    intent.putExtra("custName", custName)
-                    intent.putExtra("serviceAcct", serviceAcct)
-                    intent.putExtra("userId", phoneNumber)
-                    startActivity(intent)
-                }
-            }
             finish()
         } catch (e: JSONException) {
             showErrorDialog("Failed to parse user info response")
         }
     }
+
+
 
 
     private fun showLoadingDialog() {

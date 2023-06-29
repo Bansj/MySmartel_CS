@@ -70,7 +70,7 @@ class MyInfoFragment : Fragment() {
                 .addToBackStack(null)
                 .commit()
         }
-        // Set click listener for btn_menu button
+        // Set click listener for btn_menu button 하단 메뉴이동 네비게이션바 컨트롤러
         rootView.findViewById<ImageButton>(R.id.btn_menu).setOnClickListener {
             it.findNavController().navigate(R.id.action_myInfoFragment_to_menuFragment)
         }
