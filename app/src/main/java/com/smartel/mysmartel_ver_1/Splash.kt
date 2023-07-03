@@ -1,5 +1,6 @@
 package com.smartel.mysmartel_ver_1
 
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -11,8 +12,16 @@ class Splash : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_splash)
 
+        val sharedPrefs = getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
+        val autoLoginEnabled = sharedPrefs.getBoolean("autoLogin", false)
+
         Handler().postDelayed({
-            startActivity(Intent(this, LoginActivity::class.java))
+            val intent = if (autoLoginEnabled) {
+                Intent(this, MainActivity::class.java) // Replace with your MyInfoActivity
+            } else {
+                Intent(this, LoginActivity::class.java)
+            }
+            startActivity(intent)
             finish()
         }, 2000)
     }

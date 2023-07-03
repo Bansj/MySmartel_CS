@@ -71,6 +71,7 @@
                 android:orientation="horizontal">
 
                 <Switch
+                    android:id="@+id/switch_autoLogin"
                     android:layout_width="50dp"
                     android:layout_height="30dp"
                     android:checked="true"

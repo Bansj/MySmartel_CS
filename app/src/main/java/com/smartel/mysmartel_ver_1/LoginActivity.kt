@@ -1,6 +1,7 @@
 package com.smartel.mysmartel_ver_1
 
 import android.app.AlertDialog
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
@@ -52,12 +53,15 @@ class LoginActivity : AppCompatActivity() {
         requestQueue = Volley.newRequestQueue(this, ignoreSslErrorHurlStack())
 
         loginButton.setOnClickListener {
-            Log.d("LoginActivity", "========================= Login button clicked =========================")
+            Log.d(
+                "LoginActivity",
+                "========================= Login button clicked ========================="
+            )
             loginUser()
         }
 
         signUpButton = findViewById(R.id.btn_signUp)
-        signUpButton.setOnClickListener{
+        signUpButton.setOnClickListener {
             val message = "회원가입 완료후에 로그인하기 버튼을 클릭하여 주십시오. "
             showAlertDialog(message)
         }
@@ -74,14 +78,12 @@ class LoginActivity : AppCompatActivity() {
         alertDialog.setOnShowListener {
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(resources.getColor(R.color.orange))
         }
-
         alertDialog.show()
     }
     private fun navigateToSignupActivity() {
         val intent = Intent(this, WebViewActivity::class.java)
         startActivity(intent)
     }
-
     private fun createLoadingDialog(): AlertDialog {
         val dialogBuilder = AlertDialog.Builder(this)
         val dialogView = layoutInflater.inflate(R.layout.loading_dialog, null)
@@ -164,29 +166,19 @@ class LoginActivity : AppCompatActivity() {
             val serviceAcct = response.getString("serviceAcct")
             val phoneNumber = phoneNumberEditText.text.toString()
 
-            val infoBundle = Bundle()
-            infoBundle.putString("telecom", telecom)
-            infoBundle.putString("custName", custName)
-            infoBundle.putString("serviceAcct", serviceAcct)
-            infoBundle.putString("userId", phoneNumber)
+            Log.d("LoginActivity", "-----------------User Info - Telecom: $telecom, CustName: $custName, ServiceAccount: $serviceAcct, PhoneNumber: $phoneNumber-----------------------")
 
-            Log.d("LoginActivity", "Retrieved User Information: Telecom: $telecom, CustName: $custName, ServiceAccount: $serviceAcct, UserId: $phoneNumber")
 
-            val myInfoFragment = MyInfoFragment()
-            myInfoFragment.arguments = infoBundle
-
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.myInfoFragment, myInfoFragment)
-                .commit()
-
-            finish()
+            val intent = Intent(this, MainActivity::class.java)
+            intent.putExtra("userName", custName)
+            intent.putExtra("userPhoneNumber", phoneNumber)
+            intent.putExtra("userTelecom", telecom)
+            intent.putExtra("serviceAcct", serviceAcct)
+            startActivity(intent)
         } catch (e: JSONException) {
             showErrorDialog("Failed to parse user info response")
         }
     }
-
-
-
 
     private fun showLoadingDialog() {
         loadingDialog.show()
@@ -232,5 +224,3 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 }
-
-
