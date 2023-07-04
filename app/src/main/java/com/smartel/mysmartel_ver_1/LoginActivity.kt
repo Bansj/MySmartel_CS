@@ -170,9 +170,9 @@ class LoginActivity : AppCompatActivity() {
 
 
             val intent = Intent(this, MainActivity::class.java)
-            intent.putExtra("userName", custName)
-            intent.putExtra("userPhoneNumber", phoneNumber)
-            intent.putExtra("userTelecom", telecom)
+            intent.putExtra("custName", custName)
+            intent.putExtra("PhoneNumber", phoneNumber)
+            intent.putExtra("Telecom", telecom)
             intent.putExtra("serviceAcct", serviceAcct)
             startActivity(intent)
         } catch (e: JSONException) {

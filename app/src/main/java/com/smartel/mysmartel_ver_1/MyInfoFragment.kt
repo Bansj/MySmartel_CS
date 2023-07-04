@@ -18,7 +18,7 @@ import com.example.mysmartel_ver_1.R
 
 class MyInfoFragment : Fragment() {
 
-    private lateinit var txtUserName: TextView
+    private lateinit var txtcustName: TextView
     private lateinit var txtPhoneNumber: TextView
     private lateinit var txtTelecom: TextView
     private lateinit var sharedPrefs: MyInfoSharedPreferences
@@ -39,46 +39,55 @@ class MyInfoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        txtUserName = view.findViewById(R.id.txt_cust_nm)
+        txtcustName = view.findViewById(R.id.txt_cust_nm)
         txtPhoneNumber = view.findViewById(R.id.txt_phoneNumber)
         txtTelecom = view.findViewById(R.id.txt_telecom)
 
        /* // Retrieve the data from the arguments
-        val userName = arguments?.getString("userName")
-        val userPhoneNumber = arguments?.getString("userPhoneNumber")
-        val userTelecom = arguments?.getString("userTelecom")*/
+        val custName = arguments?.getString("custName")
+        val phoneNumber = arguments?.getString("phoneNumber")
+        val Telecom = arguments?.getString("Telecom")*/
 
         sharedPrefs = MyInfoSharedPreferences(requireContext())
 
         // Retrieve the data from the ViewModel or arguments
-        val userName = viewModel.userName ?: arguments?.getString("userName")
-        val userPhoneNumber = viewModel.userPhoneNumber ?: arguments?.getString("userPhoneNumber")
-        val userTelecom = viewModel.userTelecom ?: arguments?.getString("userTelecom")
+        val custName = viewModel.custName ?: arguments?.getString("custName")
+        val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")
+        val Telecom = viewModel.Telecom ?: arguments?.getString("Telecom")
 
        // Set the data in the views
-        txtUserName.text = " ${userName}님, 안녕하세요. "
-        txtPhoneNumber.text = " ✆ [$userTelecom] $userPhoneNumber "
-        txtTelecom.text = userTelecom
+        txtcustName.text = " ${custName}님, 안녕하세요. "
+        txtPhoneNumber.text = " ✆ [$Telecom] ${phoneNumber ?: "Unknown"} "
+        txtTelecom.text = Telecom
 
         // Set the data in the ViewModel
-        viewModel.userName = userName
-        viewModel.userPhoneNumber = userPhoneNumber
-        viewModel.userTelecom = userTelecom
+        viewModel.custName = custName
+        viewModel.phoneNumber = phoneNumber
+        viewModel.Telecom = Telecom
 
         // 버튼을 클릭시 아래에서 위로 올라오는 상세보기 페이지 클릭이벤트
         val btnShowFragment = view?.findViewById<Button>(R.id.btn_detailDeduct)
         btnShowFragment?.setOnClickListener {
-            val fragment = LgtDeductDetailViewFragment()
-            requireFragmentManager().beginTransaction()
-                .setCustomAnimations(
-                    R.anim.slide_in_up, // Animation for fragment enter
-                    R.anim.slide_out_down, // Animation for fragment exit
-                    R.anim.slide_in_up, // Animation for fragment pop-enter
-                    R.anim.slide_out_down // Animation for fragment pop-exit
-                )
-                .add(android.R.id.content, fragment)
-                .addToBackStack(null)
-                .commit()
+            val telecom = viewModel.Telecom ?: arguments?.getString("Telecom")
+            val fragment = when (telecom) {
+                "SKT" -> SktDeductDetailViewFragment()
+                "KT" -> KtDeductDetailViewFragment()
+                "LGT" -> LgtDeductDetailViewFragment()
+                else -> null
+            }
+
+            fragment?.let {
+                requireFragmentManager().beginTransaction()
+                    .setCustomAnimations(
+                        R.anim.slide_in_up, // Animation for fragment enter
+                        R.anim.slide_out_down, // Animation for fragment exit
+                        R.anim.slide_in_up, // Animation for fragment pop-enter
+                        R.anim.slide_out_down // Animation for fragment pop-exit
+                    )
+                    .add(android.R.id.content, it)
+                    .addToBackStack(null)
+                    .commit()
+            }
         }
 
         // Set click listener for btn_menu button 하단 메뉴이동 네비게이션바 컨트롤러
@@ -98,7 +107,7 @@ class MyInfoFragment : Fragment() {
         super.onDestroyView()
 
         // Save the data to SharedPreferences before the fragment view is destroyed
-        sharedPrefs.userName = txtUserName.text.toString()
+        sharedPrefs.custName = txtcustName.text.toString()
         sharedPrefs.phoneNumber = txtPhoneNumber.text.toString()
         sharedPrefs.telecom = txtTelecom.text.toString()
     }

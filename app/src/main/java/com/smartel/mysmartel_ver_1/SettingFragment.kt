@@ -11,6 +11,8 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.Switch
+import android.widget.TextView
+import android.widget.Toast
 import androidx.navigation.findNavController
 import com.example.mysmartel_ver_1.R
 
@@ -52,7 +54,9 @@ class SettingFragment : Fragment() {
         }
         // Handle switch changes and save the status in shared preferences
         switchAutoLogin.setOnCheckedChangeListener { _, isChecked ->
-            sharedPrefs.edit().putBoolean("autoLogin", isChecked).apply()
+            if(isChecked){
+                sharedPrefs.edit().putBoolean("autoLogin", isChecked).apply()
+            }
         }
 
         return rootView

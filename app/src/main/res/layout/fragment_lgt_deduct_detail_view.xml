@@ -40,60 +40,57 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
-        android:id="@+id/deductDetailsTextView"
+        android:id="@+id/textViewServiceName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Service Name: "
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textViewServiceType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Service Type: "
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textViewServiceUnit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Service Unit: "
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textViewAllocationValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Allocation Value: "
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textViewUsageValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Usage Value: "
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textViewProductType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Product Type: "
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <View
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="here"
-        android:textSize="16sp" />
-
-    <TextView
-        android:id="@+id/productNameTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:text="Product Name:"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/serviceTypeTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:text="Service Type:"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/serviceUnitTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:text="Service Unit:"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/allocationValueTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:text="Allocation Value:"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/usageValueTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:text="Usage Value:"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/productTypeTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:text="Product Type:"
-        android:textStyle="bold" />
+        android:layout_height="1dp"
+        android:background="#000000" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/deductionDetailsRecyclerView"

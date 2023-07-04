@@ -7,7 +7,7 @@ class MyInfoSharedPreferences(private val context: Context) {
 
     companion object {
         private const val PREF_NAME = "my_info_prefs"
-        private const val KEY_USER_NAME = "user_name"
+        private const val KEY_CUST_NAME = "cust_name"
         private const val KEY_PHONE_NUMBER = "phone_number"
         private const val KEY_TELECOM = "telecom"
     }
@@ -15,9 +15,9 @@ class MyInfoSharedPreferences(private val context: Context) {
     private val preferences: SharedPreferences =
         context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
 
-    var userName: String?
-        get() = preferences.getString(KEY_USER_NAME, null)
-        set(value) = preferences.edit().putString(KEY_USER_NAME, value).apply()
+    var custName: String?
+        get() = preferences.getString(KEY_CUST_NAME, null)
+        set(value) = preferences.edit().putString(KEY_CUST_NAME, value).apply()
 
     var phoneNumber: String?
         get() = preferences.getString(KEY_PHONE_NUMBER, null)
