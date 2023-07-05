@@ -1,26 +1,38 @@
 package com.smartel.mysmartel_ver_1
 
 
-import androidx.activity.viewModels
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
+import android.widget.Button
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
+import androidx.fragment.app.viewModels
 import com.example.mysmartel_ver_1.R
 
 class MainActivity : AppCompatActivity() {
 
+    private val TAG = "MainActivity" // 로그 태그
+
     private val viewModel: MyInfoViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Retrieve the phoneNumber from SharedPreferences
+        val sharedPrefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val phoneNumber = sharedPrefs.getString("phoneNumber", "")
+
         // Retrieve the data from the intent extras
         val custName = intent.getStringExtra("custName")
-        val phoneNumber = intent.getStringExtra("phoneNumber")
+        //val phoneNumber = intent.getStringExtra("phoneNumber")
         val Telecom = intent.getStringExtra("Telecom")
         val serviceAcct = intent.getStringExtra("serviceAcct")
+
+        // Log the data before creating the fragment
+        Log.d(TAG, "---------------getStringExtra -> custName: $custName, phoneNumber: $phoneNumber, Telecom: $Telecom, serviceAcct: $serviceAcct---------------")
 
         // Create a Bundle to hold the data
         val bundle = Bundle()
@@ -30,6 +42,9 @@ class MainActivity : AppCompatActivity() {
         bundle.putString("phoneNumber", phoneNumber)
         bundle.putString("Telecom", Telecom)
         bundle.putString("serviceAcct", serviceAcct)
+
+        // Log the data before creating the fragment
+        Log.d(TAG, "---------------putString -> custName: $custName, phoneNumber: $phoneNumber, Telecom: $Telecom, serviceAcct: $serviceAcct---------------")
 
         // Create a new instance of MyInfoFragment
         val myInfoFragment = MyInfoFragment()
@@ -42,39 +57,21 @@ class MainActivity : AppCompatActivity() {
             .replace(R.id.myInfoFragment, myInfoFragment)
             .commit()
 
-        // Check the value of Telecom and create the appropriate fragment
-        val fragment = when (Telecom) {
-            "SKT" -> {
-                val sktDeductDetailViewFragment = SktDeductDetailViewFragment()
-                val bundle = Bundle()
-                //bundle.putString("custName", custName)
-                bundle.putString("serviceAcct", serviceAcct)
-                sktDeductDetailViewFragment.arguments = bundle
-                sktDeductDetailViewFragment
-            }
-            "KT" -> {
-                val ktDeductDetailViewFragment = KtDeductDetailViewFragment()
-                val bundle = Bundle()
-                //bundle.putString("custName", custName)
-                bundle.putString("phoneNumber", phoneNumber)
-                ktDeductDetailViewFragment.arguments = bundle
-                ktDeductDetailViewFragment
-            }
-            "LGT" -> {
-                val lgtDeductDetailViewFragment = LgtDeductDetailViewFragment()
-                val bundle = Bundle()
-                bundle.putString("custNm", custName)
-                bundle.putString("phoneNumber", phoneNumber)
-                lgtDeductDetailViewFragment.arguments = bundle
-                lgtDeductDetailViewFragment
-            }
-            else -> {
-                // Handle the case when Telecom is not SKT, KT, or LGT
-                // You can show an error message or handle it in any other way appropriate for your app
-                null
-            }
-        }
+        // Log the value of Telecom
+        Log.d(TAG, "Telecom: $Telecom")
 
+
+       /* // Set click listener for btn_detailDeduct
+        val btnDetailDeduct = findViewById<Button>(R.id.btn_detailDeduct)
+        btnDetailDeduct.setOnClickListener {
+            // Replace the current fragment with the created fragment
+            if (fragment != null) {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.myInfoFragment, fragment)
+                    .commit()
+            }
+        }*/
     }
 }
+
 

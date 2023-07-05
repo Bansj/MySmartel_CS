@@ -1,8 +1,10 @@
 package com.smartel.mysmartel_ver_1
 
+import android.content.ContentValues.TAG
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +19,7 @@ import androidx.navigation.findNavController
 import com.example.mysmartel_ver_1.R
 
 class MyInfoFragment : Fragment() {
+
 
     private lateinit var txtcustName: TextView
     private lateinit var txtPhoneNumber: TextView
@@ -54,6 +57,7 @@ class MyInfoFragment : Fragment() {
         val custName = viewModel.custName ?: arguments?.getString("custName")
         val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")
         val Telecom = viewModel.Telecom ?: arguments?.getString("Telecom")
+        val serviceAcct = viewModel.serviceAcct?: arguments?.getString("service_acct")
 
        // Set the data in the views
         txtcustName.text = " ${custName}님, 안녕하세요. "
@@ -69,11 +73,48 @@ class MyInfoFragment : Fragment() {
         val btnShowFragment = view?.findViewById<Button>(R.id.btn_detailDeduct)
         btnShowFragment?.setOnClickListener {
             val telecom = viewModel.Telecom ?: arguments?.getString("Telecom")
-            val fragment = when (telecom) {
-                "SKT" -> SktDeductDetailViewFragment()
-                "KT" -> KtDeductDetailViewFragment()
-                "LGT" -> LgtDeductDetailViewFragment()
-                else -> null
+            val fragment: Fragment? = when (telecom) {
+                "SKT" -> {
+                    val sktDeductDetailViewFragment = SktDeductDetailViewFragment()
+                    val bundle = Bundle()
+                    bundle.putString("serviceAcct", serviceAcct)
+                    sktDeductDetailViewFragment.arguments = bundle
+
+                    // Log the values for SKT
+                    Log.d(TAG, "serviceAcct: $serviceAcct")
+
+                    sktDeductDetailViewFragment
+                }
+                "KT" -> {
+                    val ktDeductDetailViewFragment = KtDeductDetailViewFragment()
+                    val bundle = Bundle()
+                    bundle.putString("phoneNumber", phoneNumber)
+                    ktDeductDetailViewFragment.arguments = bundle
+
+                    // Log the values for KT
+                    Log.d(TAG, "phoneNumber: $phoneNumber")
+
+                    ktDeductDetailViewFragment
+                }
+                "LGT" -> {
+                    val lgtDeductDetailViewFragment = LgtDeductDetailViewFragment()
+                    val bundle = Bundle()
+                    bundle.putString("custNm", custName)
+                    bundle.putString("phoneNumber", phoneNumber)
+                    lgtDeductDetailViewFragment.arguments = bundle
+
+                    // Log the values for LGT
+                    Log.d(TAG, "custName: $custName")
+                    Log.d(TAG, "phoneNumber: $phoneNumber")
+
+                    lgtDeductDetailViewFragment
+                }
+                else -> {
+                    // Handle the case when Telecom is not SKT, KT, or LGT
+                    // You can show an error message or handle it in any other way appropriate for your app
+                    Log.e(TAG, "Invalid Telecom value: $telecom")
+                    null
+                }
             }
 
             fragment?.let {

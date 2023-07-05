@@ -10,6 +10,7 @@ class MyInfoSharedPreferences(private val context: Context) {
         private const val KEY_CUST_NAME = "cust_name"
         private const val KEY_PHONE_NUMBER = "phone_number"
         private const val KEY_TELECOM = "telecom"
+        private const val KEY_SERVICE_ACCT = "service_acct"
     }
 
     private val preferences: SharedPreferences =
@@ -26,4 +27,8 @@ class MyInfoSharedPreferences(private val context: Context) {
     var telecom: String?
         get() = preferences.getString(KEY_TELECOM, null)
         set(value) = preferences.edit().putString(KEY_TELECOM, value).apply()
+
+    var serviceAcct: String?
+        get() = preferences.getString(KEY_SERVICE_ACCT, null)
+        set(value) = preferences.edit().putString(KEY_SERVICE_ACCT, value).apply()
 }

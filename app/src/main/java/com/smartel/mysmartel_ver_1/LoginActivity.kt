@@ -55,7 +55,7 @@ class LoginActivity : AppCompatActivity() {
         loginButton.setOnClickListener {
             Log.d(
                 "LoginActivity",
-                "========================= Login button clicked ========================="
+                "============================== Login button clicked =============================="
             )
             loginUser()
         }
@@ -100,7 +100,8 @@ class LoginActivity : AppCompatActivity() {
         val phoneNumber = phoneNumberEditText.text.toString()
         val password = passwordEditText.text.toString()
 
-        Log.d("LoginActivity", "--------------------Login User - Phone number: $phoneNumber, Password: $password---------------------")
+        Log.d("LoginActivity",
+            "--------------------Login User - Phone number: $phoneNumber, Password: $password---------------------")
 
         val loginParams = JSONObject()
         loginParams.put("log_id", phoneNumber)
@@ -120,6 +121,12 @@ class LoginActivity : AppCompatActivity() {
             }
         )
         requestQueue.add(loginRequest)
+
+        // Save the phoneNumber in SharedPreferences
+        val sharedPrefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPrefs.edit()
+        editor.putString("phoneNumber", phoneNumber)
+        editor.apply()
     }
 
     private fun handleLoginResponse(response: JSONObject) {
@@ -128,7 +135,8 @@ class LoginActivity : AppCompatActivity() {
 
             if (loginResult == "true") {
                 val phoneNumber = phoneNumberEditText.text.toString()
-                Log.d("LoginActivity", "--------------------Login successful - Phone number: $phoneNumber--------------------")
+                Log.d("LoginActivity",
+                    "--------------------Login successful - Phone number: $phoneNumber--------------------")
                 fetchUserInfo(phoneNumber)
             } else {
                 hideLoadingDialog()
@@ -165,9 +173,8 @@ class LoginActivity : AppCompatActivity() {
             val custName = response.getString("custNm")
             val serviceAcct = response.getString("serviceAcct")
             val phoneNumber = phoneNumberEditText.text.toString()
-
-            Log.d("LoginActivity", "-----------------User Info - Telecom: $telecom, CustName: $custName, ServiceAccount: $serviceAcct, PhoneNumber: $phoneNumber-----------------------")
-
+            Log.d("\nLoginActivity - getString",
+                "-----------------User Info - Telecom: $telecom, CustName: $custName, ServiceAccount: $serviceAcct, PhoneNumber: $phoneNumber-----------------------")
 
             val intent = Intent(this, MainActivity::class.java)
             intent.putExtra("custName", custName)
@@ -175,6 +182,9 @@ class LoginActivity : AppCompatActivity() {
             intent.putExtra("Telecom", telecom)
             intent.putExtra("serviceAcct", serviceAcct)
             startActivity(intent)
+            Log.d("\nLoginActivity - putExtra",
+                "-----------------User Info - Telecom: $telecom, CustName: $custName, ServiceAccount: $serviceAcct, PhoneNumber: $phoneNumber-----------------------")
+
         } catch (e: JSONException) {
             showErrorDialog("Failed to parse user info response")
         }
