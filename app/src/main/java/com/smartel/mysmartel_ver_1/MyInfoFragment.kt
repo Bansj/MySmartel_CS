@@ -46,11 +46,6 @@ class MyInfoFragment : Fragment() {
         txtPhoneNumber = view.findViewById(R.id.txt_phoneNumber)
         txtTelecom = view.findViewById(R.id.txt_telecom)
 
-       /* // Retrieve the data from the arguments
-        val custName = arguments?.getString("custName")
-        val phoneNumber = arguments?.getString("phoneNumber")
-        val Telecom = arguments?.getString("Telecom")*/
-
         sharedPrefs = MyInfoSharedPreferences(requireContext())
 
         // Retrieve the data from the ViewModel or arguments
@@ -110,8 +105,6 @@ class MyInfoFragment : Fragment() {
                     lgtDeductDetailViewFragment
                 }
                 else -> {
-                    // Handle the case when Telecom is not SKT, KT, or LGT
-                    // You can show an error message or handle it in any other way appropriate for your app
                     Log.e(TAG, "Invalid Telecom value: $telecom")
                     null
                 }

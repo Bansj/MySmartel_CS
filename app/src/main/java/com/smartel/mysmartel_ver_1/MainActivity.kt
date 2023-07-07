@@ -59,18 +59,6 @@ class MainActivity : AppCompatActivity() {
 
         // Log the value of Telecom
         Log.d(TAG, "Telecom: $Telecom")
-
-
-       /* // Set click listener for btn_detailDeduct
-        val btnDetailDeduct = findViewById<Button>(R.id.btn_detailDeduct)
-        btnDetailDeduct.setOnClickListener {
-            // Replace the current fragment with the created fragment
-            if (fragment != null) {
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.myInfoFragment, fragment)
-                    .commit()
-            }
-        }*/
     }
 }
 

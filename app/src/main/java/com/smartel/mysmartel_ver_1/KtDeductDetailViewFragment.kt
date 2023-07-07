@@ -1,164 +1,156 @@
 package com.smartel.mysmartel_ver_1
 
-
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.mysmartel_ver_1.R
+import com.google.gson.Gson
 import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONArray
-import org.json.JSONObject
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import java.io.IOException
 
-class KtDeductDetailViewFragment : Fragment() {
+class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
 
-    private val client = OkHttpClient()
-
-    private lateinit var textViewResultValue: TextView
-    private lateinit var textViewTraceNoValue: TextView
-    private lateinit var textViewResultCdValue: TextView
-    private lateinit var textViewResultMsgValue: TextView
+    private val TAG = "KtDeductDetailView"
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: TotaluseTimeAdapter
+    private var initialY: Float = 0f
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_kt_deduct_detail_view, container, false)
+        val view = inflater.inflate(R.layout.fragment_kt_deduct_detail_view, container, false)
+
+        recyclerView = view.findViewById(R.id.rvTotaluseTime)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        adapter = TotaluseTimeAdapter(emptyList())
+        recyclerView.adapter = adapter
+
+        // Set touch listener for swipe gesture
+        view.setOnTouchListener(this)
+
+        // Move fragment down button click event
+        val moveButton: View = view.findViewById(R.id.btn_pgDown)
+        moveButton.setOnClickListener {
+            animateFragmentOut(view)
+        }
+
+        return view
+    }
+
+    override fun onTouch(view: View, event: MotionEvent): Boolean {
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                initialY = event.rawY
+            }
+            MotionEvent.ACTION_MOVE -> {
+                val deltaY = event.rawY - initialY
+                if (deltaY > 0 && view.y <= 0) {
+                    view.translationY = deltaY
+                    return true
+                }
+            }
+            MotionEvent.ACTION_UP -> {
+                val deltaY = event.rawY - initialY
+                if (deltaY > view.height / 2) {
+                    // Swipe distance more than half, animate fragment out
+                    animateFragmentOut(view)
+                } else {
+                    // Animate fragment back to initial position
+                    animateFragmentBack(view)
+                }
+            }
+        }
+        return false
+    }
+
+    private fun animateFragmentOut(view: View) {
+        val transaction: FragmentTransaction = parentFragmentManager.beginTransaction()
+        transaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down)
+        transaction.remove(this@KtDeductDetailViewFragment)
+        transaction.commit()
+    }
+
+    private fun animateFragmentBack(view: View) {
+        view.animate().translationY(0f).setDuration(300).start()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Initialize TextViews
-        textViewResultValue = view.findViewById(R.id.textViewResultValue)
-        textViewTraceNoValue = view.findViewById(R.id.textViewTraceNoValue)
-        textViewResultCdValue = view.findViewById(R.id.textViewResultCdValue)
-        textViewResultMsgValue = view.findViewById(R.id.textViewResultMsgValue)
+        // Fetch API response
+        fetchDeductApiData()
+    }
 
-        // Get the phone number from arguments or any other means
+    private fun fetchDeductApiData() {
         val phoneNumber = arguments?.getString("phoneNumber") ?: ""
+        val apiUrl = "https://kt-self.smartelmobile.com/common/api/selfcare/selfcareAPIServer.aspx"
 
-        // Use the phoneNumber as needed in your code
-        Log.d(TAG, "\n-----------Received phoneNumber: $phoneNumber---------")
-
-        // Create the request body
-        val requestBody = KtDeductRequestBody(
-            listOf(KtDeductRequestBody.Header("X12")),
-            listOf(KtDeductRequestBody.Body("", "", "", phoneNumber, "", "", ""))
+        val requestBody = RequestBody.create(
+            "application/json; charset=utf-8".toMediaTypeOrNull(),
+            createRequestBody(phoneNumber)
         )
-
-        // Convert the request body to JSON
-        val jsonMediaType = "application/json; charset=utf-8".toMediaType()
-        val requestJson = requestBody.toJsonString()
-        val requestBodyJson = requestJson.toRequestBody(jsonMediaType)
-
-        // Create the request
         val request = Request.Builder()
-            .url("https://kt-self.smartelmobile.com/common/api/selfcare/selfcareAPIServer.aspx")
-            .addHeader("Content-Type", "application/json")
-            .post(requestBodyJson)
+            .url(apiUrl)
+            .post(requestBody)
             .build()
 
-        // Execute the request asynchronously
+        val client = OkHttpClient()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.e(TAG, "API request failed: ${e.message}")
-                activity?.runOnUiThread {
-                    textViewResultValue.text = "API request failed"
-                }
             }
 
             override fun onResponse(call: Call, response: Response) {
-                val responseBody = response.body?.string()
-                Log.d(TAG, "API response: $responseBody")
-                activity?.runOnUiThread {
-                    handleResponse(responseBody)
+                val responseData = response.body?.string()
+                Log.d(TAG, "API response: $responseData")
+
+                // Parse the API response
+                val apiResponse = Gson().fromJson(responseData, KtDeductApiResponse::class.java)
+
+                // Update the adapter with new data
+                val totaluseTimeList = mutableListOf<KtDeductApiResponse.BodyData.TotaluseTimeDtoData>()
+                apiResponse.body.forEach { bodyData ->
+                    totaluseTimeList.addAll(bodyData.totaluseTimeDto)
                 }
+                updateAdapterData(totaluseTimeList)
             }
         })
     }
 
-    private fun handleResponse(responseBody: String?) {
-        if (responseBody.isNullOrEmpty()) {
-            textViewResultValue.text = "Empty response"
-            return
-        }
-
-        try {
-            val apiResponse = parseApiResponse(responseBody)
-            val body = apiResponse.body.firstOrNull()
-
-            if (body?.result == "N") {
-                val errorMessage = "Error - ${body.resultCd}: ${body.resultMsg}"
-                Log.d(TAG, "API response: $errorMessage")
-                activity?.runOnUiThread {
-                    textViewResultValue.text = errorMessage
-                    textViewTraceNoValue.text = ""
-                    textViewResultCdValue.text = body.resultCd
-                    textViewResultMsgValue.text = body.resultMsg ?: ""
-                }
-            } else {
-                // Update UI with the desired information
-                activity?.runOnUiThread {
-                    textViewResultValue.text = "Success"
-                    textViewTraceNoValue.text = body?.traceno ?: ""
-                    textViewResultCdValue.text = body?.resultCd
-                    textViewResultMsgValue.text = body?.resultMsg ?: ""
-
-                    // Update other TextViews or UI elements as needed
-                }
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to parse API response: ${e.message}")
-            activity?.runOnUiThread {
-                textViewResultValue.text = "Failed to parse response"
-                textViewTraceNoValue.text = ""
-                textViewResultCdValue.text = ""
-                textViewResultMsgValue.text = ""
-            }
+    private fun updateAdapterData(totaluseTimeList: List<KtDeductApiResponse.BodyData.TotaluseTimeDtoData>) {
+        // Run this on the main thread
+        requireActivity().runOnUiThread {
+            adapter.setData(totaluseTimeList)
         }
     }
 
-    private fun parseApiResponse(responseBody: String): KtDeductApiResponse {
-        val jsonObject = JSONObject(responseBody)
-        val headers = jsonObject.optJSONArray("header")
-        val bodies = jsonObject.optJSONArray("body")
+    private fun createRequestBody(phoneNumber: String): String {
+        val requestBody = HashMap<String, List<HashMap<String, String>>>()
+        val headerData = HashMap<String, String>()
+        val bodyData = HashMap<String, String>()
 
-        val headerList = mutableListOf<KtDeductApiResponse.Header>()
-        val bodyList = mutableListOf<KtDeductApiResponse.Body>()
+        headerData["type"] = "X12"
+        bodyData["traceno"] = ""
+        bodyData["custId"] = ""
+        bodyData["ncn"] = ""
+        bodyData["ctn"] = phoneNumber
+        bodyData["clientIp"] = ""
+        bodyData["userId"] = ""
+        bodyData["useMonth"] = ""
 
-        headers?.let {
-            for (i in 0 until headers.length()) {
-                val headerObject = headers.optJSONObject(i)
-                val type = headerObject?.optString("type") ?: ""
-                val header = KtDeductApiResponse.Header(type)
-                headerList.add(header)
-            }
-        }
+        requestBody["header"] = listOf(headerData)
+        requestBody["body"] = listOf(bodyData)
 
-        bodies?.let {
-            for (i in 0 until bodies.length()) {
-                val bodyObject = bodies.optJSONObject(i)
-                val traceno = bodyObject?.optString("traceno") ?: ""
-                val result = bodyObject?.optString("result") ?: ""
-                val resultCd = bodyObject?.optString("resultCd") ?: ""
-                val resultMsg = bodyObject?.optString("resultMsg") ?: ""
-                val body = KtDeductApiResponse.Body(traceno, result, resultCd, resultMsg)
-                bodyList.add(body)
-            }
-        }
-
-        return KtDeductApiResponse(headerList, bodyList)
-    }
-
-    companion object {
-        private const val TAG = "KtDeductDetailViewFragment"
+        return Gson().toJson(requestBody)
     }
 }

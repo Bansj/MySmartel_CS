@@ -44,66 +44,37 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <TextView
-        android:id="@+id/textViewResultLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Result:"
-        android:textStyle="bold" />
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            tools:context=".KtDeductDetailViewFragment">
 
-    <TextView
-        android:id="@+id/textViewResultValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Waiting for response..." />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/textViewTraceNoLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Trace No:"
-        android:textStyle="bold"
-        android:layout_marginTop="16dp" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="사용 정보"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
-    <TextView
-        android:id="@+id/textViewTraceNoValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:layout_marginStart="8dp" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvTotaluseTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp" />
 
-    <TextView
-        android:id="@+id/textViewResultCdLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Result Code:"
-        android:textStyle="bold"
-        android:layout_marginTop="16dp" />
+            </LinearLayout>
 
-    <TextView
-        android:id="@+id/textViewResultCdValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:layout_marginStart="8dp" />
-
-    <TextView
-        android:id="@+id/textViewResultMsgLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Result Message:"
-        android:textStyle="bold"
-        android:layout_marginTop="16dp" />
-
-    <TextView
-        android:id="@+id/textViewResultMsgValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text=""
-        android:layout_marginStart="8dp" />
+        </ScrollView>
 
     </LinearLayout>
 
 </LinearLayout>
-
-
