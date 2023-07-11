@@ -1,6 +1,6 @@
 package com.smartel.mysmartel_ver_1
 
-import android.os.Bundle
+/*import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
@@ -182,7 +182,7 @@ class BenefitFragment : Fragment() {
 
         override fun createFragment(position: Int): Fragment = fragmentList[position]
     }
-}
+}*/
 
 
 

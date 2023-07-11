@@ -7,12 +7,12 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mysmartel_ver_1.R
 
-class TotaluseTimeAdapter(private var totaluseTimeList: List<KtDeductApiResponse.BodyData.TotaluseTimeDtoData>) :
-    RecyclerView.Adapter<TotaluseTimeAdapter.ViewHolder>() {
+class KtTotaluseTimeAdapter(private var totaluseTimeList: List<KtDeductApiResponse.BodyData.TotaluseTimeDtoData>) :
+    RecyclerView.Adapter<KtTotaluseTimeAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_totaluse_time, parent, false)
+            .inflate(R.layout.kt_item_totaluse_time, parent, false)
         return ViewHolder(view)
     }
 

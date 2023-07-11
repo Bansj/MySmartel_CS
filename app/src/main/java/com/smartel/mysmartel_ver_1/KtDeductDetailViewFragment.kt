@@ -1,11 +1,15 @@
 package com.smartel.mysmartel_ver_1
 
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.AbsoluteSizeSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -19,8 +23,11 @@ import java.io.IOException
 class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
 
     private val TAG = "KtDeductDetailView"
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: TotaluseTimeAdapter
+    private lateinit var totaluseTimeTextView: TextView
+    private lateinit var voiceCallDetailTextView: TextView
+    private lateinit var voiceCallDetailTotTextView: TextView
+    private lateinit var totUseTimeCntTextView: TextView
+    private lateinit var totUseTimeCntTotTextView: TextView
     private var initialY: Float = 0f
 
     override fun onCreateView(
@@ -30,15 +37,14 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_kt_deduct_detail_view, container, false)
 
-        recyclerView = view.findViewById(R.id.rvTotaluseTime)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        adapter = TotaluseTimeAdapter(emptyList())
-        recyclerView.adapter = adapter
+        totaluseTimeTextView = view.findViewById(R.id.tvTotaluseTime)
+        voiceCallDetailTextView = view.findViewById(R.id.tvVoiceCallDetail)
+        voiceCallDetailTotTextView = view.findViewById(R.id.tvVoiceCallDetailTot)
+        totUseTimeCntTextView = view.findViewById(R.id.tvTotUseTimeCnt)
+        totUseTimeCntTotTextView = view.findViewById(R.id.tvTotUseTimeCntTot)
 
-        // Set touch listener for swipe gesture
         view.setOnTouchListener(this)
 
-        // Move fragment down button click event
         val moveButton: View = view.findViewById(R.id.btn_pgDown)
         moveButton.setOnClickListener {
             animateFragmentOut(view)
@@ -62,10 +68,8 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
             MotionEvent.ACTION_UP -> {
                 val deltaY = event.rawY - initialY
                 if (deltaY > view.height / 2) {
-                    // Swipe distance more than half, animate fragment out
                     animateFragmentOut(view)
                 } else {
-                    // Animate fragment back to initial position
                     animateFragmentBack(view)
                 }
             }
@@ -86,8 +90,6 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // Fetch API response
         fetchDeductApiData()
     }
 
@@ -114,24 +116,29 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
                 val responseData = response.body?.string()
                 Log.d(TAG, "API response: $responseData")
 
-                // Parse the API response
                 val apiResponse = Gson().fromJson(responseData, KtDeductApiResponse::class.java)
 
-                // Update the adapter with new data
                 val totaluseTimeList = mutableListOf<KtDeductApiResponse.BodyData.TotaluseTimeDtoData>()
+                val voiceCallDetailList = mutableListOf<KtDeductApiResponse.BodyData.VoiceCallDetailDtoData>()
+                val voiceCallDetailTotList = mutableListOf<KtDeductApiResponse.BodyData.VoiceCallDetailTotDtoData>()
+                val totUseTimeCntList = mutableListOf<KtDeductApiResponse.BodyData.TotUseTimeCntDtoData>()
+                val totUseTimeCntTotList = mutableListOf<KtDeductApiResponse.BodyData.TotUseTimeCntTotDtoData>()
+
                 apiResponse.body.forEach { bodyData ->
                     totaluseTimeList.addAll(bodyData.totaluseTimeDto)
+                    voiceCallDetailList.addAll(bodyData.voiceCallDetailDto)
+                    voiceCallDetailTotList.addAll(bodyData.voiceCallDetailTotDto)
+                    totUseTimeCntList.addAll(bodyData.totUseTimeCntDto)
+                    totUseTimeCntTotList.addAll(bodyData.totUseTimeCntTotDto)
                 }
-                updateAdapterData(totaluseTimeList)
+                requireActivity().runOnUiThread {
+                    setDataToTextViews(
+                        totaluseTimeList,
+
+                    )
+                }
             }
         })
-    }
-
-    private fun updateAdapterData(totaluseTimeList: List<KtDeductApiResponse.BodyData.TotaluseTimeDtoData>) {
-        // Run this on the main thread
-        requireActivity().runOnUiThread {
-            adapter.setData(totaluseTimeList)
-        }
     }
 
     private fun createRequestBody(phoneNumber: String): String {
@@ -153,4 +160,81 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
 
         return Gson().toJson(requestBody)
     }
+    private fun setDataToTextViews(totaluseTimeList: List<KtDeductApiResponse.BodyData.TotaluseTimeDtoData>) {
+        val totaluseTimeStringBuilder = StringBuilder()
+        totaluseTimeList.forEach { totaluseTime ->
+            val strSvcName = totaluseTime.strSvcName
+            var strFreeMinTotal = formatValue(totaluseTime.strFreeMinTotal)
+            var strFreeMinReMain = formatValue(totaluseTime.strFreeMinReMain)
+            var strFreeMinUse = formatValue(totaluseTime.strFreeMinUse)
+
+            if (strSvcName.contains("데이터")) {
+                val multiplier = 0.5 / (1024 * 1024)
+                strFreeMinUse = formatDataValue(strFreeMinUse, multiplier)
+                strFreeMinReMain = formatDataValue(strFreeMinReMain, multiplier)
+                strFreeMinTotal = formatDataValue(strFreeMinTotal, multiplier)
+            } else if (strSvcName.contains("속도제어")) {
+                val multiplier = 1.0
+                strFreeMinUse = formatDataValue(strFreeMinUse, multiplier)
+            } else if (strSvcName.contains("음성")) {
+                val minutesUse = strFreeMinUse.toIntOrNull() ?: 0
+                strFreeMinReMain = "" // Hide strFreeMinReMain
+                strFreeMinUse = "${minutesUse / 60}분"
+            } else if (strSvcName.contains("영상")) {
+                val minutesTotal = strFreeMinTotal.toIntOrNull() ?: 0
+                val minutesRemain = strFreeMinReMain.toIntOrNull() ?: 0
+                val minutesUse = strFreeMinUse.toIntOrNull() ?: 0
+                strFreeMinTotal = "${minutesTotal / 60}분"
+                strFreeMinReMain = "${minutesRemain / 60}분"
+                strFreeMinUse = "${minutesUse / 60}분"
+            } else if (strSvcName.contains("통화")) {
+                val minutesTotal = strFreeMinTotal.toIntOrNull() ?: 0
+                val minutesUse = strFreeMinUse.toIntOrNull() ?: 0
+                val minutesRemain = strFreeMinReMain.toIntOrNull() ?: 0
+                strFreeMinTotal = "${minutesTotal / 60}분"
+                strFreeMinReMain = "${minutesRemain / 60}분"
+                strFreeMinUse = "${minutesUse / 60}분"
+            } else if (strSvcName.contains("SMS")) {
+                strFreeMinReMain = "" // Hide strFreeMinReMain
+            }
+
+            totaluseTimeStringBuilder.append("\n")
+            val spannableSvcName = SpannableString("${totaluseTime.strSvcName}\n")
+            spannableSvcName.setSpan(AbsoluteSizeSpan(32, true), 0, spannableSvcName.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            totaluseTimeStringBuilder.append(spannableSvcName)
+            totaluseTimeStringBuilder.append("\n")
+            totaluseTimeStringBuilder.append(String.format("%-30s %20s%n", "총제공량", strFreeMinTotal))
+            totaluseTimeStringBuilder.append(String.format("%-30s %20s%n", "잔여량", strFreeMinReMain))
+            totaluseTimeStringBuilder.append(String.format("%-30s %20s%n", "사용량", strFreeMinUse))
+            totaluseTimeStringBuilder.append("\n\n\n")
+        }
+        totaluseTimeTextView.text = totaluseTimeStringBuilder.toString()
+    }
+
+    private fun formatValue(value: String): String {
+        val intValue = value.toIntOrNull()
+        return if (intValue != null && intValue >= 999999999) {
+            "무제한"
+        } else {
+            value
+        }
+    }
+
+    private fun formatDataValue(value: String, multiplier: Double): String {
+        val floatValue = value.toFloatOrNull()
+        return if (floatValue != null) {
+            val formattedValue = String.format("%.2f GB", floatValue * multiplier)
+            formattedValue
+        } else {
+            value
+        }
+    }
+
+
+
+
+
+
+
 }
+//

@@ -22,14 +22,14 @@ data class KtDeductApiResponse(
         data class TotaluseTimeDtoData(
             val strBunGun: String,
             val strSvcName: String,
-            val strCtnSecs: String,
+            var strCtnSecs: String,
             val strSecsToRate: String,
             val strSecsToAmt: String,
-            val strFreeMinCur: String,
-            val strFreeminRoll: String,
-            val strFreeMinTotal: String,
-            val strFreeMinUse: String,
-            val strFreeMinReMain: String
+            var strFreeMinCur: String,
+            var strFreeminRoll: String,
+            var strFreeMinTotal: String,
+            var strFreeMinUse: String,
+            var strFreeMinReMain: String
         )
 
         data class VoiceCallDetailDtoData(
@@ -71,6 +71,8 @@ data class KtDeductApiResponse(
         )
     }
 }
+
+
 
 
 

@@ -16,21 +16,24 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="85dp"
+            android:orientation="horizontal"
+            android:background="#f5f5f5">
 
             <TextView
                 android:id="@+id/textView17"
-                android:layout_width="match_parent"
-                android:layout_height="80sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:background="#f5f5f5"
                 android:gravity="center"
                 android:text="사용량 상세내역"
+                android:textStyle="bold"
                 android:textColor="@color/black"
-                android:textSize="18sp"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                android:layout_marginBottom="20dp"/>
 
             <ImageButton
                 android:id="@+id/btn_pgDown"
@@ -46,31 +49,74 @@
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="16dp"
-            tools:context=".KtDeductDetailViewFragment">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:background="@color/white"
+                android:weightSum="5">
 
                 <TextView
+                    android:gravity="center"
+                    android:id="@+id/tvTotaluseTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="사용 정보"
-                    android:textSize="18sp"
-                    android:textStyle="bold" />
+                    android:text="TotaluseTime"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_weight="1"
+                    android:textColor="@color/black"
+                    android:layout_gravity="center"/>
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvTotaluseTime"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginBottom="16dp" />
+                <TextView
+                    android:id="@+id/tvVoiceCallDetail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="VoiceCallDetail"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_weight="1"
+                    android:textColor="@color/black"
+                    android:layout_gravity="center"
+                    android:visibility="gone"/>
 
+                <TextView
+                    android:id="@+id/tvVoiceCallDetailTot"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="VoiceCallDetailTot"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_weight="1"
+                    android:textColor="@color/black"
+                    android:layout_gravity="center"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/tvTotUseTimeCnt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TotuseTimeCnt"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_weight="1"
+                    android:textColor="@color/black"
+                    android:layout_gravity="center"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/tvTotUseTimeCntTot"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TotUseTimeCntTot"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_weight="1"
+                    android:textColor="@color/black"
+                    android:layout_gravity="center"
+                    android:visibility="gone"/>
             </LinearLayout>
 
         </ScrollView>
