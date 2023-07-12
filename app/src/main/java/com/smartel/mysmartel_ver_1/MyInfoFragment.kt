@@ -1,6 +1,7 @@
 package com.smartel.mysmartel_ver_1
 
 import android.content.ContentValues.TAG
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -8,18 +9,24 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
+import androidx.privacysandbox.tools.core.model.Method
+import androidx.viewpager2.widget.ViewPager2
+import com.android.volley.RequestQueue
+import com.android.volley.toolbox.*
+import com.bumptech.glide.Glide
 import com.example.mysmartel_ver_1.R
+import okhttp3.Request
+import okhttp3.Response
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
 
 class MyInfoFragment : Fragment() {
-
 
     private lateinit var txtcustName: TextView
     private lateinit var txtPhoneNumber: TextView
@@ -36,7 +43,9 @@ class MyInfoFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_my_info, container, false)
+        val view = inflater.inflate(R.layout.fragment_my_info, container, false)
+
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -55,8 +64,8 @@ class MyInfoFragment : Fragment() {
         val serviceAcct = viewModel.serviceAcct?: arguments?.getString("service_acct")
 
        // Set the data in the views
-        txtcustName.text = " ${custName}님, 안녕하세요. "
-        txtPhoneNumber.text = " ✆ [$Telecom] ${phoneNumber ?: "Unknown"} "
+        txtcustName.text = "  ${custName}님, 안녕하세요. "
+        txtPhoneNumber.text = "  ✆ [$Telecom] ${phoneNumber ?: "Unknown"} "
         txtTelecom.text = Telecom
 
         // Set the data in the ViewModel
@@ -64,7 +73,7 @@ class MyInfoFragment : Fragment() {
         viewModel.phoneNumber = phoneNumber
         viewModel.Telecom = Telecom
 
-        // 버튼을 클릭시 아래에서 위로 올라오는 상세보기 페이지 클릭이벤트
+        // 버튼을 클릭시 아래에서 위로 올라오는 사용량 상세보기 페이지 클릭이벤트
         val btnShowFragment = view?.findViewById<Button>(R.id.btn_detailDeduct)
         btnShowFragment?.setOnClickListener {
             val telecom = viewModel.Telecom ?: arguments?.getString("Telecom")
@@ -123,6 +132,65 @@ class MyInfoFragment : Fragment() {
                     .commit()
             }
         }
+        // 버튼을 클릭시 아래에서 위로 올라오는 청구요금 상세보기 페이지 클릭이벤트
+        val btnBillDetailFragment = view?.findViewById<Button>(R.id.btn_billDetailDeduct)
+        btnBillDetailFragment?.setOnClickListener {
+            val telecom = viewModel.Telecom ?: arguments?.getString("Telecom")
+            val fragment: Fragment? = when (telecom) {
+                "SKT" -> {
+                    val skBillDetailFragment = SktBillDetailFragment()
+                    val bundle = Bundle()
+                    bundle.putString("serviceAcct", serviceAcct)
+                    skBillDetailFragment.arguments = bundle
+
+                    // Log the values for SKT
+                    Log.d(TAG, "--------------------serviceAcct: $serviceAcct--------------------")
+
+                    skBillDetailFragment
+                }
+                "KT" -> {
+                    val ktBillDetailFragment = KtBillDetailFragment()
+                    val bundle = Bundle()
+                    bundle.putString("phoneNumber", phoneNumber)
+                    ktBillDetailFragment.arguments = bundle
+
+                    // Log the values for KT
+                    Log.d(TAG, "--------------------phoneNumber: $phoneNumber--------------------")
+
+                    ktBillDetailFragment
+                }
+                "LGT" -> {
+                    val lgtBillDetailFragment = LgtBillDetailFragment()
+                    val bundle = Bundle()
+                    bundle.putString("custNm", custName)
+                    bundle.putString("phoneNumber", phoneNumber)
+                    lgtBillDetailFragment.arguments = bundle
+
+                    // Log the values for LGT
+                    Log.d(TAG, "custName: $custName")
+                    Log.d(TAG, "phoneNumber: $phoneNumber")
+
+                    lgtBillDetailFragment
+                }
+                else -> {
+                    Log.e(TAG, "Invalid Telecom value: $telecom")
+                    null
+                }
+            }
+
+            fragment?.let {
+                requireFragmentManager().beginTransaction()
+                    .setCustomAnimations(
+                        R.anim.slide_in_up, // Animation for fragment enter
+                        R.anim.slide_out_down, // Animation for fragment exit
+                        R.anim.slide_in_up, // Animation for fragment pop-enter
+                        R.anim.slide_out_down // Animation for fragment pop-exit
+                    )
+                    .add(android.R.id.content, it)
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
 
         // Set click listener for btn_menu button 하단 메뉴이동 네비게이션바 컨트롤러
         view.findViewById<ImageButton>(R.id.btn_menu).setOnClickListener {
@@ -137,6 +205,7 @@ class MyInfoFragment : Fragment() {
         // Set click listener for the back button
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackPressedCallback)
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
 

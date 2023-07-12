@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mysmartel_ver_1.R
@@ -29,6 +30,8 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
     private lateinit var totUseTimeCntTextView: TextView
     private lateinit var totUseTimeCntTotTextView: TextView
     private var initialY: Float = 0f
+
+    private lateinit var sharedViewModel: SharedViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -91,6 +94,8 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         fetchDeductApiData()
+        sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
+
     }
 
     private fun fetchDeductApiData() {

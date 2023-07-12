@@ -66,6 +66,9 @@ class LoginActivity : AppCompatActivity() {
             showAlertDialog(message)
         }
     }
+
+    // Assume this function is triggered after the login process is completed
+
     private fun showAlertDialog(message: String) {
         val alertDialog = AlertDialog.Builder(this)
             .setMessage(message)

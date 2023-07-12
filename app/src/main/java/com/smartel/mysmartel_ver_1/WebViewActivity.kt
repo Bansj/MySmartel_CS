@@ -30,7 +30,7 @@ class WebViewActivity : AppCompatActivity() {
         }
     }
 
-    private inner class MyWebViewClient : WebViewClient() {
+    private inner class MyWebViewClient : WebViewClient() { // 어플 안에서 웹뷰로 열리게 해주는 기능
         override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: SslError?) {
             handler?.proceed() // Ignore SSL certificate errors
         }

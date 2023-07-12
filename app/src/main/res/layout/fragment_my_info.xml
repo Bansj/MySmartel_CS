@@ -52,7 +52,7 @@
 
                     android:id="@+id/linearLayout2"
                     android:layout_width="match_parent"
-                    android:layout_height="80dp"
+                    android:layout_height="100dp"
                     android:layout_marginHorizontal="3dp"
                     android:layout_marginTop="15dp"
                     android:background="@drawable/box_whitesmoke"
@@ -79,9 +79,9 @@
                         android:layout_height="30dp"
                         android:layout_gravity="center"
                         android:layout_marginHorizontal="10dp"
-                        android:layout_marginTop="5dp"
+                        android:layout_marginTop="15dp"
                         android:gravity="center_vertical"
-                        android:text="✆ 01012345678"
+                        android:text="  ✆ 01012345678"
                         android:textColor="@color/black"
                         android:visibility="visible"
                         android:textSize="15dp" />
@@ -104,11 +104,110 @@
                 </LinearLayout>
 
                 <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/constraintLayout"
+                    android:id="@+id/layout_leftData"
                     android:layout_width="match_parent"
-                    android:layout_height="180dp"
+                    android:layout_height="165dp"
+                    android:layout_marginTop="25dp"
                     android:layout_marginHorizontal="3dp"
-                    android:layout_marginTop="20dp"
+                    android:background="@drawable/box_whitesmoke"
+                    android:elevation="3dp"
+                    android:outlineProvider="background"
+                    android:orientation="vertical"
+                    app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
+
+                    <TextView
+                        android:id="@+id/left_data"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:layout_marginTop="15dp"
+                        android:text="남은 사용량"
+                        android:textColor="@color/black"
+                        android:textSize="18dp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/txt_leftData"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="9.82GB "
+                        android:textColor="@color/black"
+                        android:textSize="22dp"
+                        android:textStyle="bold"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/left_data"
+                        android:layout_marginStart="20dp"/>
+
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:src="@drawable/ic_update_16"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginTop="20dp"/>
+
+                    <ProgressBar
+                        android:id="@+id/progressBar_leftData5"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:layout_marginHorizontal="20dp"
+                        android:indeterminate="false"
+                        android:max="100"
+                        android:progress="82"
+                        android:progressDrawable="@drawable/progressbar_coralpink"
+                        app:layout_constraintTop_toBottomOf="@+id/txt_leftData"
+                        android:layout_marginTop="5dp" />
+
+                    <Button
+                        android:id="@+id/btn_detailDeduct"
+                        android:layout_marginTop="20dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:layout_marginHorizontal="30dp"
+                        android:layout_marginBottom="15dp"
+                        android:background="@drawable/box_silver"
+                        android:text="상세보기"
+                        android:textSize="15sp"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <LinearLayout
+                android:id="@+id/layout_banner"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginTop="25dp"
+                android:layout_marginHorizontal="3dp"
+                android:background="@drawable/box_whitesmoke"
+                android:elevation="3dp"
+                android:outlineProvider="background"
+                android:orientation="vertical"
+                app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/banner_3"
+                    android:scaleType="fitXY"/>
+
+                <androidx.viewpager2.widget.ViewPager2
+                    android:id="@+id/pg_banner"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+            </LinearLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layout_billAmount"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:layout_marginHorizontal="3dp"
+                    android:layout_marginTop="25dp"
                     android:background="@drawable/box_whitesmoke"
                     android:elevation="4dp"
                     android:orientation="vertical"
@@ -121,7 +220,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="20dp"
                         android:layout_marginTop="15dp"
-                        android:text="나의 요금"
+                        android:text="청구 요금"
                         android:textColor="@color/black"
                         android:textSize="18dp"
                         android:textStyle="bold"
@@ -129,75 +228,40 @@
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
-                        android:id="@+id/textView4"
+                        android:id="@+id/txt_thisMonthBillDate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="15dp"
                         android:layout_marginRight="10dp"
                         android:layout_toRightOf="@id/my_fee"
-                        android:text="2023.02.01 ~ 23.02.28"
+                        android:text="2023.07"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
-                        android:id="@+id/textView5"
+                        android:id="@+id/txt_thisMonthBill"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="15dp"
                         android:layout_marginRight="15dp"
-                        android:text="35,800원 >"
+                        android:text="35,800원"
                         android:textColor="@color/black"
                         android:textSize="18dp"
                         android:textStyle="bold"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/textView4" />
-
-                    <TextView
-                        android:id="@+id/textView7"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginTop="5dp"
-                        android:text="이용요금"
-                        android:textSize="15dp"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/textView5" />
-
-                    <TextView
-                        android:id="@+id/textView6"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginRight="20dp"
-                        android:text="38,800"
-                        android:textSize="15dp"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/textView5" />
-
+                        app:layout_constraintTop_toBottomOf="@+id/txt_thisMonthBillDate" />
 
                     <Button
-                        android:id="@+id/button"
-                        android:layout_width="120dp"
-                        android:layout_height="30dp"
-                        android:layout_marginLeft="60dp"
+                        android:id="@+id/btn_billDetailDeduct"
+                        android:layout_marginTop="20dp"
+                        android:layout_width="match_parent"
+                        android:layout_height="35dp"
+                        android:layout_marginHorizontal="30dp"
                         android:layout_marginBottom="15dp"
                         android:background="@drawable/box_silver"
-                        android:text="즉시납부"
-                        android:textSize="15dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
-
-                    <Button
-                        android:layout_width="120dp"
-                        android:layout_height="30dp"
-                        android:layout_marginRight="60dp"
-                        android:layout_marginBottom="15dp"
-                        android:background="@drawable/box_silver"
-                        android:gravity="center"
-                        android:text="납부방법 변경"
-                        android:textSize="15dp"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent" />
+                        android:text="상세보기"
+                        android:textSize="15sp"
+                        app:layout_constraintBottom_toBottomOf="parent" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -235,72 +299,13 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginHorizontal="3dp"
-                    android:background="@drawable/box_whitesmoke"
-                    android:elevation="3dp"
-                    android:outlineProvider="background"
-                    android:orientation="vertical"
-                    app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
-
-                    <TextView
-                        android:id="@+id/left_data"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="20dp"
-                        android:layout_marginTop="15dp"
-                        android:text="남은 사용량"
-                        android:textColor="@color/black"
-                        android:textSize="18dp"
-                        android:textStyle="bold"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
-
-                    <TextView
-                        android:layout_marginTop="10dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="20dp"
-                        android:text="9.82GB "
-                        android:textColor="@color/black"
-                        android:textSize="22dp"
-                        android:textStyle="bold" />
-
-                    <ProgressBar
-                        android:id="@+id/progressBar_leftData5"
-                        android:layout_marginTop="10dp"
-                        android:layout_width="match_parent"
-                        android:layout_marginHorizontal="20dp"
-                        android:layout_height="8dp"
-                        android:max="100"
-                        android:progress="82"
-                        android:indeterminate="false"
-                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                        android:progressDrawable="@drawable/progressbar_coralpink"/>
-
-                    <Button
-                        android:id="@+id/btn_detailDeduct"
-                        android:layout_marginTop="20dp"
-                        android:layout_width="match_parent"
-                        android:layout_height="35dp"
-                        android:layout_marginHorizontal="30dp"
-                        android:layout_marginBottom="15dp"
-                        android:background="@drawable/box_silver"
-                        android:text="상세보기"
-                        android:textSize="15sp"
-                        app:layout_constraintBottom_toBottomOf="parent" />
-
-                </LinearLayout>
-
                 <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layout_additionalServices"
                     android:layout_marginBottom="15dp"
                     android:layout_width="match_parent"
                     android:layout_height="190dp"
                     android:layout_marginHorizontal="3dp"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="25dp"
                     android:background="@drawable/box_whitesmoke"
                     android:elevation="2dp"
                     android:outlineProvider="background"
