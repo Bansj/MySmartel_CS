@@ -93,11 +93,14 @@ class KtBillDetailFragment : Fragment() {
                 bodyData?.let {
                     requireActivity().runOnUiThread {
                         setDataToTextViews(it)
+                        //checkAndSendDataToMyInfoFragment()
                     }
                 }
             }
         })
     }
+
+
 
     private fun createRequestBody(phoneNumber: String): RequestBody {
         val requestBody = HashMap<String, List<HashMap<String, String>>>()
@@ -127,7 +130,7 @@ class KtBillDetailFragment : Fragment() {
     }
 
     private fun setDataToTextViews(bodyData: Body) {
-        textViewDateView.text = "Date current 당월: ${bodyData.dateView}"
+        textViewDateView.text = "당월 ${bodyData.dateView}"
 
         val screenWidth = Resources.getSystem().displayMetrics.widthPixels
 

@@ -46,6 +46,9 @@
         <action
             android:id="@+id/action_menuFragment_to_settingFragment"
             app:destination="@id/settingFragment" />
+        <action
+            android:id="@+id/action_menuFragment_to_settingFragment2"
+            app:destination="@id/settingFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingFragment"

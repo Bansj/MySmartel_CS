@@ -2,6 +2,7 @@ package com.smartel.mysmartel_ver_1
 
 
 import android.content.Context
+import android.nfc.Tag
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -57,8 +58,31 @@ class MainActivity : AppCompatActivity() {
             .replace(R.id.myInfoFragment, myInfoFragment)
             .commit()
 
-        // Log the value of Telecom
-        Log.d(TAG, "Telecom: $Telecom")
+        // Log the value of bundle
+        Log.d(TAG, "MyInfoFragment  --> custName: $custName, phoneNumber: $phoneNumber, Telecom: $Telecom, serviceAcct: $serviceAcct---------------")
+
+        // Create a new instance of MenuFragment
+        val menuFragment = MenuFragment()
+        val menuBundle = Bundle()
+        menuBundle.putString("phoneNumber", phoneNumber)
+        menuBundle.putString("servicesAcct", serviceAcct)
+        menuBundle.putString("custName", custName)
+        menuBundle.putString("Telecom", Telecom)
+        menuFragment.arguments = menuBundle
+
+        // Log the value of phoneNumber
+        Log.d(TAG, "MenuFragment    --> custName: $custName, phoneNumber: $phoneNumber, Telecom: $Telecom, serviceAcct: $serviceAcct---------------")
+
+        // Create a new instance of SettingFragment
+        val settingFragment = SettingFragment()
+        val settingBundle = Bundle()
+        settingBundle.putString("phoneNumber", phoneNumber)
+        settingBundle.putString("servicesAcct", serviceAcct)
+        settingBundle.putString("custName", custName)
+        settingBundle.putString("Telecom", Telecom)
+        settingFragment.arguments = settingBundle
+
+        Log.d(TAG, "SettingFragment --> custName: $custName, phoneNumber: $phoneNumber, Telecom: $Telecom, serviceAcct: $serviceAcct---------------")
     }
 }
 

@@ -7,7 +7,6 @@ data class KtDeductApiResponse(
     data class HeaderData(
         val type: String
     )
-
     data class BodyData(
         val traceno: String,
         val totaluseTimeDto: List<TotaluseTimeDtoData>,

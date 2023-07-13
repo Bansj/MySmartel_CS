@@ -20,6 +20,8 @@ import com.google.gson.Gson
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import java.io.IOException
+import java.util.*
+import kotlin.collections.HashMap
 
 class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
 
@@ -30,8 +32,6 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
     private lateinit var totUseTimeCntTextView: TextView
     private lateinit var totUseTimeCntTotTextView: TextView
     private var initialY: Float = 0f
-
-    private lateinit var sharedViewModel: SharedViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -93,9 +93,14 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        fetchDeductApiData()
-        sharedViewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
 
+        // Receive phoneNumber argument
+        val phoneNumber = requireArguments().getString("PhoneNumber")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        fetchDeductApiData()
     }
 
     private fun fetchDeductApiData() {
@@ -129,21 +134,49 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
                 val totUseTimeCntList = mutableListOf<KtDeductApiResponse.BodyData.TotUseTimeCntDtoData>()
                 val totUseTimeCntTotList = mutableListOf<KtDeductApiResponse.BodyData.TotUseTimeCntTotDtoData>()
 
-                apiResponse.body.forEach { bodyData ->
-                    totaluseTimeList.addAll(bodyData.totaluseTimeDto)
-                    voiceCallDetailList.addAll(bodyData.voiceCallDetailDto)
-                    voiceCallDetailTotList.addAll(bodyData.voiceCallDetailTotDto)
-                    totUseTimeCntList.addAll(bodyData.totUseTimeCntDto)
-                    totUseTimeCntTotList.addAll(bodyData.totUseTimeCntTotDto)
+                apiResponse.body?.forEach { bodyData ->
+                    bodyData.totaluseTimeDto?.let { totaluseTimeList.addAll(it) }
+                    bodyData.voiceCallDetailDto?.let { voiceCallDetailList.addAll(it) }
+                    bodyData.voiceCallDetailTotDto?.let { voiceCallDetailTotList.addAll(it) }
+                    bodyData.totUseTimeCntDto?.let { totUseTimeCntList.addAll(it) }
+                    bodyData.totUseTimeCntTotDto?.let { totUseTimeCntTotList.addAll(it) }
                 }
-                requireActivity().runOnUiThread {
-                    setDataToTextViews(
-                        totaluseTimeList,
 
-                    )
+                requireActivity().runOnUiThread {
+                    setDataToTextViews(totaluseTimeList)
+                    checkAndSendDataToMyInfoFragment(totaluseTimeList)
                 }
             }
+
         })
+    }
+
+    private fun checkAndSendDataToMyInfoFragment(totaluseTimeList: List<KtDeductApiResponse.BodyData.TotaluseTimeDtoData>) {
+        for (totaluseTime in totaluseTimeList) {
+            val strSvcName = totaluseTime.strSvcName
+            val strFreeMinUse = totaluseTime.strFreeMinReMain
+
+            if (strSvcName.contains("데이터-합계")) {
+                val convertedValue = calculateDataValue(strFreeMinUse)
+                val formattedValue = String.format("%.2f GB", convertedValue)
+
+                val myInfoFragment = MyInfoFragment()
+                val args = Bundle()
+                args.putString("freeMinRemain", formattedValue)
+                myInfoFragment.arguments = args
+
+                val fragmentManager = requireActivity().supportFragmentManager
+                fragmentManager.beginTransaction()
+                    .add(R.id.myInfoFragment, myInfoFragment)
+                    .commit()
+                break // Exit the loop after finding the matching value
+            }
+        }
+    }
+
+    private fun calculateDataValue(value: String): Double {
+        val floatValue = value.toFloatOrNull()
+        return floatValue?.times(0.5)?.div(1024)?.div(1024) ?: 0.0
     }
 
     private fun createRequestBody(phoneNumber: String): String {
@@ -165,6 +198,7 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
 
         return Gson().toJson(requestBody)
     }
+
     private fun setDataToTextViews(totaluseTimeList: List<KtDeductApiResponse.BodyData.TotaluseTimeDtoData>) {
         val totaluseTimeStringBuilder = StringBuilder()
         totaluseTimeList.forEach { totaluseTime ->
@@ -208,9 +242,17 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
             spannableSvcName.setSpan(AbsoluteSizeSpan(32, true), 0, spannableSvcName.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             totaluseTimeStringBuilder.append(spannableSvcName)
             totaluseTimeStringBuilder.append("\n")
-            totaluseTimeStringBuilder.append(String.format("%-30s %20s%n", "총제공량", strFreeMinTotal))
-            totaluseTimeStringBuilder.append(String.format("%-30s %20s%n", "잔여량", strFreeMinReMain))
-            totaluseTimeStringBuilder.append(String.format("%-30s %20s%n", "사용량", strFreeMinUse))
+
+            totaluseTimeStringBuilder.append(String.format("%-40s %33s%n", "총제공량", strFreeMinTotal))
+            if (strSvcName.contains("음성") && strFreeMinReMain == "0") {
+                // Do not include "잔여량" if strFreeMinReMain is 0
+                totaluseTimeStringBuilder.append(String.format("%-42s %34s%n", "", strFreeMinReMain))
+            } else {
+                if (strFreeMinReMain != "0") {
+                    totaluseTimeStringBuilder.append(String.format("%-42.5s %33s%n", "잔여량", strFreeMinReMain))
+                }
+                totaluseTimeStringBuilder.append(String.format("%-42s %34s%n", "사용량", strFreeMinUse))
+            }
             totaluseTimeStringBuilder.append("\n\n\n")
         }
         totaluseTimeTextView.text = totaluseTimeStringBuilder.toString()
@@ -234,12 +276,6 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
             value
         }
     }
-
-
-
-
-
-
-
 }
+
 //

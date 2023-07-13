@@ -52,7 +52,7 @@
                 app:tint="@color/orange" />
 
             <TextView
-                android:id="@+id/user_name"
+                android:id="@+id/txtcustName"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:layout_marginStart="8dp"
@@ -64,7 +64,23 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/imageView"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.509" />
+                app:layout_constraintVertical_bias="0.488" />
+
+            <TextView
+                android:id="@+id/txtPhoneNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/txtcustName"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/txtTelecom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/txtPhoneNumber"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <View
                 android:layout_width="match_parent"
@@ -241,7 +257,7 @@
                     app:cardCornerRadius="8dp">
 
                     <TextView
-                        android:id="@+id/txt_billCheck"
+                        android:id="@+id/txt_billDetail"
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:layout_marginLeft="15dp"
@@ -643,7 +659,7 @@
             android:layout_gravity="bottom" />
 
         <ImageButton
-            android:id="@+id/btn_benefit"
+            android:id="@+id/btn_setting"
             android:layout_width="wrap_content"
             android:layout_height="60dp"
             android:layout_weight="1"

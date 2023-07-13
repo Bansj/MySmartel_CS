@@ -1,7 +1,6 @@
 package com.smartel.mysmartel_ver_1
 
 import android.content.ContentValues.TAG
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -14,17 +13,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
-import androidx.privacysandbox.tools.core.model.Method
-import androidx.viewpager2.widget.ViewPager2
-import com.android.volley.RequestQueue
-import com.android.volley.toolbox.*
-import com.bumptech.glide.Glide
 import com.example.mysmartel_ver_1.R
-import okhttp3.Request
-import okhttp3.Response
-import org.json.JSONArray
-import org.json.JSONException
-import org.json.JSONObject
 
 class MyInfoFragment : Fragment() {
 
@@ -57,13 +46,14 @@ class MyInfoFragment : Fragment() {
 
         sharedPrefs = MyInfoSharedPreferences(requireContext())
 
+
         // Retrieve the data from the ViewModel or arguments
         val custName = viewModel.custName ?: arguments?.getString("custName")
         val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")
         val Telecom = viewModel.Telecom ?: arguments?.getString("Telecom")
-        val serviceAcct = viewModel.serviceAcct?: arguments?.getString("service_acct")
+        val serviceAcct = viewModel.serviceAcct ?: arguments?.getString("service_acct")
 
-       // Set the data in the views
+        // Set the data in the views
         txtcustName.text = "  ${custName}님, 안녕하세요. "
         txtPhoneNumber.text = "  ✆ [$Telecom] ${phoneNumber ?: "Unknown"} "
         txtTelecom.text = Telecom
@@ -72,6 +62,37 @@ class MyInfoFragment : Fragment() {
         viewModel.custName = custName
         viewModel.phoneNumber = phoneNumber
         viewModel.Telecom = Telecom
+
+
+        val updateButton = view.findViewById<ImageButton>(R.id.btn_updateLeftData)
+        updateButton.setOnClickListener {
+
+            val ktDeductDetailViewFragment = KtDeductDetailViewFragment()
+            val args = Bundle()
+            args.putString("phoneNumber", phoneNumber)
+            ktDeductDetailViewFragment.arguments = args
+
+            val freeMinRemain2 = arguments?.getString("freeMinRemain")
+            if (freeMinRemain2 != null) {
+                view.findViewById<TextView>(R.id.txt_leftData).text = freeMinRemain2
+
+            val sktDeductDetailViewFragment = SktDeductDetailViewFragment()
+            val args = Bundle()
+            args.putString("serviceAcct", serviceAcct)
+            sktDeductDetailViewFragment.arguments = args
+
+            val lgtDeductDetailViewFragment = LgtDeductDetailViewFragment()
+            val argsl = Bundle()
+            args.putString("phoneNumber", phoneNumber)
+            args.putString("custName", custName)
+            lgtDeductDetailViewFragment.arguments = argsl
+
+
+
+                val toastMessage = "새로고침"
+                Toast.makeText(requireContext(), toastMessage, Toast.LENGTH_SHORT).show()
+            }
+        }
 
         // 버튼을 클릭시 아래에서 위로 올라오는 사용량 상세보기 페이지 클릭이벤트
         val btnShowFragment = view?.findViewById<Button>(R.id.btn_detailDeduct)
@@ -85,7 +106,7 @@ class MyInfoFragment : Fragment() {
                     sktDeductDetailViewFragment.arguments = bundle
 
                     // Log the values for SKT
-                    Log.d(TAG, "serviceAcct: $serviceAcct")
+                    Log.d(TAG, "--------------------serviceAcct: $serviceAcct--------------------")
 
                     sktDeductDetailViewFragment
                 }
@@ -96,7 +117,7 @@ class MyInfoFragment : Fragment() {
                     ktDeductDetailViewFragment.arguments = bundle
 
                     // Log the values for KT
-                    Log.d(TAG, "phoneNumber: $phoneNumber")
+                    Log.d(TAG, "--------------------phoneNumber: $phoneNumber--------------------")
 
                     ktDeductDetailViewFragment
                 }
@@ -108,13 +129,13 @@ class MyInfoFragment : Fragment() {
                     lgtDeductDetailViewFragment.arguments = bundle
 
                     // Log the values for LGT
-                    Log.d(TAG, "custName: $custName")
-                    Log.d(TAG, "phoneNumber: $phoneNumber")
+                    Log.d(TAG, "--------------------custName: $custName--------------------")
+                    Log.d(TAG, "--------------------phoneNumber: $phoneNumber--------------------")
 
                     lgtDeductDetailViewFragment
                 }
                 else -> {
-                    Log.e(TAG, "Invalid Telecom value: $telecom")
+                    Log.e(TAG, "Invalid Telecom value: $telecom--------------------")
                     null
                 }
             }
@@ -127,9 +148,14 @@ class MyInfoFragment : Fragment() {
                         R.anim.slide_in_up, // Animation for fragment pop-enter
                         R.anim.slide_out_down // Animation for fragment pop-exit
                     )
-                    .add(android.R.id.content, it)
+
+                    .replace(id, it) // Use the ID of any existing container view in your layout
                     .addToBackStack(null)
                     .commit()
+                    //변경전 코드
+//                    .add(android.R.id.content, it)
+//                    .addToBackStack(null)
+//                    .commit()
             }
         }
         // 버튼을 클릭시 아래에서 위로 올라오는 청구요금 상세보기 페이지 클릭이벤트
@@ -167,8 +193,8 @@ class MyInfoFragment : Fragment() {
                     lgtBillDetailFragment.arguments = bundle
 
                     // Log the values for LGT
-                    Log.d(TAG, "custName: $custName")
-                    Log.d(TAG, "phoneNumber: $phoneNumber")
+                    Log.d(TAG, "--------------------custName: $custName--------------------")
+                    Log.d(TAG, "--------------------phoneNumber: $phoneNumber--------------------")
 
                     lgtBillDetailFragment
                 }
@@ -186,13 +212,68 @@ class MyInfoFragment : Fragment() {
                         R.anim.slide_in_up, // Animation for fragment pop-enter
                         R.anim.slide_out_down // Animation for fragment pop-exit
                     )
-                    .add(android.R.id.content, it)
+                    .replace(id, it) // Use the ID of any existing container view in your layout
                     .addToBackStack(null)
                     .commit()
             }
         }
+        val delayedRunnable = Runnable {
+            val telecom = viewModel.Telecom ?: arguments?.getString("Telecom")
+            val fragment: Fragment? = when (telecom) {
+                "SKT" -> {
+                    val sktDeductDetailViewFragment = SktDeductDetailViewFragment()
+                    val bundle = Bundle()
+                    bundle.putString("serviceAcct", serviceAcct)
+                    sktDeductDetailViewFragment.arguments = bundle
 
-        // Set click listener for btn_menu button 하단 메뉴이동 네비게이션바 컨트롤러
+                    // Log the values for SKT
+                    Log.d(TAG, "--------------------serviceAcct: $serviceAcct--------------------")
+
+                    sktDeductDetailViewFragment
+                }
+                "KT" -> {
+                    val ktDeductDetailViewFragment = KtDeductDetailViewFragment()
+                    val bundle = Bundle()
+                    bundle.putString("phoneNumber", phoneNumber)
+                    ktDeductDetailViewFragment.arguments = bundle
+
+                    // Log the values for KT
+                    Log.d(TAG, "--------------------phoneNumber: $phoneNumber--------------------")
+
+                    ktDeductDetailViewFragment
+                }
+                "LGT" -> {
+                    val lgtDeductDetailViewFragment = LgtDeductDetailViewFragment()
+                    val bundle = Bundle()
+                    bundle.putString("custNm", custName)
+                    bundle.putString("phoneNumber", phoneNumber)
+                    lgtDeductDetailViewFragment.arguments = bundle
+
+                    // Log the values for LGT
+                    Log.d(TAG, "--------------------custName: $custName--------------------")
+                    Log.d(TAG, "--------------------phoneNumber: $phoneNumber--------------------")
+
+                    lgtDeductDetailViewFragment
+                }
+                else -> {
+                    Log.e(TAG, "Invalid Telecom value: $telecom--------------------")
+                    null
+                }
+            }
+        }
+        val delayHandler = Handler(Looper.getMainLooper())
+
+        fun onResume() {
+            super.onResume()
+            delayHandler.postDelayed(delayedRunnable, 1000) // Delayed for 1 second
+        }
+
+        fun onPause() {
+            super.onPause()
+            delayHandler.removeCallbacks(delayedRunnable) // Remove the callback when the fragment is paused or stopped
+        }
+
+            // Set click listener for btn_menu button 하단 메뉴이동 네비게이션바 컨트롤러
         view.findViewById<ImageButton>(R.id.btn_menu).setOnClickListener {
             it.findNavController().navigate(R.id.action_myInfoFragment_to_menuFragment)
         }
@@ -233,6 +314,3 @@ class MyInfoFragment : Fragment() {
         }
     }
 }
-
-
-
