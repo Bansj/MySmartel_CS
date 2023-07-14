@@ -243,15 +243,15 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
             totaluseTimeStringBuilder.append(spannableSvcName)
             totaluseTimeStringBuilder.append("\n")
 
-            totaluseTimeStringBuilder.append(String.format("%-40s %33s%n", "총제공량", strFreeMinTotal))
+            totaluseTimeStringBuilder.append(String.format("%-40s %30s%n", "총제공량", strFreeMinTotal))
             if (strSvcName.contains("음성") && strFreeMinReMain == "0") {
                 // Do not include "잔여량" if strFreeMinReMain is 0
-                totaluseTimeStringBuilder.append(String.format("%-42s %34s%n", "", strFreeMinReMain))
+                totaluseTimeStringBuilder.append(String.format("%-40s %31s%n", "", strFreeMinReMain))
             } else {
                 if (strFreeMinReMain != "0") {
-                    totaluseTimeStringBuilder.append(String.format("%-42.5s %33s%n", "잔여량", strFreeMinReMain))
+                    totaluseTimeStringBuilder.append(String.format("%-41.5s %32s%n", "잔여량", strFreeMinReMain))
                 }
-                totaluseTimeStringBuilder.append(String.format("%-42s %34s%n", "사용량", strFreeMinUse))
+                totaluseTimeStringBuilder.append(String.format("%-40s %31s%n", "사용량", strFreeMinUse))
             }
             totaluseTimeStringBuilder.append("\n\n\n")
         }

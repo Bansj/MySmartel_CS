@@ -59,64 +59,28 @@
                 android:weightSum="5">
 
                 <TextView
-                    android:gravity="center"
-                    android:id="@+id/tvTotaluseTime"
+                    android:id="@+id/textViewDateView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="TotaluseTime"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_weight="1"
-                    android:textColor="@color/black"
-                    android:layout_gravity="center"/>
+                    android:text="Date View" />
 
                 <TextView
-                    android:id="@+id/tvVoiceCallDetail"
+                    android:id="@+id/textViewUseDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="VoiceCallDetail"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_weight="1"
-                    android:textColor="@color/black"
-                    android:layout_gravity="center"
-                    android:visibility="gone"/>
+                    android:text="Use Date" />
 
                 <TextView
-                    android:id="@+id/tvVoiceCallDetailTot"
+                    android:id="@+id/textViewDetListDto"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="VoiceCallDetailTot"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_weight="1"
-                    android:textColor="@color/black"
-                    android:layout_gravity="center"
-                    android:visibility="gone"/>
+                    android:text="Detail List DTO" />
 
                 <TextView
-                    android:id="@+id/tvTotUseTimeCnt"
+                    android:id="@+id/txt_sumAmount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="TotuseTimeCnt"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_weight="1"
-                    android:textColor="@color/black"
-                    android:layout_gravity="center"
-                    android:visibility="gone"/>
-
-                <TextView
-                    android:id="@+id/tvTotUseTimeCntTot"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="TotUseTimeCntTot"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:layout_weight="1"
-                    android:textColor="@color/black"
-                    android:layout_gravity="center"
-                    android:visibility="gone"/>
+                    android:text="Sum Amount" />
             </LinearLayout>
 
         </ScrollView>

@@ -48,6 +48,7 @@ class LgtDeductDetailViewFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_lgt_deduct_detail_view, container, false)
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

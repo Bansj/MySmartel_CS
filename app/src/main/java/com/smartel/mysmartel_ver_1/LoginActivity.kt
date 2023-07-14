@@ -179,29 +179,6 @@ class LoginActivity : AppCompatActivity() {
             Log.d("\nLoginActivity - getString",
                 "-----------------User Info - Telecom: $telecom, CustName: $custName, ServiceAccount: $serviceAcct, PhoneNumber: $phoneNumber-----------------------")
 
-            /*// Create a new instance of MyInfoFragment
-            val myInfoFragment = MyInfoFragment()
-
-            // Create a Bundle to hold the data
-            val bundle = Bundle()
-
-            // Put the data into the Bundle
-            bundle.putString("custName", custName)
-            bundle.putString("phoneNumber", phoneNumber)
-            bundle.putString("Telecom", telecom)
-            bundle.putString("serviceAcct", serviceAcct)
-
-            // Set the arguments (data) for the fragment
-            myInfoFragment.arguments = bundle
-
-            // Replace the current fragment with MyInfoFragment
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.myInfoFragment, myInfoFragment)
-                .commit()
-
-            Log.d("\nLoginActivity - putExtra",
-                "-----------------User Info - Telecom: $telecom, CustName: $custName, ServiceAccount: $serviceAcct, PhoneNumber: $phoneNumber-----------------------")*/
-
             val intent = Intent(this, MainActivity::class.java)
             intent.putExtra("custName", custName)
             intent.putExtra("PhoneNumber", phoneNumber)

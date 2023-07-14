@@ -99,10 +99,7 @@ class KtBillDetailFragment : Fragment() {
             }
         })
     }
-
-
-
-    private fun createRequestBody(phoneNumber: String): RequestBody {
+    private fun createRequestBody(phoneNumber: String): RequestBody {  //Requerst body만들어 발신하기
         val requestBody = HashMap<String, List<HashMap<String, String>>>()
         val headerData = HashMap<String, String>()
         val bodyData = HashMap<String, String>()
@@ -163,18 +160,13 @@ class KtBillDetailFragment : Fragment() {
 
         Log.d(TAG, "Data set to TextViews: \n bodyData=$bodyData\n, \n detListDtoText=$detListDtoText \n")
     }
-
-
     private fun getCurrentYearMonth(): String {
         val currentDate = Calendar.getInstance().time
         val yearMonthFormat = SimpleDateFormat("yyyyMM", Locale.getDefault())
         return yearMonthFormat.format(currentDate)
     }
-
     companion object {
         private const val TAG = "KtBillDetailFragment"
         private val MEDIA_TYPE_JSON = "application/json; charset=utf-8".toMediaType()
     }
 }
-
-
