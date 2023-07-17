@@ -1,6 +1,5 @@
 package com.smartel.mysmartel_ver_1
 
-
 import android.content.Context
 import android.nfc.Tag
 import android.os.Bundle

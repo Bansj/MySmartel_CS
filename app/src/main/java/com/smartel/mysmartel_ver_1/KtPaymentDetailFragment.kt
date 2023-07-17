@@ -1,10 +1,14 @@
 package com.smartel.mysmartel_ver_1
 
+import android.content.Context
+import android.content.res.Resources
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -21,10 +25,7 @@ import java.util.*
 
 class KtPaymentDetailFragment : Fragment() {
 
-    private lateinit var textViewDateView: TextView
-    private lateinit var textViewUseDate: TextView
     private lateinit var textViewDetListDto: TextView
-    private lateinit var txt_sumAmount: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,10 +35,8 @@ class KtPaymentDetailFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_kt_payment_detail, container, false)
 
         // Initialize TextViews
-        textViewDateView = view.findViewById(R.id.textViewDateView)
-        textViewUseDate = view.findViewById(R.id.textViewUseDate)
         textViewDetListDto = view.findViewById(R.id.textViewDetListDto)
-        txt_sumAmount = view.findViewById(R.id.txt_sumAmount)
+
         val moveButton = view.findViewById<ImageButton>(R.id.btn_pgDown)
         moveButton.setOnClickListener {
             animateFragmentOut(view)
@@ -78,7 +77,7 @@ class KtPaymentDetailFragment : Fragment() {
                 val apiResponse = Gson().fromJson(responseData, KtPaymentApiResponse::class.java)
 
                 requireActivity().runOnUiThread {
-                    val paymentDataString = formatPaymentData(apiResponse)
+                    val paymentDataString = formatPaymentData(apiResponse, requireContext())
                     textViewDetListDto.text = paymentDataString
                 }
             }
@@ -102,39 +101,80 @@ class KtPaymentDetailFragment : Fragment() {
 
         return jsonRequestBody.toRequestBody(MEDIA_TYPE_JSON)
     }
-    private fun formatPaymentData(apiResponse: KtPaymentApiResponse): String {
+    private fun formatPaymentData(apiResponse: KtPaymentApiResponse, context: Context): String {
         val bodyData = apiResponse.body?.firstOrNull()
 
         if (bodyData != null) {
             val stringBuilder = StringBuilder()
 
-            stringBuilder.append("CTN Number: ${bodyData.ctnNumproductionDate} for the current month")
-            stringBuilder.append("\n\n")
-
-            val numberFormat = NumberFormat.getNumberInstance(Locale.getDefault())
-
             bodyData.payMentDto?.forEach { paymentDto ->
                 stringBuilder.append("\n")
-                val billMonth = paymentDto.billMonth.substring(0, 6)
-                stringBuilder.append(String.format("%6s", billMonth).trim().centerJustify(6))
+                val year = paymentDto.billMonth.substring(0, 4)
+                val month = paymentDto.billMonth.substring(4, 6)
+                val formattedBillMonth = "${year}년 ${month}월"
+
+                val screenWidth = getScreenWidth(context)
+                val fixedWidth = 70
+                val availableWidth = screenWidth.coerceAtMost(fixedWidth)
+                val padding = (availableWidth - formattedBillMonth.length) / 2
+
+                val centeredBillMonth = " ".repeat(padding) + formattedBillMonth + " ".repeat(padding)
+
+                stringBuilder.append(centeredBillMonth)
                 stringBuilder.append("\n\n")
-                stringBuilder.append("청구요금: ${paymentDto.thisMonth}")
+
+                val titleWidth = 12 // Fixed width for the title section
+                val valueWidth = 12 // Arbitrary width for the value section
+
+                val formattedThisMonth = "청구요금 ${paymentDto.thisMonth}원".splitValueAndAlign(titleWidth, valueWidth)
+                stringBuilder.append(formattedThisMonth)
                 stringBuilder.append("\n")
-                stringBuilder.append("미납요금: ${paymentDto.pastDueAmt}")
-                stringBuilder.append("\n\n")
+
+                val formattedPastDueAmt = "미납요금 ${paymentDto.pastDueAmt}원".splitValueAndAlign(titleWidth, valueWidth)
+                stringBuilder.append(formattedPastDueAmt)
+                stringBuilder.append("\n\n\n")
             }
             return stringBuilder.toString()
         }
         return "No payment data available"
     }
 
+    private fun getScreenWidth(context: Context): Int {
+        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+        val displayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+        return displayMetrics.widthPixels
+    }
+
+    fun String.splitValueAndAlign(titleWidth: Int, valueWidth: Int): String {
+        val parts = this.split(" ")
+        val title = parts[0]
+        val value = parts[1]
+
+        val titlePadding = titleWidth - title.length
+        val valuePadding = valueWidth - value.length
+
+        val titlePaddingBuilder = StringBuilder()
+        val valuePaddingBuilder = StringBuilder()
+
+        for (i in 0 until titlePadding) {
+            titlePaddingBuilder.append("\t\t\t\t")
+        }
+        for (i in 0 until valuePadding) {
+            valuePaddingBuilder.append("\t")
+        }
+
+        return "$title$titlePaddingBuilder$valuePaddingBuilder$value"
+    }
+
     private fun String.centerJustify(width: Int): String {
         val padding = width - this.length
         val leftPadding = padding / 2
         val rightPadding = padding - leftPadding
-        return " ".repeat(leftPadding) + this + " ".repeat(rightPadding)
+        val adjustedLeftPadding = maxOf(leftPadding, 0)
+        val adjustedRightPadding = maxOf(rightPadding, 0)
+        return " ".repeat(adjustedLeftPadding) + this + " ".repeat(adjustedRightPadding)
     }
-
 
     private fun getCurrentYearMonth(): String {
         val currentDate = Calendar.getInstance().time
