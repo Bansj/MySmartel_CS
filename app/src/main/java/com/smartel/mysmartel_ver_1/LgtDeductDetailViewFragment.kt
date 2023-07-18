@@ -24,7 +24,6 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
-
 class LgtDeductDetailViewFragment : Fragment() {
 
     private lateinit var binding: FragmentLgtDeductDetailViewBinding
@@ -143,54 +142,63 @@ class LgtDeductDetailViewFragment : Fragment() {
             } else {
                 svcTypNm
             }
-
             // Append the values to the data string with proper formatting
             dataStringBuilder.append("$svcNm\t")
             dataStringBuilder.append(" $modifiedSvcTypNm\n\n")
+            dataStringBuilder.appendLine().appendLine()
 
             if (svcUnitCd.contains("초")) {
                 if (alloValue.contains("Z")) {
-                    dataStringBuilder.append("총제공량: 무제한\n")
+                    dataStringBuilder.append("총제공량 ${"무제한".padStart(40)}\n\n")
                     val useValueInMinutes = useValue.toDouble() / 60
-                    dataStringBuilder.append("사용량: ${useValueInMinutes.format(0)}분\n\n\n")
+                    dataStringBuilder.append("사용량 ${useValueInMinutes.format(0).padStart(40)}분\n\n\n\n")
+                    dataStringBuilder.appendLine().appendLine()
                 } else {
                     val alloValueInMinutes = alloValue.toDouble() / 60
                     val useValueInMinutes = useValue.toDouble() / 60
                     val remainValueMin = alloValueInMinutes - useValueInMinutes
-                    dataStringBuilder.append("총제공량: ${alloValueInMinutes.format(0)}분\n")
-                    dataStringBuilder.append("사용량: ${useValueInMinutes.format(0)}분\n")
-                    dataStringBuilder.append("잔여량 ${remainValueMin.format(0)}분\n\n\n")
+                    dataStringBuilder.append("총제공량 ${alloValueInMinutes.format(0).padStart(40)}분\n\n")
+                    dataStringBuilder.append("사용량 ${useValueInMinutes.format(0).padStart(40)}분\n\n")
+                    dataStringBuilder.append("잔여량   ${remainValueMin.format(0).padStart(40)}분\n\n\n\n")
+                    dataStringBuilder.appendLine().appendLine()
                 }
             } else if (svcUnitCd.contains("건")) {
                 if (alloValue.contains("Z")) {
-                    dataStringBuilder.append("총제공량: 무제한\n")
-                    dataStringBuilder.append("사용량: ${useValue}건\n\n\n")
+                    dataStringBuilder.append("총제공량 ${"무제한".padStart(40)}\n\n")
+                    dataStringBuilder.append("사용량 ${useValue.padStart(40)}건\n\n\n\n")
+                    dataStringBuilder.appendLine().appendLine()
                 } else {
-                    dataStringBuilder.append("총제공량: ${alloValue}건\n")
-                    dataStringBuilder.append("사용량: ${useValue}건\n")
+                    dataStringBuilder.append("총제공량 ${alloValue.padStart(40)}건\n\n")
+                    dataStringBuilder.append("사용량 ${useValue.padStart(40)}건\n\n")
                     val remainValue = alloValue.toInt() - useValue.toInt()
-                    dataStringBuilder.append("잔여량: ${remainValue}건\n\n\n")
+                    dataStringBuilder.append("잔여량:   ${remainValue.toString().padStart(40)}건\n\n\n\n")
+                    dataStringBuilder.appendLine().appendLine()
                 }
             } else if (svcTypNm.contains("패킷")) {
                 val alloValueInGB = alloValue.toDouble() / 1024 / 1024
                 val useValueInGB = useValue.toDouble() / 1024 / 1024
                 val remainValueInGB = alloValueInGB - useValueInGB
-                dataStringBuilder.append("총제공량: ${alloValueInGB.format(1)}GB\n")
-                dataStringBuilder.append("사용량: ${useValueInGB.format(1)}GB\n")
-                dataStringBuilder.append("잔여량: ${remainValueInGB.format(1)}GB\n\n\n")
+                dataStringBuilder.append("총제공량 ${alloValueInGB.format(1).padStart(40)}GB\n\n")
+                dataStringBuilder.append("사용량 ${useValueInGB.format(1).padStart(40)}GB\n\n")
+                dataStringBuilder.append("잔여량   ${remainValueInGB.format(1).padStart(40)}GB\n\n\n\n")
+                dataStringBuilder.appendLine().appendLine()
             } else {
-                dataStringBuilder.append("총제공량: $alloValue\n")
-                dataStringBuilder.append("사용량: $useValue\n\n\n")
+                dataStringBuilder.append("총제공량: $alloValue\n\n")
+                dataStringBuilder.append("사용량: $useValue\n\n\n\n")
+                dataStringBuilder.appendLine().appendLine()
             }
         }
         // Set the data string to the dataTextView and center-align the text
         dataTextView.text = dataStringBuilder.toString()
         dataTextView.gravity = Gravity.CENTER
     }
+
     // Extension function to format a Double value with the specified number of decimal places
     private fun Double.format(decimalPlaces: Int): String {
         return String.format("%.${decimalPlaces}f", this)
     }
+
+
 }
 
 

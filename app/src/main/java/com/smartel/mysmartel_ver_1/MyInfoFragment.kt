@@ -164,7 +164,7 @@ class MyInfoFragment : Fragment() {
                 "LGT" -> {
                     val lgtBillDetailFragment = LgtBillDetailFragment()
                     val bundle = Bundle()
-                    bundle.putString("custNm", custName)
+                    bundle.putString("custName", custName)
                     bundle.putString("phoneNumber", phoneNumber)
                     lgtBillDetailFragment.arguments = bundle
 
@@ -188,7 +188,7 @@ class MyInfoFragment : Fragment() {
                         R.anim.slide_in_up, // Animation for fragment pop-enter
                         R.anim.slide_out_down // Animation for fragment pop-exit
                     )
-                    .replace(id, it) // Use the ID of any existing container view in your layout
+                    .add(id, it) // Use the ID of any existing container view in your layout
                     .addToBackStack(null)
                     .commit()
             }
