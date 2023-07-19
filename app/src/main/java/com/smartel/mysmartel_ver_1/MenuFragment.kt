@@ -1,5 +1,9 @@
 package com.smartel.mysmartel_ver_1
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.ContentValues.TAG
 import android.content.Intent
 import android.os.Bundle
@@ -8,6 +12,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.viewModels
@@ -22,6 +27,7 @@ class MenuFragment : Fragment() {
     private lateinit var txtPhoneNumber: TextView
     private lateinit var txtTelecom: TextView
     private lateinit var sharedPrefs: MyInfoSharedPreferences
+
 
     private val viewModel: MyInfoViewModel by viewModels({ requireActivity() })
 
@@ -181,8 +187,21 @@ class MenuFragment : Fragment() {
         }
 
         // 부가서비스 메뉴 스크롤
-        binding.layout01.setOnClickListener {
-            toggleVisibility(binding.layoutDetailExtraServices, binding.layoutBtn01)
+        // Set the visibility of layoutDetailExtraServices, layoutBtn01, and textView13 based on telecom value
+        binding.layoutDetailExtraServices.visibility = if (telecom == "KT" || telecom == "LGT" || telecom == "SKT") {
+            View.GONE
+        } else {
+            View.VISIBLE
+        }
+        binding.layoutBtn01.visibility = if (telecom == "KT" || telecom == "LGT" || telecom == "SKT") {
+            View.GONE
+        } else {
+            View.VISIBLE
+        }
+        binding.textView13.visibility = if (telecom == "KT" || telecom == "LGT" || telecom == "SKT") {
+            View.GONE
+        } else {
+            View.VISIBLE
         }
 
         // 청구서 메뉴 스크롤
@@ -224,21 +243,89 @@ class MenuFragment : Fragment() {
 
         _binding = null
     }
+    private var isAnimating = false
 
-
+    // 아래 스크롤 버튼 클릭 이벤트 : 요소들이 하나씩 펼쳐지고 접히는 애니메이션 효과
     private fun toggleVisibility(layout: View, button: View) {
+        if (isAnimating) {
+            return
+        }
+
         if (layout.visibility == View.VISIBLE) {
-            layout.visibility = View.GONE
+            val foldAnimation = ValueAnimator.ofInt(layout.height, 0)
+            foldAnimation.addUpdateListener { animator ->
+                val value = animator.animatedValue as Int
+                val layoutParams = layout.layoutParams
+                layoutParams.height = value
+                layout.layoutParams = layoutParams
+            }
+            foldAnimation.apply {
+                duration = 300
+                interpolator = DecelerateInterpolator()
+                addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationStart(animation: Animator) {
+                        isAnimating = true
+                    }
+
+                    override fun onAnimationEnd(animation: Animator) {
+                        layout.visibility = View.GONE
+                        isAnimating = false
+                    }
+
+                    override fun onAnimationCancel(animation: Animator) {
+                        isAnimating = false
+                    }
+                })
+            }
+
             button.animate().apply {
                 duration = 300
                 rotation(0f)
             }
+
+            foldAnimation.start()
         } else {
-            layout.visibility = View.VISIBLE
+            layout.visibility = View.VISIBLE // Reset layout visibility
+
+            // Measure the height to calculate the correct unfold height
+            layout.measure(
+                View.MeasureSpec.makeMeasureSpec(layout.width, View.MeasureSpec.EXACTLY),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+            )
+            val unfoldHeight = layout.measuredHeight
+
+            val unfoldAnimation = ValueAnimator.ofInt(0, unfoldHeight)
+            unfoldAnimation.addUpdateListener { animator ->
+                val value = animator.animatedValue as Int
+                val layoutParams = layout.layoutParams
+                layoutParams.height = value
+                layout.layoutParams = layoutParams
+            }
+            unfoldAnimation.apply {
+                duration = 300
+                interpolator = DecelerateInterpolator()
+                addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationStart(animation: Animator) {
+                        isAnimating = true
+                    }
+
+                    override fun onAnimationEnd(animation: Animator) {
+                        isAnimating = false
+                    }
+
+                    override fun onAnimationCancel(animation: Animator) {
+                        isAnimating = false
+                    }
+                })
+            }
+
             button.animate().apply {
                 duration = 300
                 rotation(180f)
             }
+
+            unfoldAnimation.start()
         }
     }
+
 }

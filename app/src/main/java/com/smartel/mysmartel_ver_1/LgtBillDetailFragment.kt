@@ -47,6 +47,7 @@ class LgtBillDetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_lgt_bill_detail, container, false)
+
         val moveButton = view.findViewById<ImageButton>(R.id.btn_pgDown)
         moveButton.setOnClickListener {
             animateFragmentOut(view)

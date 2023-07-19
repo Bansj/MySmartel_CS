@@ -57,7 +57,7 @@
                 android:layout_height="30dp"
                 android:layout_marginStart="8dp"
                 android:gravity="center_vertical"
-                android:text=" 반승주님 반갑습니다. "
+                android:text=" 홍길동님, 반갑습니다. "
                 android:textColor="@color/black"
                 android:textSize="20dp"
                 android:textStyle="bold"

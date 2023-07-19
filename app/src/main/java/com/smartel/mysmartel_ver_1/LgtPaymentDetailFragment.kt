@@ -11,10 +11,12 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import com.example.mysmartel_ver_1.R
 import com.google.gson.Gson
 import okhttp3.*
@@ -38,17 +40,30 @@ class LgtPaymentDetailFragment : Fragment() {
     private val client = getUnsafeOkHttpClient()
     private val gson = Gson()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_lgt_payment_detail, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_lgt_payment_detail, container, false)
+
+        val moveButton = view.findViewById<ImageButton>(R.id.btn_pgDown)
+        moveButton.setOnClickListener {
+            animateFragmentOut(view)
+        }
+
+        return view
+    }
+    private fun animateFragmentOut(view: View) {
+        val transaction: FragmentTransaction = parentFragmentManager.beginTransaction()
+        transaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down)
+        transaction.remove(this@LgtPaymentDetailFragment)
+        transaction.commit()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-   /*     paymentMethodTextView = view.findViewById(R.id.paymentMethodTextView)
-        paymentDateTextView = view.findViewById(R.id.paymentDateTextView)
-        paymentAmountTextView = view.findViewById(R.id.paymentAmountTextView)
-        paymentNameTextView = view.findViewById(R.id.paymentNameTextView)*/
         containerLayout = view.findViewById(R.id.containerLayout)
 
         val custNm = arguments?.getString("custNm")
