@@ -11,4 +11,5 @@
     <color name="select">#FF6347</color>
     <color name="unselect">#000000</color>
     <color name="coral_orange">#FF7F50</color>
+    <color name="grey">#808080</color>
 </resources>

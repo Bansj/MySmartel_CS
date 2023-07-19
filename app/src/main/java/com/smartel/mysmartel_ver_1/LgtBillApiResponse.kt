@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName
 
 data class LgtBillApiResponse(
     @SerializedName("BillInfo")
-    val BillInfo: List<BillInfo>,
+    val billInfo: List<BillInfo>,
     @SerializedName("ResultCode")
     val ResultCode: String
 )

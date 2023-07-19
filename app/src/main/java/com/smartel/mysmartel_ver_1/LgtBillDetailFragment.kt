@@ -1,14 +1,20 @@
 package com.smartel.mysmartel_ver_1
 
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.StyleSpan
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import com.example.mysmartel_ver_1.R
 import com.google.gson.Gson
 import okhttp3.*
@@ -32,6 +38,7 @@ class LgtBillDetailFragment : Fragment() {
     private lateinit var blItemNmTextView: TextView
     private lateinit var billAmtTextView: TextView
     private lateinit var vatPrntYnTextView: TextView
+
     private lateinit var txt_sumAmount: TextView
 
     override fun onCreateView(
@@ -39,7 +46,18 @@ class LgtBillDetailFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_lgt_bill_detail, container, false)
+        val view = inflater.inflate(R.layout.fragment_lgt_bill_detail, container, false)
+        val moveButton = view.findViewById<ImageButton>(R.id.btn_pgDown)
+        moveButton.setOnClickListener {
+            animateFragmentOut(view)
+        }
+        return view
+    }
+    private fun animateFragmentOut(view: View) {
+        val transaction: FragmentTransaction = parentFragmentManager.beginTransaction()
+        transaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down)
+        transaction.remove(this@LgtBillDetailFragment)
+        transaction.commit()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -77,7 +95,7 @@ class LgtBillDetailFragment : Fragment() {
 
                 try {
                     val apiResponse = Gson().fromJson(responseData, LgtBillApiResponse::class.java)
-                    if (apiResponse.BillInfo.isNullOrEmpty()) {
+                    if (apiResponse.billInfo.isNullOrEmpty()) {
                         Log.e("LgtBillDetailFragment", "Bill Info is null or empty in API response.")
                         return
                     }
@@ -123,12 +141,12 @@ class LgtBillDetailFragment : Fragment() {
     }
 
     private fun updateUI(apiResponse: LgtBillApiResponse) {
-        if (apiResponse.BillInfo.isNullOrEmpty()) {
+        if (apiResponse.billInfo.isNullOrEmpty()) {
             Log.e("LgtBillDetailFragment", "Bill Info is null or empty in API response.")
             return
         }
 
-        val billInfoList = apiResponse.BillInfo
+        val billInfoList = apiResponse.billInfo
         var totalAmount: String? = null
 
         val sb = StringBuilder()
@@ -146,7 +164,12 @@ class LgtBillDetailFragment : Fragment() {
                 sb.append(String.format("%64s", totalAmount)) // Right align totalAmount value with padding
             } else {
                 val formattedBillAmt = numberFormat.format(billInfo.billAmt.toLong())
-                sb.append(String.format("%64s", "${formattedBillAmt}원")) // Right align billAmt value with padding
+
+                // Create a SpannableString with bold style for billAmt
+                val spannableString = SpannableString("${formattedBillAmt}원")
+                spannableString.setSpan(StyleSpan(Typeface.BOLD), 0, spannableString.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+                sb.append(String.format("%64s", spannableString)) // Right align billAmt value with padding
             }
             sb.append("\n\n\n\n")
         }
@@ -184,7 +207,4 @@ class LgtBillDetailFragment : Fragment() {
         }
         return maxBlItemNmWidth
     }
-
-
-
 }

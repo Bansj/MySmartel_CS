@@ -136,14 +136,22 @@ class LgtDeductDetailViewFragment : Fragment() {
             val useValue = remainInfo.useValue
             val prodTypeCd = remainInfo.prodTypeCd
 
-            // Modify svcTypNm if it contains "패킷데이터"
-            val modifiedSvcTypNm = if (svcTypNm.contains("패킷데이터")) {
-                svcTypNm.replace("패킷데이터", "데이터")
-            } else {
-                svcTypNm
+            val modifiedSvcNm = svcNm.replace("[SMT]", "")
+
+            // Modify svcTypNm if it contains "패킷데이터" or "음성+영상"
+            val modifiedSvcTypNm = when {
+                svcTypNm.contains("패킷데이터") -> {
+                    svcTypNm.replace("패킷데이터", "데이터")
+                }
+                svcTypNm.contains("음성+영상") -> {
+                    svcTypNm.replace("음성+영상", "부가통화")
+                }
+                else -> {
+                    svcTypNm
+                }
             }
             // Append the values to the data string with proper formatting
-            dataStringBuilder.append("$svcNm\t")
+            dataStringBuilder.append("$modifiedSvcNm\t")
             dataStringBuilder.append(" $modifiedSvcTypNm\n\n")
             dataStringBuilder.appendLine().appendLine()
 
@@ -151,27 +159,27 @@ class LgtDeductDetailViewFragment : Fragment() {
                 if (alloValue.contains("Z")) {
                     dataStringBuilder.append("총제공량 ${"무제한".padStart(40)}\n\n")
                     val useValueInMinutes = useValue.toDouble() / 60
-                    dataStringBuilder.append("사용량 ${useValueInMinutes.format(0).padStart(40)}분\n\n\n\n")
+                    dataStringBuilder.append("사용량  ${useValueInMinutes.format(0).padStart(40)}분\n\n\n\n")
                     dataStringBuilder.appendLine().appendLine()
                 } else {
                     val alloValueInMinutes = alloValue.toDouble() / 60
                     val useValueInMinutes = useValue.toDouble() / 60
                     val remainValueMin = alloValueInMinutes - useValueInMinutes
                     dataStringBuilder.append("총제공량 ${alloValueInMinutes.format(0).padStart(40)}분\n\n")
-                    dataStringBuilder.append("사용량 ${useValueInMinutes.format(0).padStart(40)}분\n\n")
-                    dataStringBuilder.append("잔여량   ${remainValueMin.format(0).padStart(40)}분\n\n\n\n")
+                    dataStringBuilder.append("사용량  ${useValueInMinutes.format(0).padStart(40)}분\n\n")
+                    dataStringBuilder.append("잔여량    ${remainValueMin.format(0).padStart(40)}분\n\n\n\n")
                     dataStringBuilder.appendLine().appendLine()
                 }
             } else if (svcUnitCd.contains("건")) {
                 if (alloValue.contains("Z")) {
                     dataStringBuilder.append("총제공량 ${"무제한".padStart(40)}\n\n")
-                    dataStringBuilder.append("사용량 ${useValue.padStart(40)}건\n\n\n\n")
+                    dataStringBuilder.append("사용량  ${useValue.padStart(40)}건\n\n\n\n")
                     dataStringBuilder.appendLine().appendLine()
                 } else {
                     dataStringBuilder.append("총제공량 ${alloValue.padStart(40)}건\n\n")
-                    dataStringBuilder.append("사용량 ${useValue.padStart(40)}건\n\n")
+                    dataStringBuilder.append("사용량  ${useValue.padStart(40)}건\n\n")
                     val remainValue = alloValue.toInt() - useValue.toInt()
-                    dataStringBuilder.append("잔여량:   ${remainValue.toString().padStart(40)}건\n\n\n\n")
+                    dataStringBuilder.append("잔여량:    ${remainValue.toString().padStart(40)}건\n\n\n\n")
                     dataStringBuilder.appendLine().appendLine()
                 }
             } else if (svcTypNm.contains("패킷")) {
@@ -179,12 +187,12 @@ class LgtDeductDetailViewFragment : Fragment() {
                 val useValueInGB = useValue.toDouble() / 1024 / 1024
                 val remainValueInGB = alloValueInGB - useValueInGB
                 dataStringBuilder.append("총제공량 ${alloValueInGB.format(1).padStart(40)}GB\n\n")
-                dataStringBuilder.append("사용량 ${useValueInGB.format(1).padStart(40)}GB\n\n")
-                dataStringBuilder.append("잔여량   ${remainValueInGB.format(1).padStart(40)}GB\n\n\n\n")
+                dataStringBuilder.append("사용량  ${useValueInGB.format(1).padStart(40)}GB\n\n")
+                dataStringBuilder.append("잔여량    ${remainValueInGB.format(1).padStart(40)}GB\n\n\n\n")
                 dataStringBuilder.appendLine().appendLine()
             } else {
                 dataStringBuilder.append("총제공량: $alloValue\n\n")
-                dataStringBuilder.append("사용량: $useValue\n\n\n\n")
+                dataStringBuilder.append("사용량:  $useValue\n\n\n\n")
                 dataStringBuilder.appendLine().appendLine()
             }
         }
@@ -197,8 +205,6 @@ class LgtDeductDetailViewFragment : Fragment() {
     private fun Double.format(decimalPlaces: Int): String {
         return String.format("%.${decimalPlaces}f", this)
     }
-
-
 }
 
 

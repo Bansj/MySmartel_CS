@@ -1,60 +1,169 @@
 package com.smartel.mysmartel_ver_1
 
+import android.graphics.Color
+import android.graphics.Typeface
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.example.mysmartel_ver_1.R
+import com.google.gson.Gson
+import okhttp3.*
+import java.io.IOException
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
+import java.text.SimpleDateFormat
+import java.util.*
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [LgtPaymentDetailFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class LgtPaymentDetailFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var paymentMethodTextView: TextView
+    private lateinit var paymentDateTextView: TextView
+    private lateinit var paymentAmountTextView: TextView
+    private lateinit var paymentNameTextView: TextView
+    private lateinit var containerLayout: LinearLayout
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private val baseUrl = "https://www.mysmartel.com/api/lguPayment.php"
+    private val client = getUnsafeOkHttpClient()
+    private val gson = Gson()
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_lgt_payment_detail, container, false)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment LgtPaymentDetailFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            LgtPaymentDetailFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+   /*     paymentMethodTextView = view.findViewById(R.id.paymentMethodTextView)
+        paymentDateTextView = view.findViewById(R.id.paymentDateTextView)
+        paymentAmountTextView = view.findViewById(R.id.paymentAmountTextView)
+        paymentNameTextView = view.findViewById(R.id.paymentNameTextView)*/
+        containerLayout = view.findViewById(R.id.containerLayout)
+
+        val custNm = arguments?.getString("custNm")
+        val phoneNumber = arguments?.getString("phoneNumber")
+
+        Log.d("LgtPaymentDetailFragment", "Phone Number: $phoneNumber")
+        Log.d("LgtPaymentDetailFragment", "Customer Name: $custNm")
+
+        val url = "$baseUrl?serviceNum=$phoneNumber&custNm=$custNm"
+        val request = Request.Builder().url(url).build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("LgtPaymentDetailFragment", "API Call Failed: ${e.message}")
+                // Handle API call failure
             }
+
+            override fun onResponse(call: Call, response: Response) {
+                val responseBody = response.body?.string()
+                val apiResponse = gson.fromJson(responseBody, LgtPaymentApiResponse::class.java)
+
+                activity?.runOnUiThread {
+                    updateUI(apiResponse, response.toString())
+                }
+
+                Log.d("LgtPaymentDetailFragment", "Response Body: $responseBody")
+            }
+        })
+    }
+
+    private fun getUnsafeOkHttpClient(): OkHttpClient {
+        try {
+            // Create a trust manager that does not validate certificate chains
+            val trustAllCerts: Array<TrustManager> = arrayOf(object : X509TrustManager {
+                override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
+
+                override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
+
+                override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
+            })
+
+            // Install the all-trusting trust manager
+            val sslContext = SSLContext.getInstance("TLS")
+            sslContext.init(null, trustAllCerts, java.security.SecureRandom())
+
+            // Create an OkHttpClient that trusts all certificates
+            val builder = OkHttpClient.Builder()
+            builder.sslSocketFactory(sslContext.socketFactory, trustAllCerts[0] as X509TrustManager)
+            builder.hostnameVerifier { _, _ -> true }
+
+            return builder.build()
+        } catch (e: Exception) {
+            throw RuntimeException(e)
+        }
+    }
+
+    private fun updateUI(apiResponse: LgtPaymentApiResponse, responseString: String) {
+        if (apiResponse.BillInfo.isNullOrEmpty()) {
+            Log.e("LgtPaymentDetailFragment", "Bill Info is null or empty in API response.")
+            return
+        }
+
+        val billInfoList = apiResponse.BillInfo
+
+        val sb = StringBuilder()
+        for (billInfo in billInfoList) {
+            val paymentMethod = billInfo.Method
+            val paymentDate = billInfo.PayDate
+            val paymentAmount = billInfo.PayAmt
+            val paymentName = billInfo.PayName
+
+            sb.append("Payment Method: $paymentMethod\n")
+            sb.append("Payment Date: $paymentDate\n")
+            sb.append("Payment Amount: $paymentAmount\n")
+            sb.append("Payment Name: $paymentName\n\n")
+
+            val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
+            val parsedDate = dateFormat.parse(paymentDate)
+            val formattedDate = SimpleDateFormat("yyyy년 MM월 dd일", Locale.getDefault()).format(parsedDate ?: Date())
+
+            val paymentDateTextView = TextView(requireContext()).apply {
+                text = "\n$formattedDate\n\n"
+                gravity = Gravity.CENTER
+                setTextColor(Color.BLACK)
+                textSize = 20f
+            }
+
+            val paymentAmountTextView = TextView(requireContext()).apply {
+                val fullText = "청구요금  \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" +
+                        "${paymentAmount}원\n"
+                val grayTextColor = ContextCompat.getColor(requireContext(), R.color.grey)
+                val blackTextColor = Color.BLACK
+
+                val spannableString = SpannableString(fullText)
+                spannableString.setSpan(ForegroundColorSpan(grayTextColor), 0, 5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                spannableString.setSpan(ForegroundColorSpan(blackTextColor), 5, fullText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+                text = spannableString
+                gravity = Gravity.CENTER
+                textSize = 18f
+            }
+
+            val paymentMethodTextView = TextView(requireContext()).apply {
+                text = "납부방법  \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+ paymentMethod + "\n\n"
+                gravity = Gravity.CENTER
+                textSize = 18f
+            }
+            // Add the TextViews to the layout container
+            containerLayout.addView(paymentDateTextView)
+            containerLayout.addView(paymentAmountTextView)
+            containerLayout.addView(paymentMethodTextView)
+        }
+        // Log the complete response
+        sb.append("Complete Response: $responseString")
     }
 }
+
+

@@ -92,8 +92,6 @@
                     android:textStyle="bold"
                     android:textColor="@color/black"/>
 
-
-
             </LinearLayout>
 
          </ScrollView>
