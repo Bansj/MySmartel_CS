@@ -93,9 +93,6 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // Receive phoneNumber argument
-        val phoneNumber = requireArguments().getString("PhoneNumber")
     }
 
     override fun onResume() {

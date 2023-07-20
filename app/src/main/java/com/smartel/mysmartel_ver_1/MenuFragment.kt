@@ -6,6 +6,7 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.ContentValues.TAG
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -15,6 +16,8 @@ import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import com.example.mysmartel_ver_1.R
@@ -71,6 +74,49 @@ class MenuFragment : Fragment() {
         viewModel.custName = custName
         viewModel.phoneNumber = phoneNumber
         viewModel.Telecom = telecom
+
+        // 이메일 문의
+        binding.txtEmail.setOnClickListener {
+            val email = "smartelmvno@nate.com"
+            val subject = "Regarding your services"
+            val intent = Intent(Intent.ACTION_SENDTO)
+            intent.data = Uri.parse("mailto:$email")
+            intent.putExtra(Intent.EXTRA_SUBJECT, subject)
+
+            val emailApps = requireActivity().packageManager.queryIntentActivities(intent, 0)
+            if (emailApps.isNotEmpty()) {
+                val appNames = emailApps.map { app ->
+                    app.loadLabel(requireActivity().packageManager).toString()
+                }.toTypedArray()
+
+                val builder = AlertDialog.Builder(requireContext())
+                builder.setTitle("Choose Email App")
+                    .setItems(appNames) { dialog, which ->
+                        val appIntent = Intent(Intent.ACTION_SENDTO)
+                        appIntent.data = Uri.parse("mailto:$email")
+                        appIntent.putExtra(Intent.EXTRA_SUBJECT, subject)
+                        appIntent.`package` = emailApps[which].activityInfo.packageName
+                        startActivity(appIntent)
+                        dialog.dismiss()
+                    }
+                    .setNegativeButton("Cancel") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .create()
+                    .show()
+            } else {
+                Toast.makeText(requireContext(), "No email client found.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+
+        // 카카오톡 문의하기 버튼 클릭 이벤트
+        binding.txtKakaoTalk.setOnClickListener {
+            val url = "https://pf.kakao.com/_MIbvd"
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            startActivity(intent)
+        }
+
 
         // 청구요금 조회 슬라이드 업 클릭 이벤트
         binding.txtBillDetail.setOnClickListener {
@@ -321,7 +367,7 @@ class MenuFragment : Fragment() {
 
             button.animate().apply {
                 duration = 300
-                rotation(180f)
+                rotation(-180f)
             }
 
             unfoldAnimation.start()

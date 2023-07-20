@@ -10,7 +10,7 @@ class MyInfoSharedPreferences(private val context: Context) {
         private const val KEY_CUST_NAME = "cust_name"
         private const val KEY_PHONE_NUMBER = "phone_number"
         private const val KEY_TELECOM = "telecom"
-        private const val KEY_SERVICE_ACCT = "service_acct"
+        private const val KEY_SERVICE_ACCT = "serviceAcct"
     }
 
     private val preferences: SharedPreferences =

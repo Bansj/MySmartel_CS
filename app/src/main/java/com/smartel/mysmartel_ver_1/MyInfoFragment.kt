@@ -51,7 +51,13 @@ class MyInfoFragment : Fragment() {
         val custName = viewModel.custName ?: arguments?.getString("custName")
         val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")
         val Telecom = viewModel.Telecom ?: arguments?.getString("Telecom")
-        val serviceAcct = viewModel.serviceAcct ?: arguments?.getString("service_acct")
+        val serviceAcct = viewModel.serviceAcct ?: arguments?.getString("serviceAcct")
+
+        // Log the values
+        Log.d("MyInfoFragment", "from get viewModel -----> custName: $custName")
+        Log.d("MyInfoFragment", "from get viewModel -----> phoneNumber: $phoneNumber")
+        Log.d("MyInfoFragment", "from get viewModel -----> Telecom: $Telecom")
+        Log.d("MyInfoFragment", "from get viewModel -----> serviceAcct: $serviceAcct")
 
         // Set the data in the views
         txtcustName.text = "  ${custName}님, 안녕하세요. "
@@ -64,6 +70,7 @@ class MyInfoFragment : Fragment() {
         viewModel.Telecom = Telecom
 
 
+        //UI 업데이트 내정보화면에 남은 사용량
         val updateButton = view.findViewById<ImageButton>(R.id.btn_updateLeftData)
         updateButton.setOnClickListener {
 
@@ -109,22 +116,34 @@ class MyInfoFragment : Fragment() {
                 val sktDeductDetailViewFragment = SktDeductDetailViewFragment()
                 val bundle = Bundle()
                 bundle.putString("serviceAcct", serviceAcct)
+                bundle.putString("Telecom", Telecom)
                 sktDeductDetailViewFragment.arguments = bundle
+                // Log the values for SKT
+                Log.d("MyInfoFragment", "to SktDeductDetailViewFragment--------------------serviceAcct: $serviceAcct--------------------")
+                Log.d("MyInfoFragment", "to SktDeductDetailViewFragment--------------------Telecom: $Telecom--------------------")
                 fragmentTransaction.replace(android.R.id.content, sktDeductDetailViewFragment, "SktDeductDetailViewFragment")
-            } else if (telecom == "KT") {
+            }
+            else if (telecom == "KT") {
                 val ktDeductDetailViewFragment = KtDeductDetailViewFragment()
                 val bundle = Bundle()
                 bundle.putString("phoneNumber", phoneNumber)
                 ktDeductDetailViewFragment.arguments = bundle
+                // Log the values for KT
+                Log.d("MyInfoFragment", "to KtDeductDetailViewFragment--------------------phoneNumber: $phoneNumber--------------------")
                 fragmentTransaction.replace(android.R.id.content, ktDeductDetailViewFragment, "KtDeductDetailViewFragment")
-            } else if (telecom == "LGT") {
+            }
+            else if (telecom == "LGT") {
                 val lgtDeductDetailViewFragment = LgtDeductDetailViewFragment()
                 val bundle = Bundle()
                 bundle.putString("custNm", custName)
                 bundle.putString("phoneNumber", phoneNumber)
                 lgtDeductDetailViewFragment.arguments = bundle
+                // Log the values for LGT
+                Log.d("MyInfoFragment", "to LgtDeductDetailViewFragment--------------------custName: $custName--------------------")
+                Log.d("MyInfoFragment", "to LgtDeductDetailViewFragment--------------------phoneNumber: $phoneNumber--------------------")
                 fragmentTransaction.replace(android.R.id.content, lgtDeductDetailViewFragment, "LgtDeductDetailViewFragment")
-            } else {
+            }
+            else {
                 Log.e(TAG, "Invalid Telecom value: $telecom")
                 return@setOnClickListener
             }
@@ -146,7 +165,7 @@ class MyInfoFragment : Fragment() {
                     skBillDetailFragment.arguments = bundle
 
                     // Log the values for SKT
-                    Log.d(TAG, "--------------------serviceAcct: $serviceAcct--------------------")
+                    Log.d("MyInfoFragment", "to SktBillDetailFragment--------------------serviceAcct: $serviceAcct--------------------")
 
                     skBillDetailFragment
                 }
@@ -157,7 +176,7 @@ class MyInfoFragment : Fragment() {
                     ktBillDetailFragment.arguments = bundle
 
                     // Log the values for KT
-                    Log.d(TAG, "--------------------phoneNumber: $phoneNumber--------------------")
+                    Log.d("MyInfoFragment", "to KtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
 
                     ktBillDetailFragment
                 }
@@ -169,13 +188,13 @@ class MyInfoFragment : Fragment() {
                     lgtBillDetailFragment.arguments = bundle
 
                     // Log the values for LGT
-                    Log.d(TAG, "--------------------custName: $custName--------------------")
-                    Log.d(TAG, "--------------------phoneNumber: $phoneNumber--------------------")
+                    Log.d("MyInfoFragment", "to LgtBillDetailFragment--------------------custName: $custName--------------------")
+                    Log.d("MyInfoFragment", "to LgtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
 
                     lgtBillDetailFragment
                 }
                 else -> {
-                    Log.e(TAG, "Invalid Telecom value: $telecom")
+                    Log.e("MyInfoFragment", "Invalid Telecom value: $telecom")
                     null
                 }
             }
