@@ -2,6 +2,7 @@ package com.smartel.mysmartel_ver_1
 
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,8 +27,6 @@ import javax.net.ssl.X509TrustManager
 
 class SktDeductDetailViewFragment : Fragment() {
 
-    private lateinit var svcAcntNumTextView: TextView
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -37,8 +36,6 @@ class SktDeductDetailViewFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        svcAcntNumTextView = view.findViewById(R.id.svcAcntNumTextView)
 
         // Get the serviceAcct and telecom values from MyInfoFragment
         val serviceAcct = arguments?.getString("serviceAcct")
@@ -136,7 +133,7 @@ class SktDeductDetailViewFragment : Fragment() {
 
             // Update the UI with the parsed response data
             apiResponse?.let {
-                showDataOnUI(it)
+                updateUI(it)
             }
         }
     }
@@ -159,10 +156,7 @@ class SktDeductDetailViewFragment : Fragment() {
         }
         return remainInfoList
     }
-
-    private fun showDataOnUI(apiResponse: SktDeductApiResponse) {
-        // Update the UI elements with the parsed data
-        svcAcntNumTextView.text = "Service Account Number: ${apiResponse.svcAcntNum}"
+    private fun updateUI(apiResponse: SktDeductApiResponse) {
 
         // Display remainInfo details in a separate TextView or a RecyclerView (depending on your layout design)
         val remainInfoTextView = view?.findViewById<TextView>(R.id.remainInfoTextView)
@@ -171,21 +165,79 @@ class SktDeductDetailViewFragment : Fragment() {
             val remainInfoStr = StringBuilder()
 
             for (remainInfo in apiResponse.remainInfo) {
-                remainInfoStr.append("Plan ID: ${remainInfo.planId}\n")
-                remainInfoStr.append("Plan Name: ${remainInfo.planNm}\n")
-                remainInfoStr.append("Skip Code: ${remainInfo.skipCode}\n")
-                remainInfoStr.append("Free Plan Name: ${remainInfo.freePlanName}\n")
-                remainInfoStr.append("Total Quantity: ${remainInfo.totalQty}\n")
-                remainInfoStr.append("Used Quantity: ${remainInfo.useQty}\n")
-                remainInfoStr.append("Remaining Quantity: ${remainInfo.remQty}\n")
-                remainInfoStr.append("Unit Code: ${remainInfo.unitCd}\n\n")
-            }
 
+                // Check if freePlanName contains "데이터" or "Data"
+                if (remainInfo.freePlanName.contains("데이터") || remainInfo.freePlanName.contains("Data")) {
+                    // Handle the case where the values are not valid numbers (e.g., "무제한")
+                    val totalQtyGB = parseValueToGB(remainInfo.totalQty)
+                    val useQtyGB = parseValueToGB(remainInfo.useQty)
+                    val remQtyGB = parseValueToGB(remainInfo.remQty)
+
+                    remainInfoStr.append("\n${remainInfo.freePlanName}\n\n")
+                    remainInfoStr.append("총제공량".padEnd(60) + "$totalQtyGB\n\n") // Add padding between label and value
+                    remainInfoStr.append("사용량".padEnd(60) + "$useQtyGB\n\n") // Add padding between label and value
+                    remainInfoStr.append("잔여량".padEnd(60) + "$remQtyGB\n\n\n\n") // Add padding between label and value
+                }
+                else if (remainInfo.freePlanName.contains("음성") || remainInfo.freePlanName.contains("전화")) {
+                    // Handle the case where the values are "음성" or "전화"
+                    val totalQtyMin = parseValueToMinutes(remainInfo.totalQty)
+                    val useQtyMin = parseValueToMinutes(remainInfo.useQty)
+                    val remQtyMin = parseValueToMinutes(remainInfo.remQty)
+
+                    remainInfoStr.append("${remainInfo.freePlanName}\n\n")
+                    remainInfoStr.append("총제공량".padEnd(60) + "$totalQtyMin\n\n") // Add padding between label and value
+                    remainInfoStr.append("사용량".padEnd(60) + "$useQtyMin\n\n") // Add padding between label and value
+                    remainInfoStr.append("잔여량".padEnd(60) + "$remQtyMin\n\n\n\n") // Add padding between label and value
+                }
+                else {
+                    // Default case for other freePlanName values
+                    remainInfoStr.append("${remainInfo.freePlanName}\n\n")
+                    remainInfoStr.append("총제공량".padEnd(60) + "${remainInfo.totalQty}\n\n")
+                    remainInfoStr.append("사용량".padEnd(60) + "${remainInfo.useQty}\n\n")
+                    remainInfoStr.append("잔여량".padEnd(60) + "${remainInfo.remQty}\n\n\n\n")
+                }
+            }
             remainInfoTextView?.text = remainInfoStr.toString()
+            remainInfoTextView!!.gravity = Gravity.CENTER
+
         } else {
             remainInfoTextView?.text = "No Remain Info found."
         }
     }
+
+
+    // Helper function to convert the value to GB or handle non-numeric cases
+    private fun parseValueToGB(value: String): String {
+        return try {
+            if (!value.contains("무제한") && value.replace(",", "").toDoubleOrNull() != null) {
+                val number = value.replace(",", "").toDouble() / (1024 * 1024)
+                "%.1fGB".format(number)
+            } else {
+                value
+            }
+        } catch (e: NumberFormatException) {
+            // Handle non-numeric cases, e.g., "unlimited"
+            value
+        }
+    }
+    // Helper function to convert the value to minutes or handle non-numeric cases
+    private fun parseValueToMinutes(value: String): String {
+        return try {
+            if (!value.contains("무제한") && value.replace(",", "").toDoubleOrNull() != null) {
+                val number = value.replace(",", "").toDouble() / 60
+                "%.0f분".format(number)
+            } else {
+                value
+            }
+        } catch (e: NumberFormatException) {
+            // Handle non-numeric cases, e.g., "unlimited"
+            value
+        }
+    }
+
+
+
+
 
 }
 

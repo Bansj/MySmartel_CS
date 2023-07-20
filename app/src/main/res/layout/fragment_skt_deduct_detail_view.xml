@@ -41,28 +41,25 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
-            <!-- TextView to display the Service Account Number -->
-            <TextView
-                android:id="@+id/svcAcntNumTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp"/>
-
-            <!-- TextView to display the remainInfo details -->
-            <TextView
-                android:id="@+id/remainInfoTextView"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="16sp"/>
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/remainInfoTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="17sp"/>
+
+            </LinearLayout>
+
+        </ScrollView>
 
     </LinearLayout>
 
