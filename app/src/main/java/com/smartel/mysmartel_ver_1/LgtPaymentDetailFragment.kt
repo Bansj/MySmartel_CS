@@ -152,8 +152,7 @@ class LgtPaymentDetailFragment : Fragment() {
             }
 
             val paymentAmountTextView = TextView(requireContext()).apply {
-                val fullText = "청구요금  \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t" +
-                        "${paymentAmount}원\n"
+                val fullText = "청구요금".padEnd(40) + "${paymentAmount}원\n"
                 val grayTextColor = ContextCompat.getColor(requireContext(), R.color.grey)
                 val blackTextColor = Color.BLACK
 
@@ -167,7 +166,7 @@ class LgtPaymentDetailFragment : Fragment() {
             }
 
             val paymentMethodTextView = TextView(requireContext()).apply {
-                text = "납부방법  \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t"+ paymentMethod + "\n\n"
+                text = "납부방법".padEnd(30) + paymentMethod + "\n\n"
                 gravity = Gravity.CENTER
                 textSize = 18f
             }

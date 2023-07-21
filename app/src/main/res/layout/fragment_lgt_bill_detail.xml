@@ -73,15 +73,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
-                    android:textColor="@color/black"/>
+                    android:textColor="@color/black"
+                    android:text="\nLoading Billing Details..."
+                    android:layout_gravity="center"
+                    android:gravity="center"/>
 
-                <TextView
-                    android:id="@+id/blItemNmTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="14sp"
-                    android:paddingTop="8dp"
-                    android:textColor="@color/black"/>
 
                 <TextView
                     android:id="@+id/billAmtTextView"

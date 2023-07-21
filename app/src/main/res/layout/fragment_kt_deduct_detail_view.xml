@@ -65,11 +65,12 @@
                     android:weightSum="5">
 
                     <TextView
+                        android:layout_marginTop="25dp"
                         android:gravity="center"
                         android:id="@+id/tvTotaluseTime"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="TotaluseTime"
+                        android:text="Loading Deduct Details..."
                         android:textSize="16sp"
                         android:textStyle="bold"
                         android:layout_weight="1"

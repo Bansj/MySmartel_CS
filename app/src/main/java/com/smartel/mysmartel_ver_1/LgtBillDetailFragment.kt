@@ -65,8 +65,8 @@ class LgtBillDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         svcNmTextView = view.findViewById(R.id.svcNmTextView)
-        blItemNmTextView = view.findViewById(R.id.blItemNmTextView)
-        billAmtTextView = view.findViewById(R.id.billAmtTextView)
+       // blItemNmTextView = view.findViewById(R.id.blItemNmTextView)
+        //billAmtTextView = view.findViewById(R.id.billAmtTextView)
         txt_sumAmount = view.findViewById(R.id.txt_sumAmount)
 
         val phoneNumber = arguments?.getString("phoneNumber")
@@ -157,7 +157,7 @@ class LgtBillDetailFragment : Fragment() {
         val maxBlItemNmWidth = calculateMaxBlItemNmWidth(billInfoList) // Calculate the maximum width of blItemNm column
 
         for (billInfo in billInfoList) {
-            sb.append(String.format("%-60s\n\n", billInfo.blItemNm)) // Left align blItemNm column with 20 characters
+            sb.append(String.format("\n%-60s\n\n", billInfo.blItemNm)) // Left align blItemNm column with 20 characters
 
             if (billInfo.blItemNm.contains("총 납부하실 금액", ignoreCase = true)) {
                 val formattedAmount = numberFormat.format(billInfo.billAmt.toLong())
@@ -172,7 +172,7 @@ class LgtBillDetailFragment : Fragment() {
 
                 sb.append(String.format("%64s", spannableString)) // Right align billAmt value with padding
             }
-            sb.append("\n\n\n\n")
+            sb.append("\n\n\n")
         }
 
         activity?.runOnUiThread {

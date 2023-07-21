@@ -209,29 +209,39 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
                 strFreeMinUse = formatDataValue(strFreeMinUse, multiplier)
                 strFreeMinReMain = formatDataValue(strFreeMinReMain, multiplier)
                 strFreeMinTotal = formatDataValue(strFreeMinTotal, multiplier)
-            } else if (strSvcName.contains("속도제어")) {
+            }
+            else if (strSvcName.contains("속도제어")) {
                 val multiplier = 1.0
                 strFreeMinUse = formatDataValue(strFreeMinUse, multiplier)
-            } else if (strSvcName.contains("음성")) {
+            }
+            else if (strSvcName.contains("음성")) {
                 val minutesUse = strFreeMinUse.toIntOrNull() ?: 0
                 strFreeMinReMain = "" // Hide strFreeMinReMain
                 strFreeMinUse = "${minutesUse / 60}분"
-            } else if (strSvcName.contains("영상")) {
+
+                // Check if strFreeMinTotal is not "무제한" and is numeric
+                if (strFreeMinTotal != "무제한") {
+                    val minutesTotal = strFreeMinTotal.toIntOrNull() ?: 0
+                    strFreeMinTotal = "${minutesTotal / 60}분"
+                }
+            }
+            else if (strSvcName.contains("영상") || strSvcName.contains("통화")) {
                 val minutesTotal = strFreeMinTotal.toIntOrNull() ?: 0
                 val minutesRemain = strFreeMinReMain.toIntOrNull() ?: 0
                 val minutesUse = strFreeMinUse.toIntOrNull() ?: 0
                 strFreeMinTotal = "${minutesTotal / 60}분"
                 strFreeMinReMain = "${minutesRemain / 60}분"
                 strFreeMinUse = "${minutesUse / 60}분"
-            } else if (strSvcName.contains("통화")) {
-                val minutesTotal = strFreeMinTotal.toIntOrNull() ?: 0
-                val minutesUse = strFreeMinUse.toIntOrNull() ?: 0
-                val minutesRemain = strFreeMinReMain.toIntOrNull() ?: 0
-                strFreeMinTotal = "${minutesTotal / 60}분"
-                strFreeMinReMain = "${minutesRemain / 60}분"
-                strFreeMinUse = "${minutesUse / 60}분"
-            } else if (strSvcName.contains("SMS")) {
-                strFreeMinReMain = "" // Hide strFreeMinReMain
+            }
+            else if (strSvcName.contains("SMS")) {
+                val intValue = strFreeMinReMain.toIntOrNull() ?: 0
+                if (intValue > 99999) {
+                    strFreeMinReMain = "무제한"
+                } else {
+                    strFreeMinReMain = "${strFreeMinReMain}건"
+                }
+                strFreeMinTotal = "${strFreeMinTotal}건"
+                strFreeMinUse = "${strFreeMinUse}건"
             }
 
             totaluseTimeStringBuilder.append("\n")
@@ -240,15 +250,15 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
             totaluseTimeStringBuilder.append(spannableSvcName)
             totaluseTimeStringBuilder.append("\n")
 
-            totaluseTimeStringBuilder.append(String.format("%-40s %30s%n", "총제공량", strFreeMinTotal))
+            totaluseTimeStringBuilder.append(String.format("%-40s %30s%n\n", "총제공량", strFreeMinTotal))
             if (strSvcName.contains("음성") && strFreeMinReMain == "0") {
                 // Do not include "잔여량" if strFreeMinReMain is 0
-                totaluseTimeStringBuilder.append(String.format("%-40s %31s%n", "", strFreeMinReMain))
+                totaluseTimeStringBuilder.append(String.format("%-40s %31s%n\n", "", strFreeMinReMain))
             } else {
                 if (strFreeMinReMain != "0") {
-                    totaluseTimeStringBuilder.append(String.format("%-41.5s %32s%n", "잔여량", strFreeMinReMain))
+                    totaluseTimeStringBuilder.append(String.format("%-41.5s %32s%n\n", "잔여량", strFreeMinReMain))
                 }
-                totaluseTimeStringBuilder.append(String.format("%-40s %31s%n", "사용량", strFreeMinUse))
+                totaluseTimeStringBuilder.append(String.format("%-40s %32s%n\n", "사용량", strFreeMinUse))
             }
             totaluseTimeStringBuilder.append("\n\n\n")
         }
@@ -263,7 +273,6 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
             value
         }
     }
-
     private fun formatDataValue(value: String, multiplier: Double): String {
         val floatValue = value.toFloatOrNull()
         return if (floatValue != null) {
