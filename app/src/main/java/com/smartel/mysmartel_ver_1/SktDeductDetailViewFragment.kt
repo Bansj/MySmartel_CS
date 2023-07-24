@@ -173,7 +173,7 @@ class SktDeductDetailViewFragment : Fragment() {
                     val useQtyGB = parseValueToGB(remainInfo.useQty)
                     val remQtyGB = parseValueToGB(remainInfo.remQty)
 
-                    remainInfoStr.append("\n${remainInfo.freePlanName}\n\n")
+                    remainInfoStr.append("\n\n${remainInfo.freePlanName}\n\n\n")
                     remainInfoStr.append("총제공량".padEnd(60) + "$totalQtyGB\n\n") // Add padding between label and value
                     remainInfoStr.append("사용량".padEnd(60) + "$useQtyGB\n\n") // Add padding between label and value
                     remainInfoStr.append("잔여량".padEnd(60) + "$remQtyGB\n\n\n\n") // Add padding between label and value

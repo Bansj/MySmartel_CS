@@ -8,15 +8,23 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.mysmartel_ver_1.R
-import okhttp3.*
-import java.io.IOException
-import java.net.URLEncoder
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.*
+import java.nio.charset.Charset
+import java.text.SimpleDateFormat
+import java.util.*
 
 class SktBillDetailFragment : Fragment() {
 
-    // Late-initialized variables
-    private lateinit var serviceAcct: String
-    private lateinit var textViewBillingDetails: TextView
+    private lateinit var phoneNumber: String
+    private lateinit var currentYearMonth: String
+
+    private lateinit var textView: TextView
+    private val yearMonthFormat = SimpleDateFormat("yyyyMM", Locale.getDefault())
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,76 +36,83 @@ class SktBillDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Initialize textViewBillingDetails using findViewById with its ID
-        textViewBillingDetails = view.findViewById(R.id.textViewBillingDetails)
+        // Initialize the textView
+        textView = view.findViewById(R.id.textViewData)
 
-        // Retrieve the serviceAcct value from arguments
-        serviceAcct = arguments?.getString("serviceAcct") ?: ""
-        if (serviceAcct.isEmpty()) {
-            // Handle the case where serviceAcct is not provided properly
-            Log.e("BillingDetails", "Missing serviceAcct value from arguments")
-            return
-        }
+        // Get the phoneNumber value from MyInfoFragment
+        phoneNumber = arguments?.getString("phoneNumber") ?: ""
 
-        // Fetch billing details from API
-        fetchBillingDetails(serviceAcct)
+        // Set ifClCd value as "R5"
+        val ifClCd = "R5"
+
+        // Get the current year and month from the user's mobile phone
+        val calendar = Calendar.getInstance()
+        val yearMonthFormat = SimpleDateFormat("yyyyMM", Locale.getDefault())
+        currentYearMonth = yearMonthFormat.format(calendar.time)
+
+        // Query the API and fetch the data
+        fetchBillingDetail()
+
     }
 
-    private fun fetchBillingDetails(serviceAcct: String) {
-        val baseUrl = "http://vacs.smartelmobile.com/SKTRealTime/GetUsageRate.php"
-        val encodedServiceAcct = URLEncoder.encode(serviceAcct, "UTF-8")
-        val url = "$baseUrl?sv_acnt_num=$encodedServiceAcct"
+    private fun fetchBillingDetail() {
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                // Construct the API URL with parameters
+                val url =
+                    URL("https://www.mysmartel.com/api/sktGetInfo.php?svcNum=$phoneNumber&ifClCd=R5&addInfo=$currentYearMonth")
+                Log.d("BillingDetail", "API URL: $url")
 
-        val client = OkHttpClient()
-        val request = Request.Builder()
-            .url(url)
-            .build()
+                val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
+                connection.setRequestProperty("charset", "euc-kr")
+                connection.requestMethod = "GET"
 
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                // Handle API call failure here
-                Log.e("BillingDetails", "API call failed: ${e.message}")
-            }
+                // Get the response in EUC-KR charset
+                val reader = BufferedReader(InputStreamReader(connection.inputStream, Charset.forName("EUC-KR")))
+                val response = reader.readText()
+                Log.d("BillingDetail", "Response: $response")
 
-            override fun onResponse(call: Call, response: Response) {
-                val responseData = response.body?.string() ?: ""
-                if (responseData.isNotEmpty()) {
-                    // Process the API response and display in textView
-                    activity?.runOnUiThread {
-                        processResponseData(responseData)
-                    }
+                // Check if the "E6" value is included in the response
+                if (response.contains("E6")) {
+                    Log.d("BillingDetail", "E6 found in the response")
+                    val lastMonth = Calendar.getInstance()
+                    lastMonth.add(Calendar.MONTH, -1)
+                    currentYearMonth = yearMonthFormat.format(lastMonth.time)
+
+                    // Requery the API with last month's data
+                    val lastMonthUrl = URL("https://www.mysmartel.com/api/sktGetInfo.php?svcNum=$phoneNumber&ifClCd=R5&addInfo=$currentYearMonth")
+                    Log.d("BillingDetail", "Last Month API URL: $lastMonthUrl")
+                    val lastMonthConnection: HttpURLConnection = lastMonthUrl.openConnection() as HttpURLConnection
+                    lastMonthConnection.setRequestProperty("charset", "euc-kr")
+                    lastMonthConnection.requestMethod = "GET"
+
+                    // Get the new response in EUC-KR charset
+                    val lastMonthReader = BufferedReader(InputStreamReader(lastMonthConnection.inputStream, Charset.forName("EUC-KR")))
+                    val lastMonthResponse = lastMonthReader.readText()
+                    Log.d("BillingDetail", "Last Month Response: $lastMonthResponse")
+
+                    // Display the data in the textView
+                    displayData(lastMonthResponse)
+
                 } else {
-                    // Handle the case where the response is empty or unexpected
-                    Log.e("BillingDetails", "Empty or unexpected response: $responseData")
+                    // Display the data in the textView
+                    displayData(response)
                 }
+
+            } catch (e: Exception) {
+                Log.e("BillingDetail", "Error fetching billing detail: ${e.message}")
             }
-        })
-    }
-
-    private fun processResponseData(responseData: String) {
-        val items = responseData.split(" ")
-
-        val stringBuilder = StringBuilder()
-        for (i in 0 until items.size step 5) {
-            val name = items.getOrNull(i) ?: continue
-            val description = items.getOrNull(i + 1) ?: continue
-            val amount = items.getOrNull(i + 2) ?: continue
-
-            val formattedString = "$name $description $amount \t"
-            stringBuilder.append(formattedString)
         }
-
-        val formattedBillingDetails = stringBuilder.toString()
-
-        // Replace the newline character with a space for logging
-        val formattedBillingDetailsLog = formattedBillingDetails.replace("\n", " ")
-
-        // Log the formatted billing details in a single line
-        Log.d("BillingDetails", "Formatted Billing Details: $formattedBillingDetailsLog")
-
-        // Set the formatted billing details to the textView
-        textViewBillingDetails.text = formattedBillingDetails
     }
 
-}
+    private fun displayData(data: String) {
+        // Update the UI on the main thread
+        GlobalScope.launch(Dispatchers.Main) {
+            // Encode the data in UTF-8 to prevent broken characters
+            val encodedData = String(data.toByteArray(Charset.forName("UTF-8")), Charset.forName("UTF-8"))
 
+            // Display the data in the textView
+            textView.text = encodedData
+        }
+    }
+}

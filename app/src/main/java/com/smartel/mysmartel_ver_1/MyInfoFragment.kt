@@ -162,11 +162,12 @@ class MyInfoFragment : Fragment() {
                     val skBillDetailFragment = SktBillDetailFragment()
                     val bundle = Bundle()
                     bundle.putString("serviceAcct", serviceAcct)
+                    bundle.putString("phoneNumber", phoneNumber)
                     skBillDetailFragment.arguments = bundle
 
                     // Log the values for SKT
                     Log.d("MyInfoFragment", "to SktBillDetailFragment--------------------serviceAcct: $serviceAcct--------------------")
-
+                    Log.d("MyInfoFragment", "to SktBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
                     skBillDetailFragment
                 }
                 "KT" -> {

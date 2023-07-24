@@ -146,6 +146,7 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
             }
 
         })
+
     }
 
     private fun checkAndSendDataToMyInfoFragment(totaluseTimeList: List<KtDeductApiResponse.BodyData.TotaluseTimeDtoData>) {

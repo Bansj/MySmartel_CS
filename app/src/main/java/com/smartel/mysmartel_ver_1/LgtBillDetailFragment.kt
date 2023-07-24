@@ -35,10 +35,6 @@ class LgtBillDetailFragment : Fragment() {
     private val baseUrl = "https://www.mysmartel.com/api/lguChargeDtl.php"
 
     private lateinit var svcNmTextView: TextView
-    private lateinit var blItemNmTextView: TextView
-    private lateinit var billAmtTextView: TextView
-    private lateinit var vatPrntYnTextView: TextView
-
     private lateinit var txt_sumAmount: TextView
 
     override fun onCreateView(
