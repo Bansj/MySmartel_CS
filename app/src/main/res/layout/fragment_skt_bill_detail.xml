@@ -76,29 +76,6 @@
                     android:padding="16dp"
                     android:text="Loading Date details..."
                     android:textSize="18sp" />
-                <TextView
-                    android:id="@+id/tvBasicFee"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Basic Fee" />
-
-                <TextView
-                    android:id="@+id/tvDiscount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Discount" />
-
-                <TextView
-                    android:id="@+id/tvOtherAmount"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Other Amount" />
-
-                <TextView
-                    android:id="@+id/tvVAT"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="VAT" />
 
             </LinearLayout>
 
