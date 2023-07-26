@@ -19,6 +19,7 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Collections.min
+import kotlin.math.min
 
 class SktBillDetailFragment : Fragment() {
 
@@ -109,43 +110,59 @@ class SktBillDetailFragment : Fragment() {
     private fun displayData(data: String) {
         // Update the UI on the main thread
         GlobalScope.launch(Dispatchers.Main) {
-            // Encode the data in UTF-8 to prevent broken characters
-            val encodedData = String(data.toByteArray(Charset.forName("UTF-8")), Charset.forName("UTF-8"))
+            try {
+                val encodedData = String(data.toByteArray(Charset.forName("UTF-8")), Charset.forName("UTF-8"))
+                val trueValue = encodedData.drop(60).dropLast(2)
+                val dataWithoutTrailing00 = trueValue.dropLast(2)
 
-            // Remove 60 characters at the starting of the raw data
-            val trueValue = encodedData.substring(60)
+                val 구분코드 = trueValue.take(1)
+                val 업무유형코드 = trueValue.safeSubstring(1, 3)
+                val 전화번호 = trueValue.safeSubstring(3, 15)
+                val 서비스계정번호 = trueValue.safeSubstring(15, 26)
+                val 조회월 = trueValue.safeSubstring(26, 32)
+                val 총청구금액 = trueValue.safeSubstring(32, 54).trimStart('0')
+                val 청구서건수 = trueValue.safeSubstring(54, 59).trim().toInt()
 
-            // Remove 32 characters from trueValue
-            val realValue = trueValue.substring(32)
+                val dataRemaining = trueValue.drop(59)
+                val 청구서리스트 = mutableListOf<String>()
 
-            // Cut off 22 characters from realValue
-            val totalAmt = realValue.substring(0, 22).trimStart('0')
+                for (i in 0 until 청구서건수) {
+                    val 대분류명 = dataRemaining.safeSubstring(i * 262, i * 262 + 75).replace("\\s","") //262
+                    val 소분류명 = dataRemaining.safeSubstring(i * 252 + 75, i * 262 + 154).replace("\\s","")
+                    val 항목명 = dataRemaining.safeSubstring(i * 262 + 154, i * 262 + 240)
+                        .replace("\\s","")
+                        .trimStart('0')
+                    val 청구금액 = dataRemaining.safeSubstring(i * 262 + 240, i * 262 + 253)
+                        .replace(Regex("[^\\d]"), "") // 문자열 삭제
+                        .replace("\\s", "") // 공백삭제
+                        .trimStart('0') // 0 삭제     .trimStart { it == '0' || it.isWhitespace() }
+                    청구서리스트.add("\n분류명: $대분류명\n\n소분류: $소분류명\n\n항목명: $항목명\n\n금액: ${청구금액}원\n\n")
 
-            // Cut off first 5 characters from the remaining data
-            val leftData1 = realValue.substring(22)
-            val leftData2 = leftData1.substring(5)
+                    Log.d("\n\n-----------청구서 출력 ------------\n",
+                        "대분류 : $대분류명\n" +
+                            "소분류 : $소분류명\n" +
+                            "항목명 : $항목명\n" +
+                            "청구금액 : $청구금액\n")
+                }
 
-            // Cut off first 80 characters from leftData2 as 청구서대분류명
-            val 청구서대분류명 = leftData2.substring(0, 80)
+                val 에러코드 = dataRemaining.safeSubstring(청구서건수 * 262, 청구서건수 * 262 + 2)
+                val 종료문자 = dataRemaining.safeSubstring(청구서건수 * 262 + 2, 청구서건수 * 262 + 3)
 
-            // Cut off next 80 characters as 청구서소분류명
-            val 청구서소분류명 = leftData2.substring(80, 160)
-
-            // Cut off next 80 characters as 청구서항목
-            val 청구서항목 = leftData2.substring(160, 240)
-
-            // Cut off next 22 characters as 청구금액
-            val 청구금액 = leftData2.substring(240, 262)
-
-
-            val formattedTotalAmt = NumberFormat.getNumberInstance().format(totalAmt.toInt())
-            // Display the values in the textView
-            textView.text = "총 납부하실 금액$formattedTotalAmt\n\n\n청구서대분류명: $청구서대분류명\n\n\n" +
-                    "청구서소분류명: $청구서소분류명\n\n\n청구서항목: $청구서항목\n\n\n청구금액: $청구금액\n\n"
-
-            sumAmount.text = "${formattedTotalAmt}원"
+                textView.text = "조회 월: $조회월\n\n" +
+                        "총 납부하실 금액: ${총청구금액}원\n\n" +
+                        "청구서 건수: $청구서건수\n\n\n" +
+                        "청구서리스트:\n${청구서리스트.joinToString("\n\n")}\n\n"
+            } catch (e: Exception) {
+                textView.text = "데이터 처리 중 오류가 발생했습니다:\n${e.message}"
+            }
         }
     }
+
+    fun String.safeSubstring(startIndex: Int, endIndex: Int): String {
+        if (startIndex >= length) return ""
+        return substring(startIndex, min(endIndex, length))
+    }
+
 }
 
 
