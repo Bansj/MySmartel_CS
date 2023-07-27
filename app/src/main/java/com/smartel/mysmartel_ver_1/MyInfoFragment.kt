@@ -121,7 +121,8 @@ class MyInfoFragment : Fragment() {
                 // Log the values for SKT
                 Log.d("MyInfoFragment", "to SktDeductDetailViewFragment--------------------serviceAcct: $serviceAcct--------------------")
                 Log.d("MyInfoFragment", "to SktDeductDetailViewFragment--------------------Telecom: $Telecom--------------------")
-                fragmentTransaction.replace(android.R.id.content, sktDeductDetailViewFragment, "SktDeductDetailViewFragment")
+                sktDeductDetailViewFragment
+                //fragmentTransaction.replace(android.R.id.content, sktDeductDetailViewFragment, "SktDeductDetailViewFragment")
             }
             else if (telecom == "KT") {
                 val ktDeductDetailViewFragment = KtDeductDetailViewFragment()
@@ -151,6 +152,70 @@ class MyInfoFragment : Fragment() {
             fragmentTransaction.addToBackStack(null)
             fragmentTransaction.commit()
         }
+
+       /* // 버튼을 클릭시 아래에서 위로 올라오는 new사용량 상세보기 페이지 클릭이벤트
+        val btnDeductDeailFragment = view?.findViewById<Button>(R.id.btn_detailDeduct)
+        btnDeductDeailFragment?.setOnClickListener {
+            val telecom = viewModel.Telecom ?: arguments?.getString("Telecom")
+            val fragment: Fragment? = when (telecom) {
+                "SKT" -> {
+                    val sktDeductDetailViewFragment = SktDeductDetailViewFragment()
+                    val bundle = Bundle()
+                    bundle.putString("serviceAcct", serviceAcct)
+                    bundle.putString("Telecom", Telecom)
+                    sktDeductDetailViewFragment.arguments = bundle
+
+                    // Log the values for SKT
+                    Log.d("MyInfoFragment", "to SktDeductDetailFragment--------------------serviceAcct: $serviceAcct--------------------")
+                    Log.d("MyInfoFragment", "to SktDeductDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+                    sktDeductDetailViewFragment
+                }
+                "KT" -> {
+                    val ktDeductDetailViewFragment = KtDeductDetailViewFragment()
+                    val bundle = Bundle()
+                    bundle.putString("phoneNumber", phoneNumber)
+                    ktDeductDetailViewFragment.arguments = bundle
+
+                    // Log the values for KT
+                    Log.d("MyInfoFragment", "to KtDeductDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+
+                    ktDeductDetailViewFragment
+                }
+                "LGT" -> {
+                    val lgtDeductDetailViewFragment = LgtDeductDetailViewFragment()
+                    val bundle = Bundle()
+                    bundle.putString("custName", custName)
+                    bundle.putString("phoneNumber", phoneNumber)
+                    lgtDeductDetailViewFragment.arguments = bundle
+
+                    // Log the values for LGT
+                    Log.d("MyInfoFragment", "to LgtDeductDetailFragment--------------------custName: $custName--------------------")
+                    Log.d("MyInfoFragment", "to LgtDeductDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+
+                    lgtDeductDetailViewFragment
+                }
+                else -> {
+                    Log.e("MyInfoFragment", "Invalid Telecom value: $telecom")
+                    null
+                }
+            }
+
+            fragment?.let {
+                requireFragmentManager().beginTransaction()
+                    .setCustomAnimations(
+                        R.anim.slide_in_up, // Animation for fragment enter
+                        R.anim.slide_out_down, // Animation for fragment exit
+                        R.anim.slide_in_up, // Animation for fragment pop-enter
+                        R.anim.slide_out_down // Animation for fragment pop-exit
+                    )
+                    .add(id, it) // Use the ID of any existing container view in your layout
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }*/
+
+
+
 
 
         // 버튼을 클릭시 아래에서 위로 올라오는 청구요금 상세보기 페이지 클릭이벤트

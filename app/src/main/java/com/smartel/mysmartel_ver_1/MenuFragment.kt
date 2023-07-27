@@ -7,6 +7,7 @@ import android.animation.ValueAnimator
 import android.content.ContentValues.TAG
 import android.content.Intent
 import android.net.Uri
+import android.nfc.Tag
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -181,11 +182,13 @@ class MenuFragment : Fragment() {
                 "SKT" -> {
                     val sktPaymentDetailFragment = SktPaymentDetailFragment()
                     val bundle = Bundle()
+                    bundle.putString("phoneNumber", phoneNumber)
                     bundle.putString("serviceAcct", serviceAcct)
                     sktPaymentDetailFragment.arguments = bundle
 
                     // Log the values for SKT
-                    Log.d(TAG, "-------------------- SKT --> serviceAcct: $serviceAcct------ -")
+                    Log.d(TAG,"--------------------- SKT --> phoneNumber: $phoneNumber----------")
+                    Log.d(TAG, "-------------------- SKT --> serviceAcct: $serviceAcct----------")
 
                     sktPaymentDetailFragment
                 }

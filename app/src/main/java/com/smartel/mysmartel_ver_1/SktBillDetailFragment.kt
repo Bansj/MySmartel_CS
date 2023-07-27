@@ -38,6 +38,7 @@ class SktBillDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         // Initialize the textView
         textView = view.findViewById(R.id.textViewData)
         sumAmount = view.findViewById(R.id.txt_sumAmount)
@@ -106,7 +107,6 @@ class SktBillDetailFragment : Fragment() {
             }
         }
     }
-
     private fun displayData(data: String) {
         // Update the UI on the main thread
         GlobalScope.launch(Dispatchers.Main) {
@@ -125,25 +125,30 @@ class SktBillDetailFragment : Fragment() {
 
                 val dataRemaining = trueValue.drop(59)
                 val 청구서리스트 = mutableListOf<String>()
+                Log.d("chicking", "청구서리스트: $청구서리스트")
 
+                val test = mutableListOf<String>()
                 for (i in 0 until 청구서건수) {
-                    val 대분류명 = dataRemaining.safeSubstring(i * 262, i * 262 + 75).replace("\\s","") //262
-                    val 소분류명 = dataRemaining.safeSubstring(i * 252 + 75, i * 262 + 154).replace("\\s","")
-                    val 항목명 = dataRemaining.safeSubstring(i * 262 + 154, i * 262 + 240)
-                        .replace("\\s","")
-                        .trimStart('0')
-                    val 청구금액 = dataRemaining.safeSubstring(i * 262 + 240, i * 262 + 253)
-                        .replace(Regex("[^\\d]"), "") // 문자열 삭제
-                        .replace("\\s", "") // 공백삭제
-                        .trimStart('0') // 0 삭제     .trimStart { it == '0' || it.isWhitespace() }
+                    val 대분류명 = dataRemaining.safeSubstring(i * 262, i * 262 + 80)//.trim().replace("\\s","") //262
+                    val 소분류명 = dataRemaining.safeSubstring(i * 262 + 80, i * 262 + 160)//.trim().replace("\\s","")
+                    val 항목명 = dataRemaining.safeSubstring(i * 262 + 160, i * 262 + 240)//.trim().replace("\\s","").trimStart('0')
+                    val 청구금액 = dataRemaining.safeSubstring(i * 262 + 240, i * 262 + 262)//.replace(Regex("[^\\d]"), "") // 문자열 삭제.replace("\\s", "") // 공백삭제.trimStart('0') // 0 삭제     .trimStart { it == '0' || it.isWhitespace() }
                     청구서리스트.add("\n분류명: $대분류명\n\n소분류: $소분류명\n\n항목명: $항목명\n\n금액: ${청구금액}원\n\n")
 
-                    Log.d("\n\n-----------청구서 출력 ------------\n",
+                    test.add(대분류명)
+                    test.add(소분류명)
+                    test.add(항목명)
+                    test.add(청구금액)
+
+
+                    Log.d("\n\n-------------------- 청구서 출력 ----------------------------------------------------------\n",
                         "대분류 : $대분류명\n" +
-                            "소분류 : $소분류명\n" +
-                            "항목명 : $항목명\n" +
-                            "청구금액 : $청구금액\n")
+                                "소분류 : $소분류명\n" +
+                                "항목명 : $항목명\n" +
+                                "청구금액 : $청구금액\n")
                 }
+
+                Log.d("test mutable", "------$test")
 
                 val 에러코드 = dataRemaining.safeSubstring(청구서건수 * 262, 청구서건수 * 262 + 2)
                 val 종료문자 = dataRemaining.safeSubstring(청구서건수 * 262 + 2, 청구서건수 * 262 + 3)
@@ -162,7 +167,6 @@ class SktBillDetailFragment : Fragment() {
         if (startIndex >= length) return ""
         return substring(startIndex, min(endIndex, length))
     }
-
 }
 
 
