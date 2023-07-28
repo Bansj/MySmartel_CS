@@ -5,12 +5,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.mysmartel_ver_1.R
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.*
@@ -19,6 +18,7 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.Collections.min
+import java.util.regex.Pattern
 import kotlin.math.min
 
 class SktBillDetailFragment : Fragment() {
@@ -29,6 +29,17 @@ class SktBillDetailFragment : Fragment() {
     private val yearMonthFormat = SimpleDateFormat("yyyyMM", Locale.getDefault())
 
     private lateinit var sumAmount: TextView
+
+    private lateinit var tv_code: TextView
+    private lateinit var tv_type: TextView
+    private lateinit var tv_phone_number: TextView
+    private lateinit var tv_account_number: TextView
+    private lateinit var tv_month: TextView
+    private lateinit var tv_total_amount: TextView
+    private lateinit var tv_bill_count: TextView
+    private lateinit var ll_billing_details: LinearLayout
+    private lateinit var tv_error_code: TextView
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -107,6 +118,7 @@ class SktBillDetailFragment : Fragment() {
             }
         }
     }
+
     private fun displayData(data: String) {
         // Update the UI on the main thread
         GlobalScope.launch(Dispatchers.Main) {
@@ -123,40 +135,23 @@ class SktBillDetailFragment : Fragment() {
                 val 총청구금액 = trueValue.safeSubstring(32, 54).trimStart('0')
                 val 청구서건수 = trueValue.safeSubstring(54, 59).trim().toInt()
 
+                val 한글패턴 = Regex("[가-힣]")
+                val snowflakeCount = 한글패턴.findAll(data).count()
+                val 길이 = data.length + snowflakeCount
+
                 val dataRemaining = trueValue.drop(59)
                 val 청구서리스트 = mutableListOf<String>()
-                Log.d("chicking", "청구서리스트: $청구서리스트")
 
-                val test = mutableListOf<String>()
                 for (i in 0 until 청구서건수) {
-                    val 대분류명 = dataRemaining.safeSubstring(i * 262, i * 262 + 80)//.trim().replace("\\s","") //262
-                    val 소분류명 = dataRemaining.safeSubstring(i * 262 + 80, i * 262 + 160)//.trim().replace("\\s","")
-                    val 항목명 = dataRemaining.safeSubstring(i * 262 + 160, i * 262 + 240)//.trim().replace("\\s","").trimStart('0')
-                    val 청구금액 = dataRemaining.safeSubstring(i * 262 + 240, i * 262 + 262)//.replace(Regex("[^\\d]"), "") // 문자열 삭제.replace("\\s", "") // 공백삭제.trimStart('0') // 0 삭제     .trimStart { it == '0' || it.isWhitespace() }
+                    val 대분류명 = dataRemaining.safeSubstring(i * 262, i * 262 + 80)
+                    val 소분류명 = dataRemaining.safeSubstring(i * 262 + 80, i * 262 + 160)
+                    val 항목명 = dataRemaining.safeSubstring(i * 262 + 160, i * 262 + 240)
+                    val 청구금액 = dataRemaining.safeSubstring(i * 262 + 240, i * 262 + 262)
+
                     청구서리스트.add("\n분류명: $대분류명\n\n소분류: $소분류명\n\n항목명: $항목명\n\n금액: ${청구금액}원\n\n")
-
-                    test.add(대분류명)
-                    test.add(소분류명)
-                    test.add(항목명)
-                    test.add(청구금액)
-
-
-                    Log.d("\n\n-------------------- 청구서 출력 ----------------------------------------------------------\n",
-                        "대분류 : $대분류명\n" +
-                                "소분류 : $소분류명\n" +
-                                "항목명 : $항목명\n" +
-                                "청구금액 : $청구금액\n")
                 }
 
-                Log.d("test mutable", "------$test")
-
-                val 에러코드 = dataRemaining.safeSubstring(청구서건수 * 262, 청구서건수 * 262 + 2)
-                val 종료문자 = dataRemaining.safeSubstring(청구서건수 * 262 + 2, 청구서건수 * 262 + 3)
-
-                textView.text = "조회 월: $조회월\n\n" +
-                        "총 납부하실 금액: ${총청구금액}원\n\n" +
-                        "청구서 건수: $청구서건수\n\n\n" +
-                        "청구서리스트:\n${청구서리스트.joinToString("\n\n")}\n\n"
+                textView.text = "조회 월: $조회월\n\n총 납부하실 금액: ${총청구금액}원\n\n청구서 건수: $청구서건수\n\n\n청구서리스트:\n${청구서리스트.joinToString("\n\n")}\n\n데이터 길이: $길이 칸"
             } catch (e: Exception) {
                 textView.text = "데이터 처리 중 오류가 발생했습니다:\n${e.message}"
             }
@@ -168,5 +163,9 @@ class SktBillDetailFragment : Fragment() {
         return substring(startIndex, min(endIndex, length))
     }
 }
+
+
+
+
 
 
