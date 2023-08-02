@@ -1,5 +1,6 @@
 package com.smartel.mysmartel_ver_1
 
+import android.media.MediaPlayer.MetricsConstants.ERROR_CODE
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,13 +11,16 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.mysmartel_ver_1.R
 import kotlinx.coroutines.*
+import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.*
 import java.nio.charset.Charset
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
+import java.time.Month
 import java.util.*
+import java.util.Calendar.MONTH
 import java.util.Collections.min
 import java.util.regex.Pattern
 import kotlin.math.min
@@ -68,101 +72,156 @@ class SktBillDetailFragment : Fragment() {
     private fun fetchBillingDetail() {
         GlobalScope.launch(Dispatchers.IO) {
             try {
-                // Construct the API URL with parameters
-                val url =
-                    URL("https://www.mysmartel.com/api/sktGetInfo.php?svcNum=$phoneNumber&ifClCd=R5&addInfo=$currentYearMonth")
-                Log.d("BillingDetail", "API URL: $url")
-                val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
-                connection.setRequestProperty("charset", "euc-kr")
-                connection.requestMethod = "GET"
-                // Get the response in EUC-KR charset
-                val reader = BufferedReader(
-                    InputStreamReader(
-                        connection.inputStream,
-                        Charset.forName("EUC-KR")
-                    )
-                )
-                val response = reader.readText()
-                Log.d("BillingDetail", "Response: $response")
-                // Check if the "E6" value is included in the response
-                if (response.contains("E6")) {
-                    Log.d("BillingDetail", "E6 found in the response")
-                    val lastMonth = Calendar.getInstance()
-                    lastMonth.add(Calendar.MONTH, -1)
-                    currentYearMonth = yearMonthFormat.format(lastMonth.time)
-                    // Requery the API with last month's data
-                    val lastMonthUrl =
-                        URL("https://www.mysmartel.com/api/sktGetInfo.php?svcNum=$phoneNumber&ifClCd=R5&addInfo=$currentYearMonth")
-                    Log.d("BillingDetail", "Last Month API URL: $lastMonthUrl")
-                    val lastMonthConnection: HttpURLConnection =
-                        lastMonthUrl.openConnection() as HttpURLConnection
-                    lastMonthConnection.setRequestProperty("charset", "euc-kr")
-                    lastMonthConnection.requestMethod = "GET"
-                    // Get the new response in EUC-KR charset
-                    val lastMonthReader = BufferedReader(
+                var currentResponse = ""
+                var currentMonth = Calendar.getInstance()
+                currentMonth.add(Calendar.MONTH, -1)
+
+                while (true) {
+                    // Log the current year and month
+                    Log.d("BillingDetail", "Current Year-Month: ${yearMonthFormat.format(currentMonth.time)}")
+
+                    // Construct the API URL with parameters
+                    val url =
+                        URL("https://www.mysmartel.com/api/sktGetInfo.php?svcNum=$phoneNumber&ifClCd=R5&addInfo=${yearMonthFormat.format(currentMonth.time)}")
+                    Log.d("BillingDetail", "API URL: $url")
+                    val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
+                    connection.setRequestProperty("charset", "euc-kr")
+                    connection.requestMethod = "GET"
+                    // Get the response in EUC-KR charset
+                    val reader = BufferedReader(
                         InputStreamReader(
-                            lastMonthConnection.inputStream,
+                            connection.inputStream,
                             Charset.forName("EUC-KR")
                         )
                     )
-                    val lastMonthResponse = lastMonthReader.readText()
-                    Log.d("BillingDetail", "Last Month Response: $lastMonthResponse")
-                    // Display the data in the textView
-                    displayData(lastMonthResponse)
-                } else {
-                    // Display the data in the textView
-                    displayData(response)
+                    currentResponse = reader.readText()
+                    Log.d("BillingDetail", "Response: $currentResponse")
+
+                    // Check if the "E6" value is included in the response
+                    if (!currentResponse.contains("E6")) {
+                        // If "E6" is not found, break the loop and display the data
+                        break
+                    }
+
+                    // Decrement the month for the next iteration
+                    currentMonth.add(Calendar.MONTH, -1)
                 }
+
+                // Display the data in the textView
+                displayData(currentResponse)
             } catch (e: Exception) {
                 Log.e("BillingDetail", "Error fetching billing detail: ${e.message}")
             }
         }
     }
+    // 1. 한글 포함 여부 확인하는 함수와 데이터 처리 로직 작성
+    fun isKoreanIncluded(data: String): Boolean {
+        val pattern = Pattern.compile(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*")
+        val matcher = pattern.matcher(data)
+        return matcher.find()
+    }
 
-    private fun displayData(data: String) {
-        // Update the UI on the main thread
-        GlobalScope.launch(Dispatchers.Main) {
-            try {
-                val encodedData = String(data.toByteArray(Charset.forName("UTF-8")), Charset.forName("UTF-8"))
-                val trueValue = encodedData.drop(60).dropLast(2)
-                val dataWithoutTrailing00 = trueValue.dropLast(2)
-
-                val 구분코드 = trueValue.take(1)
-                val 업무유형코드 = trueValue.safeSubstring(1, 3)
-                val 전화번호 = trueValue.safeSubstring(3, 15)
-                val 서비스계정번호 = trueValue.safeSubstring(15, 26)
-                val 조회월 = trueValue.safeSubstring(26, 32)
-                val 총청구금액 = trueValue.safeSubstring(32, 54).trimStart('0')
-                val 청구서건수 = trueValue.safeSubstring(54, 59).trim().toInt()
-
-                val 한글패턴 = Regex("[가-힣]")
-                val snowflakeCount = 한글패턴.findAll(data).count()
-                val 길이 = data.length + snowflakeCount
-
-                val dataRemaining = trueValue.drop(59)
-                val 청구서리스트 = mutableListOf<String>()
-
-                for (i in 0 until 청구서건수) {
-                    val 대분류명 = dataRemaining.safeSubstring(i * 262, i * 262 + 80)
-                    val 소분류명 = dataRemaining.safeSubstring(i * 262 + 80, i * 262 + 160)
-                    val 항목명 = dataRemaining.safeSubstring(i * 262 + 160, i * 262 + 240)
-                    val 청구금액 = dataRemaining.safeSubstring(i * 262 + 240, i * 262 + 262)
-
-                    청구서리스트.add("\n분류명: $대분류명\n\n소분류: $소분류명\n\n항목명: $항목명\n\n금액: ${청구금액}원\n\n")
+    fun processText(text: String): String {
+        var processedText = text
+        if (isKoreanIncluded(text)) {
+            val length = text.length
+            val buffer = StringBuffer(length)
+            for (i in 0 until length) {
+                val c = text[i]
+                if (c in '가'..'힣' || c in '\uAC00'..'\uD7AF') {
+                    buffer.append(c)
+                    buffer.append('\u0000') // 2byte로 처리
+                } else {
+                    buffer.append(c)
                 }
-
-                textView.text = "조회 월: $조회월\n\n총 납부하실 금액: ${총청구금액}원\n\n청구서 건수: $청구서건수\n\n\n청구서리스트:\n${청구서리스트.joinToString("\n\n")}\n\n데이터 길이: $길이 칸"
-            } catch (e: Exception) {
-                textView.text = "데이터 처리 중 오류가 발생했습니다:\n${e.message}"
             }
+            processedText = buffer.toString()
+        }
+        return processedText
+    }
+
+    // 2. JSON 형식으로 결과 반환하는 함수 작성
+    fun makeResultJsonObject(data: MutableList<String>, keyList: MutableList<String>): JSONObject {
+        val jsonObject = JSONObject()
+        for (i in data.indices) {
+            jsonObject.put(keyList[i], data[i].trim())
+        }
+        return jsonObject
+    }
+
+    // 3. 조회된 데이터 처리 및 결과 출력 코드 수정
+    private fun displayData(data: String) {
+        GlobalScope.launch(Dispatchers.Main) {
+            val encodedData = String(data.toByteArray(Charset.forName("UTF-8")), Charset.forName("UTF-8"))
+
+            // 1. Check if the string contains Korean characters and adjust the string accordingly
+            val adjustedData = encodedData.chunked(1).joinToString(separator = "") { char ->
+                if (char[0].toInt() in 0xAC00..0xD7A3) char + '\u0000' else char
+            }
+
+            // 2. Remove the first 60 bytes from the data and create trueValue
+            val trueValue = adjustedData.substring(60)
+
+            // Helper function to consume bytes from the string
+            var currentIndex = 0
+            fun consumeBytes(count: Int): String {
+                val substring = trueValue.substring(currentIndex, currentIndex + count)
+                currentIndex += count
+                return substring
+            }
+
+            // 3. Parse the trueValue according to the format
+            val opClCd = consumeBytes(1)
+            val opTypCd = consumeBytes(2)
+            val svcNum = consumeBytes(12)
+            val svAcntNum = consumeBytes(11)
+            val INV_YM = consumeBytes(6)
+            val TOT_INV_AMT = consumeBytes(22)
+            val BILL_REC_CNT = consumeBytes(5).trim().toInt()
+
+            // 4. Iterate through the billing items and display additional values
+            val stringBuilder1 = StringBuilder()
+            stringBuilder1.append("운영구분코드: $opClCd\n")
+            stringBuilder1.append("업무구분코드: $opTypCd\n")
+            stringBuilder1.append("서비스번호: $svcNum\n")
+            stringBuilder1.append("부가서비스 계정번호: $svAcntNum\n")
+            stringBuilder1.append("청구년월: $INV_YM\n")
+            stringBuilder1.append("총청구금액: ${TOT_INV_AMT.trimStart('0')}원\n")
+            stringBuilder1.append("청구서 항목수: $BILL_REC_CNT\n\n")
+
+            // 4. Iterate through the billing items
+            val stringBuilder = StringBuilder()
+            for (i in 0 until BILL_REC_CNT) {
+                val BILL_ITM_LCL_NM = consumeBytes(80).trim()
+                val BILL_ITM_SCL_NM = consumeBytes(80).trim()
+                val BILL_ITM_NM = consumeBytes(80).trim()
+                val INV_AMT = consumeBytes(22).trimStart('0').trim()
+
+                Log.d("BillingDetail", "대분류명: $BILL_ITM_LCL_NM")
+                Log.d("BillingDetail", "소분류명: $BILL_ITM_SCL_NM")
+                Log.d("BillingDetail", "항목명: $BILL_ITM_NM")
+                Log.d("BillingDetail", "청구금액: $INV_AMT")
+
+                stringBuilder.append("청구서 대분류명: $BILL_ITM_LCL_NM\n")
+                stringBuilder.append("청구서 소분류명: $BILL_ITM_SCL_NM\n")
+                stringBuilder.append("청구서 항목명: $BILL_ITM_NM\n")
+                stringBuilder.append("청구금액: ${INV_AMT}원\n\n")
+            }
+
+            val ErrorCode = consumeBytes(2)
+
+            textView.text = stringBuilder1.toString() + stringBuilder.toString()
+
+            // Log to show the length of each parsed field
+            Log.d("ParsedData", "opClCd: ${opClCd.length}, opTypCd: ${opTypCd.length}, svcNum: ${svcNum.length}, svAcntNum: ${svAcntNum.length}, INV_YM: ${INV_YM.length}, TOT_INV_AMT: ${TOT_INV_AMT.length}, BILL_REC_CNT: ${BILL_REC_CNT}, ErrorCode: ${ErrorCode.length}")
         }
     }
 
-    fun String.safeSubstring(startIndex: Int, endIndex: Int): String {
-        if (startIndex >= length) return ""
-        return substring(startIndex, min(endIndex, length))
-    }
+
+
 }
+
+
 
 
 
