@@ -3,6 +3,7 @@ package com.smartel.mysmartel_ver_1
 import android.media.MediaPlayer.MetricsConstants.ERROR_CODE
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,6 +35,9 @@ class SktBillDetailFragment : Fragment() {
 
     private lateinit var sumAmount: TextView
 
+    private lateinit var txtTitle: TextView
+    private lateinit var txtValue: TextView
+
     private lateinit var tv_code: TextView
     private lateinit var tv_type: TextView
     private lateinit var tv_phone_number: TextView
@@ -57,6 +61,9 @@ class SktBillDetailFragment : Fragment() {
         // Initialize the textView
         textView = view.findViewById(R.id.textViewData)
         sumAmount = view.findViewById(R.id.txt_sumAmount)
+
+        txtTitle = view.findViewById(R.id.txt_title)
+        txtValue = view.findViewById(R.id.txt_value)
         // Get the phoneNumber value from MyInfoFragment
         phoneNumber = arguments?.getString("phoneNumber") ?: ""
         // Set ifClCd value as "R5"
@@ -114,42 +121,9 @@ class SktBillDetailFragment : Fragment() {
             }
         }
     }
-    // 1. 한글 포함 여부 확인하는 함수와 데이터 처리 로직 작성
-    fun isKoreanIncluded(data: String): Boolean {
-        val pattern = Pattern.compile(".*[ㄱ-ㅎㅏ-ㅣ가-힣]+.*")
-        val matcher = pattern.matcher(data)
-        return matcher.find()
-    }
 
-    fun processText(text: String): String {
-        var processedText = text
-        if (isKoreanIncluded(text)) {
-            val length = text.length
-            val buffer = StringBuffer(length)
-            for (i in 0 until length) {
-                val c = text[i]
-                if (c in '가'..'힣' || c in '\uAC00'..'\uD7AF') {
-                    buffer.append(c)
-                    buffer.append('\u0000') // 2byte로 처리
-                } else {
-                    buffer.append(c)
-                }
-            }
-            processedText = buffer.toString()
-        }
-        return processedText
-    }
 
-    // 2. JSON 형식으로 결과 반환하는 함수 작성
-    fun makeResultJsonObject(data: MutableList<String>, keyList: MutableList<String>): JSONObject {
-        val jsonObject = JSONObject()
-        for (i in data.indices) {
-            jsonObject.put(keyList[i], data[i].trim())
-        }
-        return jsonObject
-    }
-
-    // 3. 조회된 데이터 처리 및 결과 출력 코드 수정
+    // 조회된 데이터 처리 및 결과 출력 코드 수정
     private fun displayData(data: String) {
         GlobalScope.launch(Dispatchers.Main) {
             val encodedData = String(data.toByteArray(Charset.forName("UTF-8")), Charset.forName("UTF-8"))
@@ -175,22 +149,25 @@ class SktBillDetailFragment : Fragment() {
             val opTypCd = consumeBytes(2)
             val svcNum = consumeBytes(12)
             val svAcntNum = consumeBytes(11)
+
             val INV_YM = consumeBytes(6)
+            // Parse the year and month separately
+            val year = INV_YM.substring(0, 4)
+            val month = INV_YM.substring(4, 6)
+            // Format the year and month
+            val formattedDate = "${year}년 ${month}월"
+
             val TOT_INV_AMT = consumeBytes(22)
             val BILL_REC_CNT = consumeBytes(5).trim().toInt()
 
             // 4. Iterate through the billing items and display additional values
-            val stringBuilder1 = StringBuilder()
-            stringBuilder1.append("운영구분코드: $opClCd\n")
-            stringBuilder1.append("업무구분코드: $opTypCd\n")
-            stringBuilder1.append("서비스번호: $svcNum\n")
-            stringBuilder1.append("부가서비스 계정번호: $svAcntNum\n")
-            stringBuilder1.append("청구년월: $INV_YM\n")
-            stringBuilder1.append("총청구금액: ${TOT_INV_AMT.trimStart('0')}원\n")
-            stringBuilder1.append("청구서 항목수: $BILL_REC_CNT\n\n")
+            val stringBuilderDate = StringBuilder()
+            stringBuilderDate.append("$formattedDate\n\n\n")
+
 
             // 4. Iterate through the billing items
-            val stringBuilder = StringBuilder()
+            val stringBuilder2 = StringBuilder()
+
             for (i in 0 until BILL_REC_CNT) {
                 val BILL_ITM_LCL_NM = consumeBytes(80).trim()
                 val BILL_ITM_SCL_NM = consumeBytes(80).trim()
@@ -202,18 +179,49 @@ class SktBillDetailFragment : Fragment() {
                 Log.d("BillingDetail", "항목명: $BILL_ITM_NM")
                 Log.d("BillingDetail", "청구금액: $INV_AMT")
 
-                stringBuilder.append("청구서 대분류명: $BILL_ITM_LCL_NM\n")
-                stringBuilder.append("청구서 소분류명: $BILL_ITM_SCL_NM\n")
-                stringBuilder.append("청구서 항목명: $BILL_ITM_NM\n")
-                stringBuilder.append("청구금액: ${INV_AMT}원\n\n")
-            }
+                val totalLength = 57 // 이 값을 필요한 전체 문자열 길이로 변경할 수 있습니다.
+                val minGap = 20 // 이 값은 두 문자열 사이의 최소 여백 개수입니다.
+                val formattedLclNm = BILL_ITM_LCL_NM.padEnd(totalLength - (BILL_ITM_NM.length + INV_AMT.length), ' ')
+                val formattedBillItnNM = BILL_ITM_NM.padEnd(BILL_ITM_LCL_NM.length + minGap, ' ')
+                val formattedInvAmt = INV_AMT.padStart(totalLength - (BILL_ITM_NM.length + minGap), ' ')
 
+                stringBuilder2.append("$formattedLclNm\n\n")
+               // stringBuilder2.append("청구서 소분류명: $BILL_ITM_SCL_NM\n\n")
+                stringBuilder2.append("$formattedBillItnNM")
+                stringBuilder2.append("${formattedInvAmt}원\n\n\n")
+            }
             val ErrorCode = consumeBytes(2)
 
-            textView.text = stringBuilder1.toString() + stringBuilder.toString()
+            val stringBuilderTotAmt = StringBuilder()
+            val title = "총 납부하실 금액 "
+            val value = "${TOT_INV_AMT.trimStart('0')}원\n\n"
+            val maxSpacing = 15 // Adjust this value as needed for the maximum spacing
+
+            val formattedTitle = title.padEnd(title.length + maxSpacing, ' ')
+            val formattedValue = value.padStart(value.length + maxSpacing, ' ')
+
+            stringBuilderTotAmt.append(formattedTitle)
+            stringBuilderTotAmt.append(formattedValue)
+
+            //txtTitle.text = stringBuilder2.toString()
+            //txtValue.text = stringBuilder2.append("${INV_YM}원")
+            Log.d("BillingDetail", "청구금액: ${txtValue.text}")
+
+            textView.text = stringBuilderDate.toString() + stringBuilder2.toString() + stringBuilderTotAmt.toString()
+            sumAmount.text = "총 ${TOT_INV_AMT.trimStart('0')}원"
+
+            textView.gravity = Gravity.START or Gravity.END
+            sumAmount.gravity = Gravity.START or Gravity.END
 
             // Log to show the length of each parsed field
-            Log.d("ParsedData", "opClCd: ${opClCd.length}, opTypCd: ${opTypCd.length}, svcNum: ${svcNum.length}, svAcntNum: ${svAcntNum.length}, INV_YM: ${INV_YM.length}, TOT_INV_AMT: ${TOT_INV_AMT.length}, BILL_REC_CNT: ${BILL_REC_CNT}, ErrorCode: ${ErrorCode.length}")
+            Log.d("ParsedData", "opClCd: ${opClCd.length}\n" +
+                    " opTypCd: ${opTypCd.length}\n" +
+                    " svcNum: ${svcNum.length}\n" +
+                    " svAcntNum: ${svAcntNum.length}\n" +
+                    " INV_YM: ${INV_YM.length}\n" +
+                    " TOT_INV_AMT: ${TOT_INV_AMT.length}\n" +
+                    " BILL_REC_CNT: ${BILL_REC_CNT}\n" +
+                    " ErrorCode: ${ErrorCode.length}")
         }
     }
 

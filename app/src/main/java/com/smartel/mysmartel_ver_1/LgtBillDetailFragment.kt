@@ -179,7 +179,7 @@ class LgtBillDetailFragment : Fragment() {
             layoutParams.width = LinearLayout.LayoutParams.MATCH_PARENT
             layoutParams.height = LinearLayout.LayoutParams.WRAP_CONTENT
 
-            // Apply gravity to center
+            // Apply gravity to center원
             svcNmTextView.gravity = Gravity.CENTER
 
             // Set updated layout parameters for svcNmTextView
