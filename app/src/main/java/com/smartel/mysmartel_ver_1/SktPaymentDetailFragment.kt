@@ -34,15 +34,16 @@ class SktPaymentDetailFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val rootView = inflater.inflate(R.layout.fragment_skt_payment_detail, container, false)
-        textView = rootView.findViewById(R.id.textView)
-        // Retrieve phoneNumber from arguments
-        phoneNumber = arguments?.getString("phoneNumber") ?: ""
-        return rootView
+        return inflater.inflate(R.layout.fragment_skt_payment_detail, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        textView = view.findViewById(R.id.textView)
+
+        phoneNumber = arguments?.getString("phoneNumber") ?: ""
+
         fetchDataFromApi()
     }
 

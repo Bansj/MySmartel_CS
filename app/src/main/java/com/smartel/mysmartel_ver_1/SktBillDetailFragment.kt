@@ -38,16 +38,6 @@ class SktBillDetailFragment : Fragment() {
     private lateinit var txtTitle: TextView
     private lateinit var txtValue: TextView
 
-    private lateinit var tv_code: TextView
-    private lateinit var tv_type: TextView
-    private lateinit var tv_phone_number: TextView
-    private lateinit var tv_account_number: TextView
-    private lateinit var tv_month: TextView
-    private lateinit var tv_total_amount: TextView
-    private lateinit var tv_bill_count: TextView
-    private lateinit var ll_billing_details: LinearLayout
-    private lateinit var tv_error_code: TextView
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

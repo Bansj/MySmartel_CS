@@ -234,23 +234,19 @@ class MenuFragment : Fragment() {
                     .commit()
             }
         }
-
+        if (telecom != "SKT") {
+            binding.layout01.visibility = View.GONE
+            binding.layoutDetailExtraServices.visibility = View.GONE
+            binding.layoutBtnAdditionalDown.visibility = View.GONE
+            binding.txtAdditionalService.visibility = View.GONE
+        } else {
+            binding.layoutDetailExtraServices.visibility = View.VISIBLE
+            binding.layoutBtnAdditionalDown.visibility = View.VISIBLE
+            binding.txtAdditionalService.visibility = View.VISIBLE
+        }
         // 부가서비스 메뉴 스크롤
-        // Set the visibility of layoutDetailExtraServices, layoutBtn01, and textView13 based on telecom value
-        binding.layoutDetailExtraServices.visibility = if (telecom == "KT" || telecom == "LGT" || telecom == "SKT") {
-            View.GONE
-        } else {
-            View.VISIBLE
-        }
-        binding.layoutBtn01.visibility = if (telecom == "KT" || telecom == "LGT" || telecom == "SKT") {
-            View.GONE
-        } else {
-            View.VISIBLE
-        }
-        binding.textView13.visibility = if (telecom == "KT" || telecom == "LGT" || telecom == "SKT") {
-            View.GONE
-        } else {
-            View.VISIBLE
+        binding.layout01.setOnClickListener{
+            toggleVisibility(binding.layoutDetailExtraServices, binding.layoutBtnAdditionalDown)
         }
 
         // 청구서 메뉴 스크롤
@@ -294,8 +290,8 @@ class MenuFragment : Fragment() {
     }
     private var isAnimating = false
 
-    // 아래 스크롤 버튼 클릭 이벤트 : 요소들이 하나씩 펼쳐지고 접히는 애니메이션 효과
-    private fun toggleVisibility(layout: View, button: View) {
+
+    private fun toggleVisibility(layout: View, button: View) { // 아래 스크롤 버튼 클릭 이벤트 : 요소들이 하나씩 펼쳐지고 접히는 애니메이션 효과
         if (isAnimating) {
             return
         }
