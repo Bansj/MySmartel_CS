@@ -46,12 +46,19 @@ class MyInfoFragment : Fragment() {
 
         sharedPrefs = MyInfoSharedPreferences(requireContext())
 
-
         // Retrieve the data from the ViewModel or arguments
         val custName = viewModel.custName ?: arguments?.getString("custName")
         val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")
         val Telecom = viewModel.Telecom ?: arguments?.getString("Telecom")
         val serviceAcct = viewModel.serviceAcct ?: arguments?.getString("serviceAcct")
+
+        // Get a reference to the layout_additionalServices view
+        val layoutAdditionalServices = view.findViewById<View>(R.id.layout_additionalServices)
+
+        // Check if the Telecom is KT or LGT and hide the layout if necessary
+        if (Telecom == "KT" || Telecom == "LGT") {
+            layoutAdditionalServices.visibility = View.GONE
+        }
 
         // Log the values
         Log.d("MyInfoFragment", "from get viewModel -----> custName: $custName")
@@ -234,6 +241,68 @@ class MyInfoFragment : Fragment() {
                     Log.d("MyInfoFragment", "to SktBillDetailFragment--------------------serviceAcct: $serviceAcct--------------------")
                     Log.d("MyInfoFragment", "to SktBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
                     skBillDetailFragment
+                }
+                "KT" -> {
+                    val ktBillDetailFragment = KtBillDetailFragment()
+                    val bundle = Bundle()
+                    bundle.putString("phoneNumber", phoneNumber)
+                    ktBillDetailFragment.arguments = bundle
+
+                    // Log the values for KT
+                    Log.d("MyInfoFragment", "to KtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+
+                    ktBillDetailFragment
+                }
+                "LGT" -> {
+                    val lgtBillDetailFragment = LgtBillDetailFragment()
+                    val bundle = Bundle()
+                    bundle.putString("custName", custName)
+                    bundle.putString("phoneNumber", phoneNumber)
+                    lgtBillDetailFragment.arguments = bundle
+
+                    // Log the values for LGT
+                    Log.d("MyInfoFragment", "to LgtBillDetailFragment--------------------custName: $custName--------------------")
+                    Log.d("MyInfoFragment", "to LgtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+
+                    lgtBillDetailFragment
+                }
+                else -> {
+                    Log.e("MyInfoFragment", "Invalid Telecom value: $telecom")
+                    null
+                }
+            }
+
+            fragment?.let {
+                requireFragmentManager().beginTransaction()
+                    .setCustomAnimations(
+                        R.anim.slide_in_up, // Animation for fragment enter
+                        R.anim.slide_out_down, // Animation for fragment exit
+                        R.anim.slide_in_up, // Animation for fragment pop-enter
+                        R.anim.slide_out_down // Animation for fragment pop-exit
+                    )
+                    .add(id, it) // Use the ID of any existing container view in your layout
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
+
+
+        // 버튼을 클릭시 아래에서 위로 올라오는 부가서비스 상세보기 페이지 클릭이벤트
+        val btnAddServiceFragment = view?.findViewById<Button>(R.id.btn_addService)
+        btnAddServiceFragment?.setOnClickListener {
+            val telecom = viewModel.Telecom ?: arguments?.getString("Telecom")
+            val fragment: Fragment? = when (telecom) {
+                "SKT" -> {
+                    val sktAddServiceFragment = SktAddServiceFragment()
+                    val bundle = Bundle()
+                    bundle.putString("serviceAcct", serviceAcct)
+                    bundle.putString("phoneNumber", phoneNumber)
+                    sktAddServiceFragment.arguments = bundle
+
+                    // Log the values for SKT
+                    Log.d("MyInfoFragment", "to SktBillDetailFragment--------------------serviceAcct: $serviceAcct--------------------")
+                    Log.d("MyInfoFragment", "to SktBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+                    sktAddServiceFragment
                 }
                 "KT" -> {
                     val ktBillDetailFragment = KtBillDetailFragment()
