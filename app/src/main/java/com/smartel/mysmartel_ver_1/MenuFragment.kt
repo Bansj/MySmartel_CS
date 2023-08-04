@@ -244,6 +244,7 @@ class MenuFragment : Fragment() {
             binding.layoutBtnAdditionalDown.visibility = View.VISIBLE
             binding.txtAdditionalService.visibility = View.VISIBLE
         }
+
         // 부가서비스 메뉴 스크롤
         binding.layout01.setOnClickListener{
             toggleVisibility(binding.layoutDetailExtraServices, binding.layoutBtnAdditionalDown)

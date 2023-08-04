@@ -111,7 +111,10 @@ class SktBillDetailFragment : Fragment() {
             }
         }
     }
-
+    // 문자열에 있는 이상한 문자를 제거하는 함수
+    private fun removeStrangeChars(input: String): String {
+        return input.replace(Regex("[^가-힣0-9\\s]+"), "")
+    }
 
     // 조회된 데이터 처리 및 결과 출력 코드 수정
     private fun displayData(data: String) {
@@ -154,14 +157,13 @@ class SktBillDetailFragment : Fragment() {
             val stringBuilderDate = StringBuilder()
             stringBuilderDate.append("$formattedDate\n\n\n")
 
-
             // 4. Iterate through the billing items
             val stringBuilder2 = StringBuilder()
 
             for (i in 0 until BILL_REC_CNT) {
-                val BILL_ITM_LCL_NM = consumeBytes(80).trim()
-                val BILL_ITM_SCL_NM = consumeBytes(80).trim()
-                val BILL_ITM_NM = consumeBytes(80).trim()
+                val BILL_ITM_LCL_NM = removeStrangeChars(consumeBytes(80).trim())
+                val BILL_ITM_SCL_NM = removeStrangeChars(consumeBytes(80).trim())
+                val BILL_ITM_NM = removeStrangeChars(consumeBytes(80).trim())
                 val INV_AMT = consumeBytes(22).trimStart('0').trim()
 
                 Log.d("BillingDetail", "대분류명: $BILL_ITM_LCL_NM")
@@ -169,7 +171,7 @@ class SktBillDetailFragment : Fragment() {
                 Log.d("BillingDetail", "항목명: $BILL_ITM_NM")
                 Log.d("BillingDetail", "청구금액: $INV_AMT")
 
-                val totalLength = 57 // 이 값을 필요한 전체 문자열 길이로 변경할 수 있습니다.
+                val totalLength = 48 // 이 값을 필요한 전체 문자열 길이로 변경할 수 있습니다.
                 val minGap = 20 // 이 값은 두 문자열 사이의 최소 여백 개수입니다.
                 val formattedLclNm = BILL_ITM_LCL_NM.padEnd(totalLength - (BILL_ITM_NM.length + INV_AMT.length), ' ')
                 val formattedBillItnNM = BILL_ITM_NM.padEnd(BILL_ITM_LCL_NM.length + minGap, ' ')
