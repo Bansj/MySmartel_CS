@@ -9,13 +9,13 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.mysmartel_ver_1.R
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.URL
 import java.nio.charset.Charset
+import java.util.Collections.min
+import kotlin.math.min
 
 class SktAddServiceFragment : Fragment() {
 
@@ -62,15 +62,100 @@ class SktAddServiceFragment : Fragment() {
                 // No need to convert the encoding, as we use detected charset from response
                 val responseData = response
 
-                // Update the UI in the main thread
-                launch(Dispatchers.Main) {
-                    textView.text = responseData
+                // Update the UI in the main thread and call displayData function with the response data
+                withContext(Dispatchers.Main) {
+                    displayData(responseData)
+                    Log.d("SktAddServiceFragment", "$responseData")
                 }
             } catch (e: Exception) {
                 Log.e("SktAddServiceFragment", "Error fetching service details: ${e.message}", e)
             }
         }
     }
+
+    private fun displayData(data: String) {
+        CoroutineScope(Dispatchers.Main).launch {
+            // Remove the first 60 bytes from the data and create trueValue
+            val trueValue = data.substring(60)
+
+            // Helper function to consume bytes from the string
+            var currentIndex = 0
+            fun consumeBytes(count: Int): String {
+                val subList = mutableListOf<Char>()
+                var byteCounter = 0
+
+                while (byteCounter < count && currentIndex < trueValue.length) {
+                    val char = trueValue[currentIndex]
+                    val byteSize = if (char.toInt() in 0xAC00..0xD7A3) 2 else 1
+
+                    if (byteCounter + byteSize <= count) {
+                        subList.add(char)
+                        byteCounter += byteSize
+                    } else {
+                        break
+                    }
+                    currentIndex++
+                }
+
+                return subList.joinToString(separator = "")
+            }
+
+            // Parse the trueValue according to the format
+            val opClCd = consumeBytes(1)
+            val opTypCd = consumeBytes(2)
+            val svcNum = consumeBytes(12)
+            val svAcntNum = consumeBytes(11)
+            val prodRecCnt = consumeBytes(5).trim().toInt()
+
+            Log.d("SktAddServiceFragment", "OpClCd: $opClCd")
+            Log.d("SktAddServiceFragment", "OpTypCd: $opTypCd")
+            Log.d("SktAddServiceFragment", "SvcNum: $svcNum")
+            Log.d("SktAddServiceFragment", "SvAcntNum: $svAcntNum")
+            Log.d("SktAddServiceFragment", "ProdRecCnt: $prodRecCnt")
+
+            // Iterate through the billing items
+            val stringBuilder = StringBuilder()
+            for (i in 0 until prodRecCnt) {
+                val prodId = consumeBytes(10)
+                val prodScrbDt = consumeBytes(10)
+                val prodNm = consumeBytes(50)
+                val prodFeeAmt = consumeBytes(10)
+
+                Log.d("SktAddServiceFragment", "Product Id: $prodId")
+                Log.d("SktAddServiceFragment", "Product Subscribe Date : $prodScrbDt")
+                Log.d("SktAddServiceFragment", "Product Name: $prodNm")
+                Log.d("SktAddServiceFragment", "Product Fee Amount: $prodFeeAmt")
+
+                Log.d("ProductLengths",
+                    "        Product ID Length: ${prodId.length}\n" +
+                        "                      Product Subscribe Date Length: ${prodScrbDt.length}\n" +
+                        "                      Product Name Length: ${prodNm.length}\n" +
+                        "                      Product Fee Amount Length: ${prodFeeAmt.length}\n")
+
+
+                stringBuilder.append("가입일: $prodScrbDt\n")
+                stringBuilder.append("$prodNm\t\t\t\t\t")
+                stringBuilder.append("$prodFeeAmt\n\n")
+            }
+            textView.text = stringBuilder.toString()
+
+            // Log to show the length of each parsed field
+            Log.d("ParsedData",
+                "            opClCd: ${opClCd.length}\n" +
+                    "                      opTypCd: ${opTypCd.length}\n" +
+                    "                      svcNum: ${svcNum.length}\n" +
+                    "                      svAcntNum: ${svAcntNum.length}\n" +
+                    "                      prodRecCnt: ${prodRecCnt}\n")
+        }
+    }
+
+
+
+
+
+
+
 }
+
 
 
