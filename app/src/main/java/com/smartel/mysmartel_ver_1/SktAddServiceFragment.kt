@@ -138,7 +138,7 @@ class SktAddServiceFragment : Fragment() {
 
                 //stringBuilder.append("가입일: $prodScrbDt\n")
                 stringBuilder.append("$prodNm\n\n")
-                stringBuilder.append("${displayProdFee.padStart(75)}\n\n\n\n")
+                stringBuilder.append("${displayProdFee.padStart(55)}\n\n\n\n")
             }
             textView.text = stringBuilder.toString()
 

@@ -23,6 +23,8 @@ import okhttp3.Response
 
 class MyInfoFragment : Fragment() {
 
+
+
     private lateinit var txtcustName: TextView
     private lateinit var txtPhoneNumber: TextView
     private lateinit var txtTelecom: TextView
@@ -89,7 +91,6 @@ class MyInfoFragment : Fragment() {
         viewModel.Telecom = Telecom
 
 
-
         //UI 업데이트 내정보화면에 남은 사용량
         val updateButton = view.findViewById<ImageButton>(R.id.btn_updateLeftData)
 
@@ -125,8 +126,7 @@ class MyInfoFragment : Fragment() {
         }
 
 
-
-       // 버튼을 클릭시 아래에서 위로 올라오는 사용량 상세보기 페이지 클릭이벤트
+       /*// 버튼을 클릭시 아래에서 위로 올라오는 사용량 상세보기 페이지 클릭이벤트
         val btnShowFragment = view?.findViewById<Button>(R.id.btn_detailDeduct)
         btnShowFragment?.setOnClickListener {
             val telecom = viewModel.Telecom ?: arguments?.getString("Telecom")
@@ -139,51 +139,53 @@ class MyInfoFragment : Fragment() {
                     R.anim.slide_out_down
                 )
 
-            if (telecom == "SKT") {
-                val sktDeductDetailViewFragment = SktDeductDetailViewFragment()
-                val bundle = Bundle()
-                bundle.putString("serviceAcct", serviceAcct)
-                bundle.putString("Telecom", Telecom)
-                sktDeductDetailViewFragment.arguments = bundle
-                // Log the values for SKT
-                Log.d("MyInfoFragment", "to SktDeductDetailViewFragment--------------------serviceAcct: $serviceAcct--------------------")
-                Log.d("MyInfoFragment", "to SktDeductDetailViewFragment--------------------Telecom: $Telecom--------------------")
-                sktDeductDetailViewFragment
-                //fragmentTransaction.replace(android.R.id.content, sktDeductDetailViewFragment, "SktDeductDetailViewFragment")
-            }
-            else if (telecom == "KT") {
-                val ktDeductDetailViewFragment = KtDeductDetailViewFragment()
-                val bundle = Bundle()
-                bundle.putString("phoneNumber", phoneNumber)
-                ktDeductDetailViewFragment.arguments = bundle
-                // Log the values for KT
-                Log.d("MyInfoFragment", "to KtDeductDetailViewFragment--------------------phoneNumber: $phoneNumber--------------------")
-                fragmentTransaction.replace(android.R.id.content, ktDeductDetailViewFragment, "KtDeductDetailViewFragment")
-            }
-            else if (telecom == "LGT") {
-                val lgtDeductDetailViewFragment = LgtDeductDetailViewFragment()
-                val bundle = Bundle()
-                bundle.putString("custNm", custName)
-                bundle.putString("phoneNumber", phoneNumber)
-                lgtDeductDetailViewFragment.arguments = bundle
-                // Log the values for LGT
-                Log.d("MyInfoFragment", "to LgtDeductDetailViewFragment--------------------custName: $custName--------------------")
-                Log.d("MyInfoFragment", "to LgtDeductDetailViewFragment--------------------phoneNumber: $phoneNumber--------------------")
-                fragmentTransaction.replace(android.R.id.content, lgtDeductDetailViewFragment, "LgtDeductDetailViewFragment")
-            }
-            else {
-                Log.e(TAG, "Invalid Telecom value: $telecom")
-                return@setOnClickListener
+            when (telecom) {
+                "SKT" -> {
+                    val sktDeductDetailViewFragment = SktDeductDetailViewFragment()
+                    val bundle = Bundle()
+                    bundle.putString("serviceAcct", serviceAcct)
+                    bundle.putString("Telecom", Telecom)
+                    sktDeductDetailViewFragment.arguments = bundle
+                    // Log the values for SKT
+                    Log.d("MyInfoFragment", "to SktDeductDetailViewFragment--------------------serviceAcct: $serviceAcct--------------------")
+                    Log.d("MyInfoFragment", "to SktDeductDetailViewFragment--------------------Telecom: $Telecom--------------------")
+                    sktDeductDetailViewFragment
+                    //fragmentTransaction.replace(android.R.id.content, sktDeductDetailViewFragment, "SktDeductDetailViewFragment")
+                }
+                "KT" -> {
+                    val ktDeductDetailViewFragment = KtDeductDetailViewFragment()
+                    val bundle = Bundle()
+                    bundle.putString("phoneNumber", phoneNumber)
+                    ktDeductDetailViewFragment.arguments = bundle
+                    // Log the values for KT
+                    Log.d("MyInfoFragment", "to KtDeductDetailViewFragment--------------------phoneNumber: $phoneNumber--------------------")
+                    fragmentTransaction.replace(android.R.id.content, ktDeductDetailViewFragment, "KtDeductDetailViewFragment")
+                }
+                "LGT" -> {
+                    val lgtDeductDetailViewFragment = LgtDeductDetailViewFragment()
+                    val bundle = Bundle()
+                    bundle.putString("custNm", custName)
+                    bundle.putString("phoneNumber", phoneNumber)
+                    lgtDeductDetailViewFragment.arguments = bundle
+                    // Log the values for LGT
+                    Log.d("MyInfoFragment", "to LgtDeductDetailViewFragment--------------------custName: $custName--------------------")
+                    Log.d("MyInfoFragment", "to LgtDeductDetailViewFragment--------------------phoneNumber: $phoneNumber--------------------")
+                    fragmentTransaction.replace(android.R.id.content, lgtDeductDetailViewFragment, "LgtDeductDetailViewFragment")
+                }
+                else -> {
+                    Log.e(TAG, "Invalid Telecom value: $telecom")
+                    return@setOnClickListener
+                }
             }
             fragmentTransaction.addToBackStack(null)
             fragmentTransaction.commit()
-        }
+        }*/
 
-       /* //버튼 클릭시 밑에서 위로 올라오는 사용량 상세보기 페이지 클릭이벤트
+       //버튼 클릭시 밑에서 위로 올라오는 사용량 상세보기 페이지 클릭이벤트
         val btnDeductDetailFragment = view?.findViewById<Button>(R.id.btn_detailDeduct)
         btnDeductDetailFragment?.setOnClickListener {
-            val telecom = viewModel.Telecom ?:arguments?. getString("Telecom")
-            val fragment: Fragment? = when (telecom) {
+            val Telecom = viewModel.Telecom ?:arguments?. getString("Telecom")
+            val fragment: Fragment? = when (Telecom) {
                 "SKT" -> {
                     val sktDeductDetailViewFragment = SktDeductDetailViewFragment()
                     val bundle = Bundle()
@@ -222,7 +224,7 @@ class MyInfoFragment : Fragment() {
                     lgtDeductDetailViewFragment
                 }
                 else -> {
-                    Log.e("MyInfoFragment", "Invalid Telecom value: $telecom")
+                    Log.e("MyInfoFragment", "Invalid Telecom value: $Telecom")
                     null
                 }
             }
@@ -238,7 +240,7 @@ class MyInfoFragment : Fragment() {
                     .addToBackStack(null)
                     .commit()
             }
-        }*/
+        }
 
         // 버튼을 클릭시 아래에서 위로 올라오는 청구요금 상세보기 페이지 클릭이벤트
         val btnBillDetailFragment = view?.findViewById<Button>(R.id.btn_billDetailDeduct)
@@ -368,7 +370,7 @@ class MyInfoFragment : Fragment() {
             it.findNavController().navigate(R.id.action_myInfoFragment_to_menuFragment)
         }
 
-        // Set click listener for btn_benefit button
+        // Set click listener for btn_benefit button 하단 설정창이동 네비게이션바 컨트롤러
         view.findViewById<ImageButton>(R.id.btn_setting).setOnClickListener {
             it.findNavController().navigate(R.id.action_myInfoFragment_to_settingFragment)
         }
@@ -376,7 +378,6 @@ class MyInfoFragment : Fragment() {
         // Set click listener for the back button
         //requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackPressedCallback)
     }
-
 
 
     override fun onDestroyView() {

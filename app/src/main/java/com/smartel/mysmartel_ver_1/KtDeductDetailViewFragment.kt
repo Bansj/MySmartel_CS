@@ -138,18 +138,22 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
                     bodyData.totUseTimeCntDto?.let { totUseTimeCntList.addAll(it) }
                     bodyData.totUseTimeCntTotDto?.let { totUseTimeCntTotList.addAll(it) }
                 }
-
                 requireActivity().runOnUiThread {
-                    setDataToTextViews(totaluseTimeList)
-                    checkAndSendDataToMyInfoFragment(totaluseTimeList)
+                    try {
+                        setDataToTextViews(totaluseTimeList)
+                        //checkAndSendDataToMyInfoFragment(totaluseTimeList)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error updating UI: ${e.message}")
+                    }
                 }
+
             }
 
         })
 
     }
 
-    private fun checkAndSendDataToMyInfoFragment(totaluseTimeList: List<KtDeductApiResponse.BodyData.TotaluseTimeDtoData>) {
+/*    private fun checkAndSendDataToMyInfoFragment(totaluseTimeList: List<KtDeductApiResponse.BodyData.TotaluseTimeDtoData>) {
         for (totaluseTime in totaluseTimeList) {
             val strSvcName = totaluseTime.strSvcName
             val strFreeMinUse = totaluseTime.strFreeMinReMain
@@ -170,7 +174,7 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
                 break // Exit the loop after finding the matching value
             }
         }
-    }
+    }*/
 
     private fun calculateDataValue(value: String): Double {
         val floatValue = value.toFloatOrNull()
@@ -251,15 +255,15 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
             totaluseTimeStringBuilder.append(spannableSvcName)
             totaluseTimeStringBuilder.append("\n")
 
-            totaluseTimeStringBuilder.append(String.format("%-40s %30s%n\n", "총제공량", strFreeMinTotal))
+            totaluseTimeStringBuilder.append(String.format("%-40s %3s%n\n", "총제공량", strFreeMinTotal))
             if (strSvcName.contains("음성") && strFreeMinReMain == "0") {
                 // Do not include "잔여량" if strFreeMinReMain is 0
-                totaluseTimeStringBuilder.append(String.format("%-40s %31s%n\n", "", strFreeMinReMain))
+                totaluseTimeStringBuilder.append(String.format("%-40s %3s%n\n", "", strFreeMinReMain))
             } else {
                 if (strFreeMinReMain != "0") {
-                    totaluseTimeStringBuilder.append(String.format("%-41.5s %32s%n\n", "잔여량", strFreeMinReMain))
+                    totaluseTimeStringBuilder.append(String.format("%-41.5s %3s%n\n", "잔여량", strFreeMinReMain))
                 }
-                totaluseTimeStringBuilder.append(String.format("%-40s %32s%n\n", "사용량", strFreeMinUse))
+                totaluseTimeStringBuilder.append(String.format("%-40s %3s%n\n", "사용량", strFreeMinUse))
             }
             totaluseTimeStringBuilder.append("\n\n\n")
         }
@@ -284,5 +288,3 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
         }
     }
 }
-
-//

@@ -165,33 +165,40 @@ class SktDeductDetailViewFragment : Fragment() {
             val remainInfoStr = StringBuilder()
 
             for (remainInfo in apiResponse.remainInfo) {
+                // If freePlanName is empty, use planNm instead
+                val displayName = if (remainInfo.freePlanName.isEmpty()) remainInfo.planNm else remainInfo.freePlanName
+
+                // Default values for when the string is empty or not a valid number
+                val totalQtyDefault = if (remainInfo.totalQty.isEmpty()) "0" else remainInfo.totalQty
+                val useQtyDefault = if (remainInfo.useQty.isEmpty()) "0" else remainInfo.useQty
+                val remQtyDefault = if (remainInfo.remQty.isEmpty()) "0" else remainInfo.remQty
 
                 // Check if freePlanName contains "데이터" or "Data"
-                if (remainInfo.freePlanName.contains("데이터") || remainInfo.freePlanName.contains("Data")) {
+                if (displayName.contains("데이터") || displayName.contains("Data")) {
                     // Handle the case where the values are not valid numbers (e.g., "무제한")
-                    val totalQtyGB = parseValueToGB(remainInfo.totalQty)
+                    val totalQtyGB = parseValueToGB(totalQtyDefault)
                     val useQtyGB = parseValueToGB(remainInfo.useQty)
                     val remQtyGB = parseValueToGB(remainInfo.remQty)
 
-                    remainInfoStr.append("\n\n${remainInfo.freePlanName}\n\n\n")
+                    remainInfoStr.append("\n\n$displayName\n\n\n")
                     remainInfoStr.append("총제공량".padEnd(60) + "$totalQtyGB\n\n") // Add padding between label and value
                     remainInfoStr.append("사용량".padEnd(60) + "$useQtyGB\n\n") // Add padding between label and value
                     remainInfoStr.append("잔여량".padEnd(60) + "$remQtyGB\n\n\n\n") // Add padding between label and value
                 }
-                else if (remainInfo.freePlanName.contains("음성") || remainInfo.freePlanName.contains("전화")) {
+                else if (displayName.contains("음성") || displayName.contains("전화")) {
                     // Handle the case where the values are "음성" or "전화"
                     val totalQtyMin = parseValueToMinutes(remainInfo.totalQty)
                     val useQtyMin = parseValueToMinutes(remainInfo.useQty)
                     val remQtyMin = parseValueToMinutes(remainInfo.remQty)
 
-                    remainInfoStr.append("${remainInfo.freePlanName}\n\n")
+                    remainInfoStr.append("$displayName\n\n")
                     remainInfoStr.append("총제공량".padEnd(60) + "$totalQtyMin\n\n") // Add padding between label and value
                     remainInfoStr.append("사용량".padEnd(60) + "$useQtyMin\n\n") // Add padding between label and value
                     remainInfoStr.append("잔여량".padEnd(60) + "$remQtyMin\n\n\n\n") // Add padding between label and value
                 }
                 else {
                     // Default case for other freePlanName values
-                    remainInfoStr.append("${remainInfo.freePlanName}\n\n")
+                    remainInfoStr.append("$displayName\n\n")
                     remainInfoStr.append("총제공량".padEnd(60) + "${remainInfo.totalQty}\n\n")
                     remainInfoStr.append("사용량".padEnd(60) + "${remainInfo.useQty}\n\n")
                     remainInfoStr.append("잔여량".padEnd(60) + "${remainInfo.remQty}\n\n\n\n")

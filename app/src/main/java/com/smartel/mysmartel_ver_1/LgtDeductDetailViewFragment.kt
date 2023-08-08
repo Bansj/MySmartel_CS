@@ -28,7 +28,7 @@ class LgtDeductDetailViewFragment : Fragment() {
 
     private lateinit var binding: FragmentLgtDeductDetailViewBinding
     private val phoneNumber: String by lazy { arguments?.getString("phoneNumber") ?: "" }
-    private val custNm: String by lazy { arguments?.getString("custNm") ?: "" }
+    private val custNm: String by lazy { arguments?.getString("custName") ?: "" }
     private lateinit var dataTextView: TextView
     private lateinit var downButton: ImageButton
 
@@ -118,7 +118,7 @@ class LgtDeductDetailViewFragment : Fragment() {
     }
 
     private fun updateUI(apiResponse: LgtDedcutApiResponse) {
-        val remainInfoList = apiResponse.remainInfo
+        val remainInfoList = apiResponse.remainInfo ?: emptyList()
         val resultCode = apiResponse.ResultCode
 
         // Print the ResultCode
@@ -126,6 +126,7 @@ class LgtDeductDetailViewFragment : Fragment() {
 
         // Create a StringBuilder to build the data string
         val dataStringBuilder = StringBuilder()
+
 
         // Iterate over the RemainInfo list and append the values to the data string
         for (remainInfo in remainInfoList) {
