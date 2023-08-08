@@ -160,7 +160,7 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
 
                 val myInfoFragment = MyInfoFragment()
                 val args = Bundle()
-                args.putString("freeMinRemain", formattedValue)
+                args.putString("KtFreeMinRemain", formattedValue)
                 myInfoFragment.arguments = args
 
                 val fragmentManager = requireActivity().supportFragmentManager

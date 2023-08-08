@@ -2,6 +2,7 @@ package com.smartel.mysmartel_ver_1
 
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -121,6 +122,8 @@ class SktAddServiceFragment : Fragment() {
                 val prodNm = consumeBytes(50)
                 val prodFeeAmt = consumeBytes(10)
 
+                val displayProdFee = if (prodFeeAmt.trim() == "0" || prodFeeAmt.trim().isEmpty()) "무료" else prodFeeAmt
+
                 Log.d("SktAddServiceFragment", "Product Id: $prodId")
                 Log.d("SktAddServiceFragment", "Product Subscribe Date : $prodScrbDt")
                 Log.d("SktAddServiceFragment", "Product Name: $prodNm")
@@ -133,9 +136,9 @@ class SktAddServiceFragment : Fragment() {
                         "                      Product Fee Amount Length: ${prodFeeAmt.length}\n")
 
 
-                stringBuilder.append("가입일: $prodScrbDt\n")
-                stringBuilder.append("$prodNm\t\t\t\t\t")
-                stringBuilder.append("$prodFeeAmt\n\n")
+                //stringBuilder.append("가입일: $prodScrbDt\n")
+                stringBuilder.append("$prodNm\n\n")
+                stringBuilder.append("${displayProdFee.padStart(75)}\n\n\n\n")
             }
             textView.text = stringBuilder.toString()
 

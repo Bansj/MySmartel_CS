@@ -198,13 +198,14 @@
                         app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
 
                         <ImageView
+                            android:id="@+id/img_banner"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:scaleType="centerCrop"
                             android:src="@drawable/banner_1" />
 
                         <androidx.viewpager2.widget.ViewPager2
-                            android:id="@+id/pg_banner"
+                            android:id="@+id/vp_banner"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent" />
 

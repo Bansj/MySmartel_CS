@@ -160,6 +160,10 @@ class SktBillDetailFragment : Fragment() {
             // 4. Iterate through the billing items
             val stringBuilder2 = StringBuilder()
 
+            fun formatNumber(number: String): String {
+                return NumberFormat.getInstance().format(number.toInt())
+            }
+
             for (i in 0 until BILL_REC_CNT) {
                 val BILL_ITM_LCL_NM = removeStrangeChars(consumeBytes(80).trim())
                 val BILL_ITM_SCL_NM = removeStrangeChars(consumeBytes(80).trim())
@@ -171,22 +175,25 @@ class SktBillDetailFragment : Fragment() {
                 Log.d("BillingDetail", "항목명: $BILL_ITM_NM")
                 Log.d("BillingDetail", "청구금액: $INV_AMT")
 
-                val totalLength = 48 // 이 값을 필요한 전체 문자열 길이로 변경할 수 있습니다.
+                val totalLength = 45 // 이 값을 필요한 전체 문자열 길이로 변경할 수 있습니다.
                 val minGap = 20 // 이 값은 두 문자열 사이의 최소 여백 개수입니다.
                 val formattedLclNm = BILL_ITM_LCL_NM.padEnd(totalLength - (BILL_ITM_NM.length + INV_AMT.length), ' ')
                 val formattedBillItnNM = BILL_ITM_NM.padEnd(BILL_ITM_LCL_NM.length + minGap, ' ')
-                val formattedInvAmt = INV_AMT.padStart(totalLength - (BILL_ITM_NM.length + minGap), ' ')
+                //val formattedInvAmt = INV_AMT.padStart()
 
                 stringBuilder2.append("$formattedLclNm\n\n")
                // stringBuilder2.append("청구서 소분류명: $BILL_ITM_SCL_NM\n\n")
                 stringBuilder2.append("$formattedBillItnNM")
-                stringBuilder2.append("${formattedInvAmt}원\n\n\n")
+                val formattedInvAmt = formatNumber(INV_AMT)
+                val paddedFormattedInvAmt = formattedInvAmt.padStart(60 - formattedInvAmt.length + formattedInvAmt.length, ' ')
+                stringBuilder2.append("\n${paddedFormattedInvAmt}원\n\n\n")
+
             }
             val ErrorCode = consumeBytes(2)
 
             val stringBuilderTotAmt = StringBuilder()
             val title = "총 납부하실 금액 "
-            val value = "${TOT_INV_AMT.trimStart('0')}원\n\n"
+            val value = "\n${formatNumber(TOT_INV_AMT.trimStart('0')).padStart(60)}원\n\n"
             val maxSpacing = 15 // Adjust this value as needed for the maximum spacing
 
             val formattedTitle = title.padEnd(title.length + maxSpacing, ' ')
@@ -200,10 +207,10 @@ class SktBillDetailFragment : Fragment() {
             Log.d("BillingDetail", "청구금액: ${txtValue.text}")
 
             textView.text = stringBuilderDate.toString() + stringBuilder2.toString() + stringBuilderTotAmt.toString()
-            sumAmount.text = "총 ${TOT_INV_AMT.trimStart('0')}원"
+            sumAmount.text = "총 ${formatNumber(TOT_INV_AMT.trimStart('0'))}원"
 
             textView.gravity = Gravity.START or Gravity.END
-            sumAmount.gravity = Gravity.START or Gravity.END
+            sumAmount.gravity = Gravity.END
 
             // Log to show the length of each parsed field
             Log.d("ParsedData", "opClCd: ${opClCd.length}\n" +

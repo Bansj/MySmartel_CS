@@ -1,6 +1,8 @@
 package com.smartel.mysmartel_ver_1
 
 import android.content.ContentValues.TAG
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -12,8 +14,12 @@ import android.widget.*
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import com.bumptech.glide.Glide
 import com.example.mysmartel_ver_1.R
+import kotlinx.coroutines.launch
+import okhttp3.Response
 
 class MyInfoFragment : Fragment() {
 
@@ -23,6 +29,8 @@ class MyInfoFragment : Fragment() {
     private lateinit var sharedPrefs: MyInfoSharedPreferences
 
     private var doubleBackToExitPressedOnce = false
+
+    private lateinit var bannerImage: ImageView
 
     // Obtain an instance of the ViewModel from the shared ViewModelStoreOwner
     private val viewModel: MyInfoViewModel by viewModels({ requireActivity() })
@@ -45,6 +53,10 @@ class MyInfoFragment : Fragment() {
         txtTelecom = view.findViewById(R.id.txt_telecom)
 
         sharedPrefs = MyInfoSharedPreferences(requireContext())
+
+        bannerImage = view.findViewById(R.id.img_banner)
+
+        //loadBanners()
 
         // Retrieve the data from the ViewModel or arguments
         val custName = viewModel.custName ?: arguments?.getString("custName")
@@ -77,16 +89,22 @@ class MyInfoFragment : Fragment() {
         viewModel.Telecom = Telecom
 
 
+
         //UI 업데이트 내정보화면에 남은 사용량
         val updateButton = view.findViewById<ImageButton>(R.id.btn_updateLeftData)
-        updateButton.setOnClickListener {
 
+        val handler = Handler(Looper.getMainLooper())
+        val runnable = Runnable {updateButton.performClick()
+        }
+        handler.postDelayed(runnable,0)
+
+        updateButton.setOnClickListener {
             val ktDeductDetailViewFragment = KtDeductDetailViewFragment()
             val args = Bundle()
             args.putString("phoneNumber", phoneNumber)
             ktDeductDetailViewFragment.arguments = args
 
-            val freeMinRemain2 = arguments?.getString("freeMinRemain")
+            val freeMinRemain2 = arguments?.getString("KtFeeMinRemain")
             if (freeMinRemain2 != null) {
                 view.findViewById<TextView>(R.id.txt_leftData).text = freeMinRemain2
 
@@ -99,14 +117,16 @@ class MyInfoFragment : Fragment() {
             val argsl = Bundle()
             args.putString("phoneNumber", phoneNumber)
             args.putString("custName", custName)
-            lgtDeductDetailViewFragment.arguments = argsl
+            lgtDeductDetailViewFragment.arguments = args
 
                 val toastMessage = "새로고침"
                 Toast.makeText(requireContext(), toastMessage, Toast.LENGTH_SHORT).show()
             }
         }
 
-        // 버튼을 클릭시 아래에서 위로 올라오는 사용량 상세보기 페이지 클릭이벤트
+
+
+       // 버튼을 클릭시 아래에서 위로 올라오는 사용량 상세보기 페이지 클릭이벤트
         val btnShowFragment = view?.findViewById<Button>(R.id.btn_detailDeduct)
         btnShowFragment?.setOnClickListener {
             val telecom = viewModel.Telecom ?: arguments?.getString("Telecom")
@@ -155,15 +175,14 @@ class MyInfoFragment : Fragment() {
                 Log.e(TAG, "Invalid Telecom value: $telecom")
                 return@setOnClickListener
             }
-
             fragmentTransaction.addToBackStack(null)
             fragmentTransaction.commit()
         }
 
-       /* // 버튼을 클릭시 아래에서 위로 올라오는 new사용량 상세보기 페이지 클릭이벤트
-        val btnDeductDeailFragment = view?.findViewById<Button>(R.id.btn_detailDeduct)
-        btnDeductDeailFragment?.setOnClickListener {
-            val telecom = viewModel.Telecom ?: arguments?.getString("Telecom")
+       /* //버튼 클릭시 밑에서 위로 올라오는 사용량 상세보기 페이지 클릭이벤트
+        val btnDeductDetailFragment = view?.findViewById<Button>(R.id.btn_detailDeduct)
+        btnDeductDetailFragment?.setOnClickListener {
+            val telecom = viewModel.Telecom ?:arguments?. getString("Telecom")
             val fragment: Fragment? = when (telecom) {
                 "SKT" -> {
                     val sktDeductDetailViewFragment = SktDeductDetailViewFragment()
@@ -173,8 +192,9 @@ class MyInfoFragment : Fragment() {
                     sktDeductDetailViewFragment.arguments = bundle
 
                     // Log the values for SKT
-                    Log.d("MyInfoFragment", "to SktDeductDetailFragment--------------------serviceAcct: $serviceAcct--------------------")
-                    Log.d("MyInfoFragment", "to SktDeductDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+                    Log.d("MyInfoFragment", "to SktBillDetailFragment--------------------serviceAcct: $serviceAcct--------------------")
+                    Log.d("MyInfoFragment", "to SktBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+
                     sktDeductDetailViewFragment
                 }
                 "KT" -> {
@@ -184,7 +204,7 @@ class MyInfoFragment : Fragment() {
                     ktDeductDetailViewFragment.arguments = bundle
 
                     // Log the values for KT
-                    Log.d("MyInfoFragment", "to KtDeductDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+                    Log.d("MyInfoFragment", "to KtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
 
                     ktDeductDetailViewFragment
                 }
@@ -195,9 +215,9 @@ class MyInfoFragment : Fragment() {
                     bundle.putString("phoneNumber", phoneNumber)
                     lgtDeductDetailViewFragment.arguments = bundle
 
-                    // Log the values for LGT
-                    Log.d("MyInfoFragment", "to LgtDeductDetailFragment--------------------custName: $custName--------------------")
-                    Log.d("MyInfoFragment", "to LgtDeductDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+                    // Log the values for SKT
+                    Log.d("MyInfoFragment", "to LgtBillDetailFragment--------------------custName: $custName--------------------")
+                    Log.d("MyInfoFragment", "to LgtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
 
                     lgtDeductDetailViewFragment
                 }
@@ -206,7 +226,6 @@ class MyInfoFragment : Fragment() {
                     null
                 }
             }
-
             fragment?.let {
                 requireFragmentManager().beginTransaction()
                     .setCustomAnimations(
@@ -220,10 +239,6 @@ class MyInfoFragment : Fragment() {
                     .commit()
             }
         }*/
-
-
-
-
 
         // 버튼을 클릭시 아래에서 위로 올라오는 청구요금 상세보기 페이지 클릭이벤트
         val btnBillDetailFragment = view?.findViewById<Button>(R.id.btn_billDetailDeduct)
@@ -271,7 +286,6 @@ class MyInfoFragment : Fragment() {
                     null
                 }
             }
-
             fragment?.let {
                 requireFragmentManager().beginTransaction()
                     .setCustomAnimations(
@@ -363,6 +377,8 @@ class MyInfoFragment : Fragment() {
         //requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackPressedCallback)
     }
 
+
+
     override fun onDestroyView() {
         super.onDestroyView()
 
@@ -371,22 +387,4 @@ class MyInfoFragment : Fragment() {
         sharedPrefs.phoneNumber = txtPhoneNumber.text.toString()
         sharedPrefs.telecom = txtTelecom.text.toString()
     }
-
-    // Set click listener for the back button
-  /*  private val onBackPressedCallback = object : OnBackPressedCallback(true) {
-        override fun handleOnBackPressed() {
-            if (doubleBackToExitPressedOnce) {
-                // If the back button is pressed twice, exit the app
-                requireActivity().finishAffinity() // Exit the app completely
-            } else {
-                doubleBackToExitPressedOnce = true
-                Toast.makeText(requireContext(), "Press back again to exit", Toast.LENGTH_SHORT).show()
-
-                // Reset the flag after a short delay (2 seconds)
-                Handler(Looper.getMainLooper()).postDelayed({
-                    doubleBackToExitPressedOnce = false
-                }, 2000)
-            }
-        }
-    }*/
 }

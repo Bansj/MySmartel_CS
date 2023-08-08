@@ -118,6 +118,65 @@ class MenuFragment : Fragment() {
             startActivity(intent)
         }
 
+        // 부가서비스 조회 슬라이드 업 클릭 이벤트
+        binding.txtServicesCheckChange.setOnClickListener {
+            val fragment: Fragment? = when (telecom) {
+                "SKT" -> {
+                    val sktAddServiceFragment = SktAddServiceFragment()
+                    val bundle = Bundle()
+                    bundle.putString("serviceAcct", serviceAcct)
+                    bundle.putString("phoneNumber", phoneNumber)
+                    sktAddServiceFragment.arguments = bundle
+
+                    // Log the values for SKT
+                    Log.d(TAG, "-------------------- SKT --> serviceAcct: $serviceAcct------ -")
+                    Log.d(TAG, "-------------------- SKT --> phoneNumber: $phoneNumber------ -")
+
+                    sktAddServiceFragment
+                }
+                "KT" -> {
+                    val ktBillDetailFragment = KtBillDetailFragment()
+                    val bundle = Bundle()
+                    bundle.putString("phoneNumber", phoneNumber)
+                    ktBillDetailFragment.arguments = bundle
+
+                    // Log the values for KT
+                    Log.d(TAG, "-------------------- KT --> phoneNumber: $phoneNumber------------------ -")
+
+                    ktBillDetailFragment
+                }
+                "LGT" -> {
+                    val lgtBillDetailFragment = LgtBillDetailFragment()
+                    val bundle = Bundle()
+                    bundle.putString("custNm", custName)
+                    bundle.putString("phoneNumber", phoneNumber)
+                    lgtBillDetailFragment.arguments = bundle
+
+                    // Log the values for LGT
+                    Log.d(TAG, "-------------------- LGT --> custName: $custName--------------------- -")
+                    Log.d(TAG, "-------------------- LGT --> phoneNumber: $phoneNumber------------------ -")
+
+                    lgtBillDetailFragment
+                }
+                else -> {
+                    Log.e(TAG, "Invalid Telecom value: $telecom--------")
+                    null
+                }
+            }
+            fragment?.let {
+                requireFragmentManager().beginTransaction()
+                    .setCustomAnimations(
+                        R.anim.slide_in_up, // Animation for fragment enter
+                        R.anim.slide_out_down, // Animation for fragment exit
+                        R.anim.slide_in_up, // Animation for fragment pop-enter
+                        R.anim.slide_out_down // Animation for fragment pop-exit
+                    )
+                    .add(id, it) // Use the ID of any existing container view in your layout
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
+
 
         // 청구요금 조회 슬라이드 업 클릭 이벤트
         binding.txtBillDetail.setOnClickListener {
