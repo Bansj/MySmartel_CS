@@ -177,8 +177,8 @@ class SktDeductDetailViewFragment : Fragment() {
                 if (displayName.contains("데이터") || displayName.contains("Data")) {
                     // Handle the case where the values are not valid numbers (e.g., "무제한")
                     val totalQtyGB = parseValueToGB(totalQtyDefault)
-                    val useQtyGB = parseValueToGB(remainInfo.useQty)
-                    val remQtyGB = parseValueToGB(remainInfo.remQty)
+                    val useQtyGB = parseValueToGB(useQtyDefault)
+                    val remQtyGB = parseValueToGB(remQtyDefault)
 
                     remainInfoStr.append("\n\n$displayName\n\n\n")
                     remainInfoStr.append("총제공량".padEnd(60) + "$totalQtyGB\n\n") // Add padding between label and value
@@ -241,10 +241,6 @@ class SktDeductDetailViewFragment : Fragment() {
             value
         }
     }
-
-
-
-
 
 }
 

@@ -52,7 +52,7 @@ class LgtDeductDetailViewFragment : Fragment() {
 
         return binding.root
     }
-    private fun animateFragmentOut(view: View) { // 슬라이드 업 애니메이션 효과
+    private fun animateFragmentOut(view: View) { // 슬라이드 다운 애니메이션 효과
         val transaction: FragmentTransaction = parentFragmentManager.beginTransaction()
         transaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down)
         transaction.remove(this@LgtDeductDetailViewFragment)
