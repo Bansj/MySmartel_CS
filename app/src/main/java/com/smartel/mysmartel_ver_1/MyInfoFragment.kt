@@ -32,7 +32,7 @@ class MyInfoFragment : Fragment() {
 
     private lateinit var bannerImage: ImageView
 
-    private lateinit var txtRefreshData: TextView
+    private lateinit var txt_refreshData: TextView
     private lateinit var btnRefresh: ImageButton
 
     // Obtain an instance of the ViewModel from the shared ViewModelStoreOwner
@@ -90,48 +90,6 @@ class MyInfoFragment : Fragment() {
         viewModel.custName = custName
         viewModel.phoneNumber = phoneNumber
         viewModel.Telecom = Telecom
-
-        val updateButton = view.findViewById<ImageButton>(R.id.btn_reload)
-
-        updateButton.setOnClickListener {
-            fetchUsageData()
-        }
-
-
-      /*  //UI 업데이트 내정보화면에 남은 사용량
-        val updateButton = view.findViewById<ImageButton>(R.id.btn_reload)
-
-        val handler = Handler(Looper.getMainLooper())
-        val runnable = Runnable {updateButton.performClick()
-        }
-        handler.postDelayed(runnable,0)
-
-        updateButton.setOnClickListener {
-            val ktDeductDetailViewFragment = KtDeductDetailViewFragment()
-            val args = Bundle()
-            args.putString("phoneNumber", phoneNumber)
-            ktDeductDetailViewFragment.arguments = args
-
-            val freeMinRemain2 = arguments?.getString("KtFeeMinRemain")
-            if (freeMinRemain2 != null) {
-                view.findViewById<TextView>(R.id.txt_leftData).text = freeMinRemain2
-
-            val sktDeductDetailViewFragment = SktDeductDetailViewFragment()
-            val args = Bundle()
-            args.putString("serviceAcct", serviceAcct)
-            sktDeductDetailViewFragment.arguments = args
-
-            val lgtDeductDetailViewFragment = LgtDeductDetailViewFragment()
-            val argsl = Bundle()
-            args.putString("phoneNumber", phoneNumber)
-            args.putString("custName", custName)
-            lgtDeductDetailViewFragment.arguments = args
-
-                val toastMessage = "새로고침"
-                Toast.makeText(requireContext(), toastMessage, Toast.LENGTH_SHORT).show()
-            }
-        }*/
-
 
        //버튼 클릭시 밑에서 위로 올라오는 사용량 상세보기 페이지 클릭이벤트
         val btnDeductDetailFragment = view?.findViewById<Button>(R.id.btn_detailDeduct)
@@ -316,7 +274,6 @@ class MyInfoFragment : Fragment() {
             }
         }
 
-
             // Set click listener for btn_menu button 하단 메뉴이동 네비게이션바 컨트롤러
         view.findViewById<ImageButton>(R.id.btn_menu).setOnClickListener {
             it.findNavController().navigate(R.id.action_myInfoFragment_to_menuFragment)
@@ -328,54 +285,26 @@ class MyInfoFragment : Fragment() {
         }
 
 
-
         // Set click listener for the back button
         //requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackPressedCallback)
-    }
-    // 사용량 데이터 가져와서 UI 업데이트
-    private fun fetchUsageData() {
-        val phoneNumber = viewModel.phoneNumber
-        val telecom = viewModel.Telecom
 
-        val deductFragment: Fragment = when (telecom) {
-            "SKT" -> {
-                val sktDeductDetailViewFragment = SktDeductDetailViewFragment()
-                val bundle = Bundle()
-                bundle.putString("phoneNumber", phoneNumber)
-                sktDeductDetailViewFragment.arguments = bundle
-                sktDeductDetailViewFragment
-            }
-            "KT" -> {
-                val ktDeductDetailViewFragment = KtDeductDetailViewFragment()
-                val bundle = Bundle()
-                bundle.putString("phoneNumber", phoneNumber)
-                ktDeductDetailViewFragment.arguments = bundle
-                ktDeductDetailViewFragment
-            }
-            "LGT" -> {
-                val lgtDeductDetailViewFragment = LgtDeductDetailViewFragment()
-                val bundle = Bundle()
-                bundle.putString("phoneNumber", phoneNumber)
-                bundle.putString("custName", txtcustName.text.toString())
-                lgtDeductDetailViewFragment.arguments = bundle
-                lgtDeductDetailViewFragment
-            }
-            else -> {
-                Log.e("MyInfoFragment", "유효하지 않은 통신사 값입니다: $telecom")
-                return
-            }
+        txt_refreshData = view.findViewById(R.id.txt_refreshData)
+        btnRefresh = view.findViewById(R.id.btn_refresh)
+
+        // Add click listener for btn_refresh button
+        btnRefresh.setOnClickListener {
+            fetchAndDisplayDeductData(viewModel.serviceAcct, viewModel.Telecom)
         }
 
-        requireFragmentManager().beginTransaction()
-            .setCustomAnimations(
-                R.anim.slide_in_up, // 프래그먼트 등장 애니메이션
-                R.anim.slide_out_down, // 프래그먼트 사라짐 애니메이션
-                R.anim.slide_in_up, // 프래그먼트 이전 상태 복원 애니메이션
-                R.anim.slide_out_down // 프래그먼트 이전 상태 제거 애니메이션
-            )
-            .add(id, deductFragment)
-            .addToBackStack(null)
-            .commit()
+
+    }
+
+    private fun fetchAndDisplayDeductData(serviceAcct: String?, telecom: String?) {
+        val sktDeductDetailViewFragment = SktDeductDetailViewFragment()
+        sktDeductDetailViewFragment.fetchSktDeductData(serviceAcct, telecom) { result ->
+            // Update the UI with the result obtained from SktDeductDetailViewFragment
+            txt_refreshData.text = result
+        }
     }
 
 
@@ -444,3 +373,38 @@ class MyInfoFragment : Fragment() {
      fragmentTransaction.addToBackStack(null)
      fragmentTransaction.commit()
  }*/
+
+
+/*  //UI 업데이트 내정보화면에 남은 사용량
+        val updateButton = view.findViewById<ImageButton>(R.id.btn_reload)
+
+        val handler = Handler(Looper.getMainLooper())
+        val runnable = Runnable {updateButton.performClick()
+        }
+        handler.postDelayed(runnable,0)
+
+        updateButton.setOnClickListener {
+            val ktDeductDetailViewFragment = KtDeductDetailViewFragment()
+            val args = Bundle()
+            args.putString("phoneNumber", phoneNumber)
+            ktDeductDetailViewFragment.arguments = args
+
+            val freeMinRemain2 = arguments?.getString("KtFeeMinRemain")
+            if (freeMinRemain2 != null) {
+                view.findViewById<TextView>(R.id.txt_leftData).text = freeMinRemain2
+
+            val sktDeductDetailViewFragment = SktDeductDetailViewFragment()
+            val args = Bundle()
+            args.putString("serviceAcct", serviceAcct)
+            sktDeductDetailViewFragment.arguments = args
+
+            val lgtDeductDetailViewFragment = LgtDeductDetailViewFragment()
+            val argsl = Bundle()
+            args.putString("phoneNumber", phoneNumber)
+            args.putString("custName", custName)
+            lgtDeductDetailViewFragment.arguments = args
+
+                val toastMessage = "새로고침"
+                Toast.makeText(requireContext(), toastMessage, Toast.LENGTH_SHORT).show()
+            }
+        }*/
