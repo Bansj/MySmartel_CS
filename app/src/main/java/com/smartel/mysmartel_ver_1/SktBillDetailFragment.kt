@@ -131,8 +131,10 @@ class SktBillDetailFragment : Fragment() {
 
             // Helper function to consume bytes from the string
             var currentIndex = 0
+
             fun consumeBytes(count: Int): String {
-                val substring = trueValue.substring(currentIndex, currentIndex + count)
+                val endIndex = if (currentIndex + count > trueValue.length) trueValue.length else currentIndex + count
+                val substring = trueValue.substring(currentIndex, endIndex)
                 currentIndex += count
                 return substring
             }
@@ -151,7 +153,7 @@ class SktBillDetailFragment : Fragment() {
             val formattedDate = "${year}년 ${month}월"
 
             val TOT_INV_AMT = consumeBytes(22)
-            val BILL_REC_CNT = consumeBytes(5).trim().toInt()
+            val BILL_REC_CNT = consumeBytes(5).trim(' ').toInt()
 
             // 4. Iterate through the billing items and display additional values
             val stringBuilderDate = StringBuilder()

@@ -62,12 +62,6 @@ class MyInfoFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_my_info, container, false)
 
-       // Retrieve the arguments
-        val custName = arguments?.getString("custName")
-        val phoneNumber = arguments?.getString("phoneNumber")
-        val Telecom = arguments?.getString("Telecom")
-        val serviceAcct = arguments?.getString("serviceAcct")
-
         if (savedInstanceState != null) {
             viewModel.custName = savedInstanceState.getString("custName")
             viewModel.phoneNumber = savedInstanceState.getString("phoneNumber")
@@ -139,7 +133,188 @@ class MyInfoFragment : Fragment() {
         Log.d("MyInfoFragment", "viewModel -----> Telecom: ${viewModel.Telecom}")
         Log.d("MyInfoFragment", "viewModel -----> serviceAcct: ${viewModel.serviceAcct}")
 
+        //버튼 클릭시 밑에서 위로 올라오는 사용량 상세보기 페이지 클릭이벤트
+        val btnDeductDetailFragment = view?.findViewById<Button>(R.id.btn_detailDeduct)
+        btnDeductDetailFragment?.setOnClickListener {
+            val Telecom = viewModel.Telecom ?:arguments?. getString("Telecom")
+            val fragment: Fragment? = when (Telecom) {
+                "SKT" -> {
+                    val sktDeductDetailViewFragment = SktDeductDetailViewFragment()
+                    val bundle = Bundle()
+                    bundle.putString("serviceAcct", serviceAcct)
+                    bundle.putString("Telecom", Telecom)
+                    sktDeductDetailViewFragment.arguments = bundle
 
+                    // Log the values for SKT
+                    Log.d("MyInfoFragment", "to SktBillDetailFragment--------------------serviceAcct: $serviceAcct--------------------")
+                    Log.d("MyInfoFragment", "to SktBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+
+                    sktDeductDetailViewFragment
+                }
+                "KT" -> {
+                    val ktDeductDetailViewFragment = KtDeductDetailViewFragment()
+                    val bundle = Bundle()
+                    bundle.putString("phoneNumber", phoneNumber)
+                    ktDeductDetailViewFragment.arguments = bundle
+
+                    // Log the values for KT
+                    Log.d("MyInfoFragment", "to KtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+
+                    ktDeductDetailViewFragment
+                }
+                "LGT" -> {
+                    val lgtDeductDetailViewFragment = LgtDeductDetailViewFragment()
+                    val bundle = Bundle()
+                    bundle.putString("custName", custName)
+                    bundle.putString("phoneNumber", phoneNumber)
+                    lgtDeductDetailViewFragment.arguments = bundle
+
+                    // Log the values for SKT
+                    Log.d("MyInfoFragment", "to LgtBillDetailFragment--------------------custName: $custName--------------------")
+                    Log.d("MyInfoFragment", "to LgtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+
+                    lgtDeductDetailViewFragment
+                }
+                else -> {
+                    Log.e("MyInfoFragment", "Invalid Telecom value: $Telecom")
+                    null
+                }
+            }
+            fragment?.let {
+                requireFragmentManager().beginTransaction()
+                    .setCustomAnimations(
+                        R.anim.slide_in_up, // Animation for fragment enter
+                        R.anim.slide_out_down, // Animation for fragment exit
+                        R.anim.slide_in_up, // Animation for fragment pop-enter
+                        R.anim.slide_out_down // Animation for fragment pop-exit
+                    )
+                    .add(id, it) // Use the ID of any existing container view in your layout
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
+
+        // 버튼을 클릭시 아래에서 위로 올라오는 청구요금 상세보기 페이지 클릭이벤트
+        val btnBillDetailFragment = view?.findViewById<Button>(R.id.btn_billDetailDeduct)
+        btnBillDetailFragment?.setOnClickListener {
+            val telecom = viewModel.Telecom ?: arguments?.getString("Telecom")
+            val fragment: Fragment? = when (telecom) {
+                "SKT" -> {
+                    val skBillDetailFragment = SktBillDetailFragment()
+                    val bundle = Bundle()
+                    bundle.putString("serviceAcct", serviceAcct)
+                    bundle.putString("phoneNumber", phoneNumber)
+                    skBillDetailFragment.arguments = bundle
+
+                    // Log the values for SKT
+                    Log.d("MyInfoFragment", "to SktBillDetailFragment--------------------serviceAcct: $serviceAcct--------------------")
+                    Log.d("MyInfoFragment", "to SktBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+                    skBillDetailFragment
+                }
+                "KT" -> {
+                    val ktBillDetailFragment = KtBillDetailFragment()
+                    val bundle = Bundle()
+                    bundle.putString("phoneNumber", phoneNumber)
+                    ktBillDetailFragment.arguments = bundle
+
+                    // Log the values for KT
+                    Log.d("MyInfoFragment", "to KtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+
+                    ktBillDetailFragment
+                }
+                "LGT" -> {
+                    val lgtBillDetailFragment = LgtBillDetailFragment()
+                    val bundle = Bundle()
+                    bundle.putString("custName", custName)
+                    bundle.putString("phoneNumber", phoneNumber)
+                    lgtBillDetailFragment.arguments = bundle
+
+                    // Log the values for LGT
+                    Log.d("MyInfoFragment", "to LgtBillDetailFragment--------------------custName: $custName--------------------")
+                    Log.d("MyInfoFragment", "to LgtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+
+                    lgtBillDetailFragment
+                }
+                else -> {
+                    Log.e("MyInfoFragment", "Invalid Telecom value: $telecom")
+                    null
+                }
+            }
+            fragment?.let {
+                requireFragmentManager().beginTransaction()
+                    .setCustomAnimations(
+                        R.anim.slide_in_up, // Animation for fragment enter
+                        R.anim.slide_out_down, // Animation for fragment exit
+                        R.anim.slide_in_up, // Animation for fragment pop-enter
+                        R.anim.slide_out_down // Animation for fragment pop-exit
+                    )
+                    .add(id, it) // Use the ID of any existing container view in your layout
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
+
+
+        // 버튼을 클릭시 아래에서 위로 올라오는 부가서비스 상세보기 페이지 클릭이벤트
+        val btnAddServiceFragment = view?.findViewById<Button>(R.id.btn_addService)
+        btnAddServiceFragment?.setOnClickListener {
+            val telecom = viewModel.Telecom ?: arguments?.getString("Telecom")
+            val fragment: Fragment? = when (telecom) {
+                "SKT" -> {
+                    val sktAddServiceFragment = SktAddServiceFragment()
+                    val bundle = Bundle()
+                    bundle.putString("serviceAcct", serviceAcct)
+                    bundle.putString("phoneNumber", phoneNumber)
+                    sktAddServiceFragment.arguments = bundle
+
+                    // Log the values for SKT
+                    Log.d("MyInfoFragment", "to SktBillDetailFragment--------------------serviceAcct: $serviceAcct--------------------")
+                    Log.d("MyInfoFragment", "to SktBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+                    sktAddServiceFragment
+                }
+                "KT" -> {
+                    val ktBillDetailFragment = KtBillDetailFragment()
+                    val bundle = Bundle()
+                    bundle.putString("phoneNumber", phoneNumber)
+                    ktBillDetailFragment.arguments = bundle
+
+                    // Log the values for KT
+                    Log.d("MyInfoFragment", "to KtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+
+                    ktBillDetailFragment
+                }
+                "LGT" -> {
+                    val lgtBillDetailFragment = LgtBillDetailFragment()
+                    val bundle = Bundle()
+                    bundle.putString("custName", custName)
+                    bundle.putString("phoneNumber", phoneNumber)
+                    lgtBillDetailFragment.arguments = bundle
+
+                    // Log the values for LGT
+                    Log.d("MyInfoFragment", "to LgtBillDetailFragment--------------------custName: $custName--------------------")
+                    Log.d("MyInfoFragment", "to LgtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+
+                    lgtBillDetailFragment
+                }
+                else -> {
+                    Log.e("MyInfoFragment", "Invalid Telecom value: $telecom")
+                    null
+                }
+            }
+
+            fragment?.let {
+                requireFragmentManager().beginTransaction()
+                    .setCustomAnimations(
+                        R.anim.slide_in_up, // Animation for fragment enter
+                        R.anim.slide_out_down, // Animation for fragment exit
+                        R.anim.slide_in_up, // Animation for fragment pop-enter
+                        R.anim.slide_out_down // Animation for fragment pop-exit
+                    )
+                    .add(id, it) // Use the ID of any existing container view in your layout
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
 
             // Set click listener for btn_menu button 하단 메뉴이동 네비게이션바 컨트롤러
         view.findViewById<ImageButton>(R.id.btn_menu).setOnClickListener {
@@ -282,14 +457,15 @@ class MyInfoFragment : Fragment() {
         return remainInfoList
     }
     private fun updateUI(apiResponse: SktDeductApiResponse) {
-
         // Display remainInfo details in a separate TextView or a RecyclerView (depending on your layout design)
         val remainInfoTextView = view?.findViewById<TextView>(R.id.txt_refreshData)
         val txtRefreshCall = view?.findViewById<TextView>(R.id.txt_refreshCall)
         val txtRefreshM = view?.findViewById<TextView>(R.id.txt_refreshM)
+        val txtRefreshData = view?.findViewById<TextView>(R.id.txt_refreshData)
 
         if (apiResponse.remainInfo.isNotEmpty()) {
             val remainInfoStr = StringBuilder()
+            var totalRemQtyData: Double = 0.0
 
             for (remainInfo in apiResponse.remainInfo) {
                 // If freePlanName is empty, use planNm instead
@@ -301,16 +477,20 @@ class MyInfoFragment : Fragment() {
                 val remQtyDefault = if (remainInfo.remQty.isEmpty()) "0" else remainInfo.remQty
 
                 // Check if freePlanName contains "데이터" or "Data"
-                if (displayName.contains("데이터") || displayName.contains("Data")) {
+                if ((displayName.contains("데이터") || displayName.contains("Data")) && !displayName.contains("테더링")) {
                     // Handle the case where the values are not valid numbers (e.g., "무제한")
                     val totalQtyGB = parseValueToGB(totalQtyDefault)
                     val useQtyGB = parseValueToGB(useQtyDefault)
                     val remQtyGB = parseValueToGB(remQtyDefault)
 
                     remainInfoStr.append("\n\n$displayName\n\n\n")
-                    remainInfoStr.append("총제공량".padEnd(60) + "$totalQtyGB\n\n") // Add padding between label and value
-                    remainInfoStr.append("사용량".padEnd(60) + "$useQtyGB\n\n") // Add padding between label and value
-                    remainInfoStr.append("잔여량".padEnd(60) + "$remQtyGB\n\n\n\n") // Add padding between label and value
+                    remainInfoStr.append("총제공량".padEnd(60) + "%.1fGB".format(totalQtyGB) + "\n\n")
+                    remainInfoStr.append("사용량".padEnd(60) + "%.1fGB".format(useQtyGB) + "\n\n")
+                    remainInfoStr.append("잔여량".padEnd(60) + "%.1fGB".format(remQtyGB) + "\n\n\n\n")
+
+
+                    // Add remQty to totalRemQtyData
+                    totalRemQtyData += remQtyGB.toDouble()
                 }
                 else if (displayName.contains("음성") || displayName.contains("전화")) {
                     // Handle the case where the values are "음성" or "전화"
@@ -334,25 +514,29 @@ class MyInfoFragment : Fragment() {
             remainInfoTextView?.text = remainInfoStr.toString()
             remainInfoTextView!!.gravity = Gravity.CENTER
 
+            // Set the value of totalRemQtyData to txtRefreshData
+            txtRefreshData?.text = "%.1fGB".format(totalRemQtyData)
+
         } else {
             remainInfoTextView?.text = "No Remain Info found."
         }
     }
 
     // Helper function to convert the value to GB or handle non-numeric cases
-    private fun parseValueToGB(value: String): String {
+    private fun parseValueToGB(value: String): Double {
         return try {
-            if (!value.contains("무제한") && value.replace(",", "").toDoubleOrNull() != null) {
-                val number = value.replace(",", "").toDouble() / (1024 * 1024)
-                "%.1fGB".format(number)
+            if (!value.contains("무제한")) {
+                val number = value.replace(",", "").toDouble() / (1024 * 1024) // 기존 코드에서 단위 변환을 유지합니다.
+                number
             } else {
-                value
+                0.0 // 무제한인 경우 0.0 또는 적절한 값을 설정합니다.
             }
         } catch (e: NumberFormatException) {
             // Handle non-numeric cases, e.g., "unlimited"
-            value
+            0.0
         }
     }
+
     // Helper function to convert the value to minutes or handle non-numeric cases
     private fun parseValueToMinutes(value: String): String {
         return try {
@@ -386,4 +570,14 @@ class MyInfoFragment : Fragment() {
             viewModel.serviceAcct = savedInstanceState.getString("serviceAcct")
         }
     }
+    fun parseValueToDouble(value: String): Double {
+        return try {
+            value.toDouble()
+        } catch (e: NumberFormatException) {
+            0.0
+        }
+    }
 }
+
+
+

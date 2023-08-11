@@ -51,6 +51,13 @@ class MenuFragment : Fragment() {
         return binding.root
 
     }
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString("custName", viewModel.custName)
+        outState.putString("phoneNumber", viewModel.phoneNumber)
+        outState.putString("Telecom", viewModel.Telecom)
+        outState.putString("serviceAcct", viewModel.serviceAcct)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -350,7 +357,6 @@ class MenuFragment : Fragment() {
     }
     private var isAnimating = false
 
-
     private fun toggleVisibility(layout: View, button: View) { // 아래 스크롤 버튼 클릭 이벤트 : 요소들이 하나씩 펼쳐지고 접히는 애니메이션 효과
         if (isAnimating) {
             return
@@ -430,6 +436,16 @@ class MenuFragment : Fragment() {
             }
 
             unfoldAnimation.start()
+        }
+    }
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+
+        if (savedInstanceState != null) {
+            viewModel.custName = savedInstanceState.getString("custName")
+            viewModel.phoneNumber = savedInstanceState.getString("phoneNumber")
+            viewModel.Telecom = savedInstanceState.getString("Telecom")
+            viewModel.serviceAcct = savedInstanceState.getString("serviceAcct")
         }
     }
 
