@@ -243,5 +243,3 @@ class SktDeductDetailViewFragment : Fragment() {
     }
 
 }
-
-
