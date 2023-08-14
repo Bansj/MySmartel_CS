@@ -467,6 +467,8 @@ class MyInfoFragment : Fragment() {
             val remainInfoStr = StringBuilder()
             var totalRemQtyData: Double = 0.0
 
+            val remainCallstr = StringBuilder()
+
             for (remainInfo in apiResponse.remainInfo) {
                 // If freePlanName is empty, use planNm instead
                 val displayName = if (remainInfo.freePlanName.isEmpty()) remainInfo.planNm else remainInfo.freePlanName
@@ -516,6 +518,9 @@ class MyInfoFragment : Fragment() {
 
             // Set the value of totalRemQtyData to txtRefreshData
             txtRefreshData?.text = "%.1fGB".format(totalRemQtyData)
+
+            txtRefreshCall?.text = remainCallstr.toString()
+            Log.d("txt통화량", "$remainCallstr")
 
         } else {
             remainInfoTextView?.text = "No Remain Info found."
@@ -570,13 +575,7 @@ class MyInfoFragment : Fragment() {
             viewModel.serviceAcct = savedInstanceState.getString("serviceAcct")
         }
     }
-    fun parseValueToDouble(value: String): Double {
-        return try {
-            value.toDouble()
-        } catch (e: NumberFormatException) {
-            0.0
-        }
-    }
+
 }
 
 

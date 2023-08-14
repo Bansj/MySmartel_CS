@@ -6,8 +6,10 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.lifecycleScope
 import com.example.mysmartel_ver_1.R
 import kotlinx.coroutines.Dispatchers
@@ -22,12 +24,27 @@ class SktPaymentDetailFragment : Fragment() {
     private lateinit var textView: TextView
     private lateinit var phoneNumber: String
 
+    private lateinit var downButton: ImageButton
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         Log.d("SktPaymentDetailFragment", "onCreateView called")
-        return inflater.inflate(R.layout.fragment_skt_payment_detail, container, false)
+        val view =inflater.inflate(R.layout.fragment_skt_payment_detail, container, false)
+
+        downButton = view.findViewById(R.id.btn_pgDown)
+        downButton.setOnClickListener {
+            animateFragmentOut(view)
+        }
+        return view
+    }
+
+    private fun animateFragmentOut(view: View) { // 슬라이드 다운 애니메이션 효과
+        val transaction: FragmentTransaction = parentFragmentManager.beginTransaction()
+        transaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down)
+        transaction.remove(this@SktPaymentDetailFragment)
+        transaction.commit()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
