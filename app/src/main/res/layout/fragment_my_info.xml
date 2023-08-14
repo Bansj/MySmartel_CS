@@ -72,7 +72,7 @@
                             android:layout_marginHorizontal="10dp"
                             android:layout_marginTop="10dp"
                             android:gravity="center_vertical"
-                            android:text="  반승주님, 안녕하세요"
+                            android:text="  홍길동님, 안녕하세요"
                             android:textColor="@color/black"
                             android:textSize="20dp"
                             android:textStyle="bold" />
@@ -135,7 +135,7 @@
                             android:id="@+id/txt_refreshData"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="9.82GB "
+                            android:text="10.0GB "
                             android:textColor="@color/black"
                             android:textSize="22dp"
                             android:textStyle="bold"
@@ -259,7 +259,7 @@
                             android:layout_marginTop="15dp"
                             android:layout_marginRight="10dp"
                             android:layout_toRightOf="@id/my_fee"
-                            android:text="2023.07"
+                            android:text="2023.07."
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -269,7 +269,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="15dp"
                             android:layout_marginRight="15dp"
-                            android:text="35,800원"
+                            android:text="xx,xxx원"
                             android:textColor="@color/black"
                             android:textSize="18dp"
                             android:textStyle="bold"

@@ -30,14 +30,22 @@ import okhttp3.*
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
+import java.nio.charset.Charset
 import java.security.cert.X509Certificate
+import java.text.NumberFormat
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
 class MyInfoFragment : Fragment() {
 
-
+    private val yearMonthFormat = SimpleDateFormat("yyyyMM", Locale.getDefault())
 
     private lateinit var txtcustName: TextView
     private lateinit var txtPhoneNumber: TextView
@@ -51,9 +59,13 @@ class MyInfoFragment : Fragment() {
     private lateinit var txt_refreshData: TextView
     private lateinit var btnRefresh: ImageButton
 
+    private lateinit var phoneNumber: String
+
+    private lateinit var txtThisMonthBillDate: TextView
+    private lateinit var sumAmount: TextView
+
     // Obtain an instance of the ViewModel from the shared ViewModelStoreOwner
     private val viewModel: MyInfoViewModel by viewModels({ requireActivity() })
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -84,6 +96,9 @@ class MyInfoFragment : Fragment() {
         txtcustName = view.findViewById(R.id.txt_cust_nm)
         txtPhoneNumber = view.findViewById(R.id.txt_phoneNumber)
         txtTelecom = view.findViewById(R.id.txt_telecom)
+
+        sumAmount = view.findViewById(R.id.txt_thisMonthBill)
+        txtThisMonthBillDate =view.findViewById(R.id.txt_thisMonthBillDate)
 
         sharedPrefs = MyInfoSharedPreferences(requireContext())
 
@@ -326,9 +341,10 @@ class MyInfoFragment : Fragment() {
             it.findNavController().navigate(R.id.action_myInfoFragment_to_settingFragment)
         }
 
+        this.phoneNumber = arguments?.getString("phoneNumber") ?: ""
+        Log.d("getString?","phoneNumber: $phoneNumber")
+        val ifClCd = "R5"
 
-        // Set click listener for the back button
-        //requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, onBackPressedCallback)
 
         txt_refreshData = view.findViewById(R.id.txt_refreshData)
         btnRefresh = view.findViewById(R.id.btn_refresh)
@@ -337,13 +353,197 @@ class MyInfoFragment : Fragment() {
         btnRefresh.setOnClickListener {
             val serviceAcct = arguments?.getString("serviceAcct")
             val telecom = arguments?.getString("Telecom")
-            fetchSktDeductData(serviceAcct, telecom)
+            // Get the phoneNumber value from MyInfoFragment
+
+            SktfetchDeductData(serviceAcct, telecom)
+            SktfetchBillingDetail()
         }
         btnRefresh.performClick() // 화면 전환 완료시 자동으로 버튼 클릭되는 이벤트
 
     }
 
-    private fun fetchSktDeductData(serviceAcct: String?, telecom: String?) {
+    private fun SktfetchBillingDetail() {
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                var currentResponse = ""
+                var currentMonth = Calendar.getInstance()
+                currentMonth.add(Calendar.MONTH, -1)
+
+                while (true) {
+                    // Log the current year and month
+                    Log.d("BillingDetail", "Current Year-Month: ${yearMonthFormat.format(currentMonth.time)}")
+
+                    // Construct the API URL with parameters
+                    val url =
+                        URL("https://www.mysmartel.com/api/sktGetInfo.php?svcNum=$phoneNumber&ifClCd=R5&addInfo=${yearMonthFormat.format(currentMonth.time)}")
+                    Log.d("BillingDetail", "API URL: $url")
+                    val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
+                    connection.setRequestProperty("charset", "euc-kr")
+                    connection.requestMethod = "GET"
+                    // Get the response in EUC-KR charset
+                    val reader = BufferedReader(
+                        InputStreamReader(
+                            connection.inputStream,
+                            Charset.forName("EUC-KR")
+                        )
+                    )
+                    currentResponse = reader.readText()
+                    Log.d("BillingDetail", "Response: $currentResponse")
+
+                    // Check if the "E6" value is included in the response
+                    if (!currentResponse.contains("E6")) {
+                        // If "E6" is not found, break the loop and display the data
+                        break
+                    }
+
+                    // Decrement the month for the next iteration
+                    currentMonth.add(Calendar.MONTH, -1)
+                }
+
+                // Display the data in the textView
+                displayData(currentResponse)
+            } catch (e: Exception) {
+                Log.e("BillingDetail", "Error fetching billing detail: ${e.message}")
+            }
+        }
+    }
+    // 문자열에 있는 이상한 문자를 제거하는 함수
+    private fun removeStrangeChars(input: String): String {
+        return input.replace(Regex("[^가-힣0-9\\s]+"), "")
+    }
+
+    // 조회된 데이터 처리 및 결과 출력 코드 수정
+    private fun displayData(data: String) {
+        GlobalScope.launch(Dispatchers.Main) {
+            val encodedData = String(data.toByteArray(Charset.forName("UTF-8")), Charset.forName("UTF-8"))
+
+            // 1. Check if the string contains Korean characters and adjust the string accordingly
+            val adjustedData = encodedData.chunked(1).joinToString(separator = "") { char ->
+                if (char[0].toInt() in 0xAC00..0xD7A3) char + '\u0000' else char
+            }
+
+            // 2. Remove the first 60 bytes from the data and create trueValue
+            val trueValue = adjustedData.substring(60)
+
+            // Helper function to consume bytes from the string
+            var currentIndex = 0
+
+            fun consumeBytes(count: Int): String {
+                if (currentIndex >= trueValue.length) {
+                    return ""
+                }
+
+                val endIndex = if (currentIndex + count > trueValue.length) trueValue.length else currentIndex + count
+                val substring = trueValue.substring(currentIndex, endIndex)
+                currentIndex += count
+                return substring
+            }
+
+            // 3. Parse the trueValue according to the format
+            val opClCd = consumeBytes(1)
+            val opTypCd = consumeBytes(2)
+            val svcNum = consumeBytes(12)
+            val svAcntNum = consumeBytes(11)
+
+            val INV_YM = consumeBytes(6)
+            // Parse the year and month separately
+            val year = INV_YM.substring(0, 4)
+            val month = INV_YM.substring(4, 6)
+            // Format the year and month
+            val formattedDate = "${year}년 ${month}월"
+
+            val TOT_INV_AMT = consumeBytes(22)
+            val BILL_REC_CNT = consumeBytes(5).trim(' ')
+            // 수정된 부분: BILL_REC_CNT가 빈 문자열인 경우에 default 값을 "0"으로 설정
+            val billRecCnt = if (BILL_REC_CNT.isEmpty()) 0 else BILL_REC_CNT.toInt()
+
+            // 4. Iterate through the billing items and display additional values
+            val stringBuilderDate = StringBuilder()
+            stringBuilderDate.append("$formattedDate")
+
+            // 4. Iterate through the billing items
+            val stringBuilder2 = StringBuilder()
+
+            fun formatNumber(number: String): String {
+                return try {
+                    val cleanedNumber = number.trim().filter { it.isDigit() }
+                    if (cleanedNumber.isNotEmpty()) {
+                        NumberFormat.getInstance().format(cleanedNumber.toInt())
+                    } else {
+                        "0"
+                    }
+                } catch (e: NumberFormatException) {
+                    Log.e("BillingDetail", "Error formatting number: ${e.message}")
+                    "0"
+                }
+            }
+
+
+            for (i in 0 until billRecCnt) {
+                val BILL_ITM_LCL_NM = removeStrangeChars(consumeBytes(80).trim())
+                val BILL_ITM_SCL_NM = removeStrangeChars(consumeBytes(80).trim())
+                val BILL_ITM_NM = removeStrangeChars(consumeBytes(80).trim())
+                val INV_AMT = consumeBytes(22).trimStart('0').trim()
+
+                Log.d("BillingDetail", "대분류명: $BILL_ITM_LCL_NM")
+                Log.d("BillingDetail", "소분류명: $BILL_ITM_SCL_NM")
+                Log.d("BillingDetail", "항목명: $BILL_ITM_NM")
+                Log.d("BillingDetail", "청구금액: $INV_AMT")
+
+                val totalLength = 45 // 이 값을 필요한 전체 문자열 길이로 변경 가능
+                val minGap = 20 // 이 값은 두 문자열 사이의 최소 여백 갯수
+                val formattedLclNm = BILL_ITM_LCL_NM.padEnd(totalLength - (BILL_ITM_NM.length + INV_AMT.length), ' ')
+                val formattedBillItnNM = BILL_ITM_NM.padEnd(BILL_ITM_LCL_NM.length + minGap, ' ')
+                //val formattedInvAmt = INV_AMT.padStart()
+
+                stringBuilder2.append("$formattedLclNm\n")
+                // stringBuilder2.append("청구서 소분류명: $BILL_ITM_SCL_NM\n\n")
+                stringBuilder2.append("$formattedBillItnNM")
+                val formattedInvAmt = formatNumber(INV_AMT)
+                val paddedFormattedInvAmt = formattedInvAmt.padStart(50 - formattedInvAmt.length + formattedInvAmt.length, ' ')
+                stringBuilder2.append("${paddedFormattedInvAmt}원\n")
+            }
+            val ErrorCd = consumeBytes(2)
+
+            val stringBuilderTotAmt = StringBuilder()
+            val title = "총 납부하실 금액 "
+            val value = "\n${formatNumber(TOT_INV_AMT.trimStart('0'))}원\n\n"
+            val maxSpacing = 15 // Adjust this value as needed for the maximum spacing
+
+            val formattedTitle = title.padEnd(title.length + maxSpacing, ' ')
+            val formattedValue = value.padStart(value.length + maxSpacing, ' ')
+
+            stringBuilderTotAmt.append(formattedTitle)
+            stringBuilderTotAmt.append(formattedValue)
+
+            //txtTitle.text = stringBuilder2.toString()
+            //txtValue.text = stringBuilder2.append("${INV_YM}원")
+
+            txtThisMonthBillDate.text = stringBuilderDate.toString()
+
+            sumAmount.text = "${formatNumber(TOT_INV_AMT.trimStart('0'))}원"
+
+            sumAmount.gravity = Gravity.END
+
+
+            // Log to show the length of each parsed field
+            Log.d("ParsedData", "opClCd: ${opClCd.length}\n" +
+                    " opTypCd: ${opTypCd.length}\n" +
+                    " svcNum: ${svcNum.length}\n" +
+                    " svAcntNum: ${svAcntNum.length}\n" +
+                    " INV_YM: ${INV_YM.length}\n" +
+                    " TOT_INV_AMT: ${TOT_INV_AMT.length}\n" +
+                    " BILL_REC_CNT: ${BILL_REC_CNT}\n" +
+                    " ErrorCode: ${ErrorCd.length}")
+        }
+    }
+
+
+
+
+
+
+    private fun SktfetchDeductData(serviceAcct: String?, telecom: String?) {
         GlobalScope.launch(Dispatchers.IO) {
             try {
                 val serviceAcct = viewModel.serviceAcct
@@ -466,6 +666,8 @@ class MyInfoFragment : Fragment() {
         if (apiResponse.remainInfo.isNotEmpty()) {
             val remainInfoStr = StringBuilder()
             var totalRemQtyData: Double = 0.0
+            var displayCall = ""
+            var displayM = ""
 
             val remainCallstr = StringBuilder()
 
@@ -486,10 +688,9 @@ class MyInfoFragment : Fragment() {
                     val remQtyGB = parseValueToGB(remQtyDefault)
 
                     remainInfoStr.append("\n\n$displayName\n\n\n")
-                    remainInfoStr.append("총제공량".padEnd(60) + "%.1fGB".format(totalQtyGB) + "\n\n")
-                    remainInfoStr.append("사용량".padEnd(60) + "%.1fGB".format(useQtyGB) + "\n\n")
-                    remainInfoStr.append("잔여량".padEnd(60) + "%.1fGB".format(remQtyGB) + "\n\n\n\n")
-
+                    remainInfoStr.append("총제공량".padEnd(1) + "%.1fGB".format(totalQtyGB) + "\n\n")
+                    remainInfoStr.append("사용량".padEnd(1) + "%.1fGB".format(useQtyGB) + "\n\n")
+                    remainInfoStr.append("잔여량".padEnd(1) + "%.1fGB".format(remQtyGB) + "\n\n\n\n")
 
                     // Add remQty to totalRemQtyData
                     totalRemQtyData += remQtyGB.toDouble()
@@ -501,16 +702,36 @@ class MyInfoFragment : Fragment() {
                     val remQtyMin = parseValueToMinutes(remainInfo.remQty)
 
                     remainInfoStr.append("$displayName\n\n")
-                    remainInfoStr.append("총제공량".padEnd(60) + "$totalQtyMin\n\n") // Add padding between label and value
-                    remainInfoStr.append("사용량".padEnd(60) + "$useQtyMin\n\n") // Add padding between label and value
-                    remainInfoStr.append("잔여량".padEnd(60) + "$remQtyMin\n\n\n\n") // Add padding between label and value
+                    remainCallstr.append("$totalQtyMin") // 통화 총제공량
+                    remainInfoStr.append("사용량".padEnd(1) + "$useQtyMin\n\n") // Add padding between label and value
+                    remainCallstr.append("$remQtyMin") // 통화 잔여량 표출
+
+                    if (displayName.contains("부가")) {
+                        displayCall = "✆ 무제한/무제한"
+                    } else {
+                        displayCall = "✆ $remQtyMin/$totalQtyMin"
+                    }
+
+                    Log.d("displayCall","$displayCall")
+
+                }
+                else if(displayName.contains("원")) {
+                    // Default case for other freePlanName values
+                    remainInfoStr.append("$displayName\n\n")
+                    remainInfoStr.append("${remainInfo.totalQty}원\n\n") // 총제공량
+                    remainInfoStr.append("사용량".padEnd(1) + "${remainInfo.useQty}\n\n")
+                    remainInfoStr.append("${remainInfo.remQty}원\n\n\n\n") // 잔여량
+
+                    displayM = " ✉︎ ${remainInfo.remQty}원/${remainInfo.totalQty}원"
                 }
                 else {
                     // Default case for other freePlanName values
                     remainInfoStr.append("$displayName\n\n")
-                    remainInfoStr.append("총제공량".padEnd(60) + "${remainInfo.totalQty}\n\n")
-                    remainInfoStr.append("사용량".padEnd(60) + "${remainInfo.useQty}\n\n")
-                    remainInfoStr.append("잔여량".padEnd(60) + "${remainInfo.remQty}\n\n\n\n")
+                    remainInfoStr.append("${remainInfo.totalQty}\n\n") // 총제공량
+                    remainInfoStr.append("사용량".padEnd(1) + "${remainInfo.useQty}\n\n")
+                    remainInfoStr.append("${remainInfo.remQty}\n\n\n\n") // 잔여량
+
+                    displayM = "✉︎ ${remainInfo.remQty}/${remainInfo.totalQty}"
                 }
             }
             remainInfoTextView?.text = remainInfoStr.toString()
@@ -519,8 +740,10 @@ class MyInfoFragment : Fragment() {
             // Set the value of totalRemQtyData to txtRefreshData
             txtRefreshData?.text = "%.1fGB".format(totalRemQtyData)
 
-            txtRefreshCall?.text = remainCallstr.toString()
+            txtRefreshCall?.text = displayCall
             Log.d("txt통화량", "$remainCallstr")
+
+            txtRefreshM?.text = displayM
 
         } else {
             remainInfoTextView?.text = "No Remain Info found."
@@ -556,6 +779,11 @@ class MyInfoFragment : Fragment() {
             value
         }
     }
+
+
+
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()

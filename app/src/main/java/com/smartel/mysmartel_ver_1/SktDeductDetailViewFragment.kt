@@ -213,6 +213,13 @@ class SktDeductDetailViewFragment : Fragment() {
                     remainInfoStr.append("사용량".padEnd(60) + "$useQtyMin\n\n") // Add padding between label and value
                     remainInfoStr.append("잔여량".padEnd(60) + "$remQtyMin\n\n\n\n") // Add padding between label and value
                 }
+                else if (displayName.contains("원")){
+                    // Default case for other freePlanName values
+                    remainInfoStr.append("$displayName\n\n")
+                    remainInfoStr.append("총제공량".padEnd(60) + "${remainInfo.totalQty}원\n\n")
+                    remainInfoStr.append("사용량".padEnd(60) + "${remainInfo.useQty}원\n\n")
+                    remainInfoStr.append("잔여량".padEnd(60) + "${remainInfo.remQty}원\n\n\n\n")
+                }
                 else {
                     // Default case for other freePlanName values
                     remainInfoStr.append("$displayName\n\n")

@@ -158,7 +158,7 @@ class LgtBillDetailFragment : Fragment() {
             if (billInfo.blItemNm.contains("총 납부하실 금액", ignoreCase = true)) {
                 val formattedAmount = numberFormat.format(billInfo.billAmt.toLong())
                 totalAmount = "${formattedAmount}원"
-                sb.append(String.format("%64s", totalAmount)) // Right align totalAmount value with padding
+                sb.append(String.format("%60s", totalAmount)) // Right align totalAmount value with padding
             } else {
                 val formattedBillAmt = numberFormat.format(billInfo.billAmt.toLong())
 

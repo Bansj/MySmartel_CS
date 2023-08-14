@@ -150,6 +150,10 @@ class SktBillDetailFragment : Fragment() {
             var currentIndex = 0
 
             fun consumeBytes(count: Int): String {
+                if (currentIndex >= trueValue.length) {
+                    return ""
+                }
+
                 val endIndex = if (currentIndex + count > trueValue.length) trueValue.length else currentIndex + count
                 val substring = trueValue.substring(currentIndex, endIndex)
                 currentIndex += count
@@ -170,7 +174,9 @@ class SktBillDetailFragment : Fragment() {
             val formattedDate = "${year}년 ${month}월"
 
             val TOT_INV_AMT = consumeBytes(22)
-            val BILL_REC_CNT = consumeBytes(5).trim(' ').toInt()
+            val BILL_REC_CNT = consumeBytes(5).trim(' ')
+            // 수정된 부분: BILL_REC_CNT가 빈 문자열인 경우에 default 값을 "0"으로 설정
+            val billRecCnt = if (BILL_REC_CNT.isEmpty()) 0 else BILL_REC_CNT.toInt()
 
             // 4. Iterate through the billing items and display additional values
             val stringBuilderDate = StringBuilder()
@@ -180,10 +186,14 @@ class SktBillDetailFragment : Fragment() {
             val stringBuilder2 = StringBuilder()
 
             fun formatNumber(number: String): String {
-                return NumberFormat.getInstance().format(number.toInt())
+                return if (number.isNotEmpty()) {
+                    NumberFormat.getInstance().format(number.toInt())
+                } else {
+                    "0"
+                }
             }
 
-            for (i in 0 until BILL_REC_CNT) {
+            for (i in 0 until billRecCnt) {
                 val BILL_ITM_LCL_NM = removeStrangeChars(consumeBytes(80).trim())
                 val BILL_ITM_SCL_NM = removeStrangeChars(consumeBytes(80).trim())
                 val BILL_ITM_NM = removeStrangeChars(consumeBytes(80).trim())
