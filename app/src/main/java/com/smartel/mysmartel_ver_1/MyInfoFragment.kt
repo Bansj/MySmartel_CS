@@ -22,10 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.bumptech.glide.Glide
 import com.example.mysmartel_ver_1.R
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import okhttp3.*
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
@@ -59,10 +56,15 @@ class MyInfoFragment : Fragment() {
     private lateinit var txt_refreshData: TextView
     private lateinit var btnRefresh: ImageButton
 
-    private lateinit var phoneNumber: String
+    private lateinit var phoneNumber: String // Skt 사용량, 청구요금조회, 부가서비스 조회
 
     private lateinit var txtThisMonthBillDate: TextView
     private lateinit var sumAmount: TextView
+
+    private lateinit var svcNum: String
+
+    private lateinit var txtFreeService: TextView
+    private lateinit var txtPaidService: TextView
 
     // Obtain an instance of the ViewModel from the shared ViewModelStoreOwner
     private val viewModel: MyInfoViewModel by viewModels({ requireActivity() })
@@ -99,6 +101,9 @@ class MyInfoFragment : Fragment() {
 
         sumAmount = view.findViewById(R.id.txt_thisMonthBill)
         txtThisMonthBillDate =view.findViewById(R.id.txt_thisMonthBillDate)
+
+        txtFreeService = view.findViewById(R.id.txt_freeService)
+        txtPaidService = view.findViewById(R.id.txt_paidService)
 
         sharedPrefs = MyInfoSharedPreferences(requireContext())
 
@@ -342,6 +347,8 @@ class MyInfoFragment : Fragment() {
         }
 
         this.phoneNumber = arguments?.getString("phoneNumber") ?: ""
+        svcNum = this.phoneNumber
+
         Log.d("getString?","phoneNumber: $phoneNumber")
         val ifClCd = "R5"
 
@@ -355,14 +362,144 @@ class MyInfoFragment : Fragment() {
             val telecom = arguments?.getString("Telecom")
             // Get the phoneNumber value from MyInfoFragment
 
-            SktfetchDeductData(serviceAcct, telecom)
-            SktfetchBillingDetail()
+            SktFetchDeductData(serviceAcct, telecom)
+            SktFetchBillingDetail()
+            SktFetchAddServiceDetail()
         }
         btnRefresh.performClick() // 화면 전환 완료시 자동으로 버튼 클릭되는 이벤트
 
     }
+    // SKT 부가서비스 API 조회
+    private fun SktFetchAddServiceDetail() {
+        // Use viewLifecycleOwner.lifecycleScope instead of GlobalScope
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            val apiUrl = "https://www.mysmartel.com/api/sktGetInfo.php?svcNum=$svcNum&ifClCd=R2"
+            try {
+                val url = URL(apiUrl)
+                val connection = url.openConnection()
+                val contentType = connection.contentType
+                val charset = contentType.split("charset=")
+                    .lastOrNull { it.isNotBlank() }
+                    ?.let { Charset.forName(it) }
+                    ?: Charset.defaultCharset()
 
-    private fun SktfetchBillingDetail() {
+                val response = connection.getInputStream().bufferedReader(charset).use { it.readText() }
+
+                // No need to convert the encoding, as we use detected charset from response
+                val responseData = response
+
+                // Update the UI in the main thread and call displayData function with the response data
+                withContext(Dispatchers.Main) {
+                    displayServiceData(responseData)
+                    Log.d("SktAddServiceFragment", "$responseData")
+                }
+            } catch (e: Exception) {
+                Log.e("SktAddServiceFragment", "Error fetching service details: ${e.message}", e)
+            }
+        }
+    }
+
+    private fun displayServiceData(data: String) {
+        CoroutineScope(Dispatchers.Main).launch {
+            // Remove the first 60 bytes from the data and create trueValue
+            val trueValue = data.substring(60)
+
+            // Helper function to consume bytes from the string
+            var currentIndex = 0
+            fun consumeBytes(count: Int): String {
+                val subList = mutableListOf<Char>()
+                var byteCounter = 0
+
+                while (byteCounter < count && currentIndex < trueValue.length) {
+                    val char = trueValue[currentIndex]
+                    val byteSize = if (char.toInt() in 0xAC00..0xD7A3) 2 else 1
+
+                    if (byteCounter + byteSize <= count) {
+                        subList.add(char)
+                        byteCounter += byteSize
+                    } else {
+                        break
+                    }
+                    currentIndex++
+                }
+
+                return subList.joinToString(separator = "")
+            }
+
+            // Parse the trueValue according to the format
+            val opClCd = consumeBytes(1)
+            val opTypCd = consumeBytes(2)
+            val svcNum = consumeBytes(12)
+            val svAcntNum = consumeBytes(11)
+            val prodRecCnt = consumeBytes(5).trim().toInt()
+
+            Log.d("SktAddServiceFragment", "OpClCd: $opClCd")
+            Log.d("SktAddServiceFragment", "OpTypCd: $opTypCd")
+            Log.d("SktAddServiceFragment", "SvcNum: $svcNum")
+            Log.d("SktAddServiceFragment", "SvAcntNum: $svAcntNum")
+            Log.d("SktAddServiceFragment", "ProdRecCnt: $prodRecCnt")
+
+            var freeServiceCnt = 0
+            var paidServiceCnt = 0
+
+            // Iterate through the billing items
+            val stringBuilder = StringBuilder()
+            for (i in 0 until prodRecCnt) {
+                val prodId = consumeBytes(10)
+                val prodScrbDt = consumeBytes(10)
+                val prodNm = consumeBytes(50)
+                val prodFeeAmt = consumeBytes(10)
+
+                // prodFeeAmt 값을 기준으로 무료/유료 서비스를 카운팅합니다.
+                if (prodFeeAmt.trim() == "0" || prodFeeAmt.trim().isEmpty()) {
+                    freeServiceCnt++
+                } else {
+                    paidServiceCnt++
+                }
+
+                val displayProdFee = if (prodFeeAmt.trim() == "0" || prodFeeAmt.trim().isEmpty()) "무료" else prodFeeAmt
+
+                Log.d("SktAddServiceFragment", "Product Id: $prodId")
+                Log.d("SktAddServiceFragment", "Product Subscribe Date : $prodScrbDt")
+                Log.d("SktAddServiceFragment", "Product Name: $prodNm")
+                Log.d("SktAddServiceFragment", "Product Fee Amount: $prodFeeAmt")
+
+                Log.d("ProductLengths",
+                    "        Product ID Length: ${prodId.length}\n" +
+                            "                      Product Subscribe Date Length: ${prodScrbDt.length}\n" +
+                            "                      Product Name Length: ${prodNm.length}\n" +
+                            "                      Product Fee Amount Length: ${prodFeeAmt.length}\n")
+
+
+                //stringBuilder.append("가입일: $prodScrbDt\n")
+                stringBuilder.append("$prodNm\n\n")
+                stringBuilder.append("${displayProdFee.padStart(55)}\n\n\n\n")
+            }
+
+            txtFreeService.text = "${freeServiceCnt}건"
+            txtPaidService.text = "${paidServiceCnt}건"
+
+            //textView.text = stringBuilder.toString()
+
+            // Log to show the length of each parsed field
+            Log.d("ParsedData",
+                "            opClCd: ${opClCd.length}\n" +
+                        "                      opTypCd: ${opTypCd.length}\n" +
+                        "                      svcNum: ${svcNum.length}\n" +
+                        "                      svAcntNum: ${svAcntNum.length}\n" +
+                        "                      prodRecCnt: ${prodRecCnt}\n")
+        }
+    }
+
+
+
+
+
+
+
+
+    // SKT 당월 청구요금 조회 API
+    private fun SktFetchBillingDetail() {
         GlobalScope.launch(Dispatchers.IO) {
             try {
                 var currentResponse = ""
@@ -477,8 +614,6 @@ class MyInfoFragment : Fragment() {
                     "0"
                 }
             }
-
-
             for (i in 0 until billRecCnt) {
                 val BILL_ITM_LCL_NM = removeStrangeChars(consumeBytes(80).trim())
                 val BILL_ITM_SCL_NM = removeStrangeChars(consumeBytes(80).trim())
@@ -542,8 +677,8 @@ class MyInfoFragment : Fragment() {
 
 
 
-
-    private fun SktfetchDeductData(serviceAcct: String?, telecom: String?) {
+   // SKT 잔여량 조회 API
+    private fun SktFetchDeductData(serviceAcct: String?, telecom: String?) {
         GlobalScope.launch(Dispatchers.IO) {
             try {
                 val serviceAcct = viewModel.serviceAcct
@@ -805,6 +940,3 @@ class MyInfoFragment : Fragment() {
     }
 
 }
-
-
-

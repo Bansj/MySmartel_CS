@@ -24,7 +24,7 @@ class SktAddServiceFragment : Fragment() {
 
     private lateinit var phoneNumber: String
     private lateinit var svcNum: String
-    private lateinit var ifClCd: String
+    private lateinit var ifClCdR2: String
 
     lateinit var textView: TextView
 
@@ -55,17 +55,17 @@ class SktAddServiceFragment : Fragment() {
 
         phoneNumber = arguments?.getString("phoneNumber") ?: ""
         svcNum = phoneNumber // Assuming phoneNumber is the same as svcNum based on your description
-        ifClCd = "R2"
+        ifClCdR2 = "R2"
         textView = view.findViewById(R.id.textView)
 
         // Call the API to get service details
-        getServiceDetails()
+        SktFetchAddServiceDetail()
     }
 
-    private fun getServiceDetails() {
+    private fun SktFetchAddServiceDetail() {
         // Use viewLifecycleOwner.lifecycleScope instead of GlobalScope
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            val apiUrl = "https://www.mysmartel.com/api/sktGetInfo.php?svcNum=$svcNum&ifClCd=$ifClCd"
+            val apiUrl = "https://www.mysmartel.com/api/sktGetInfo.php?svcNum=$svcNum&ifClCd=$ifClCdR2"
             try {
                 val url = URL(apiUrl)
                 val connection = url.openConnection()
@@ -168,11 +168,6 @@ class SktAddServiceFragment : Fragment() {
                     "                      prodRecCnt: ${prodRecCnt}\n")
         }
     }
-
-
-
-
-
 
 
 }
