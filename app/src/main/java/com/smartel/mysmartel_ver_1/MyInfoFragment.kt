@@ -22,20 +22,24 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import com.bumptech.glide.Glide
 import com.example.mysmartel_ver_1.R
+import com.google.gson.Gson
 import kotlinx.coroutines.*
 import okhttp3.*
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedReader
+import java.io.IOException
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.charset.Charset
+import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
@@ -56,6 +60,8 @@ class MyInfoFragment : Fragment() {
     private lateinit var txt_refreshData: TextView
     private lateinit var btnRefresh: ImageButton
 
+
+    private lateinit var custName: String // Lgt 사용량, 청구요금조회, 부가서비스조회
     private lateinit var phoneNumber: String // Skt 사용량, 청구요금조회, 부가서비스 조회
 
     private lateinit var txtThisMonthBillDate: TextView
@@ -65,6 +71,8 @@ class MyInfoFragment : Fragment() {
 
     private lateinit var txtFreeService: TextView
     private lateinit var txtPaidService: TextView
+
+    private val handler = Handler(Looper.getMainLooper())
 
     // Obtain an instance of the ViewModel from the shared ViewModelStoreOwner
     private val viewModel: MyInfoViewModel by viewModels({ requireActivity() })
@@ -119,8 +127,6 @@ class MyInfoFragment : Fragment() {
         val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")?.also { viewModel.phoneNumber = it }
         val Telecom = viewModel.Telecom ?: arguments?.getString("Telecom")?.also { viewModel.Telecom = it }
         val serviceAcct = viewModel.serviceAcct ?: arguments?.getString("serviceAcct")?.also { viewModel.serviceAcct = it }
-
-
 
         // Get a reference to the layout_additionalServices view
         val layoutAdditionalServices = view.findViewById<View>(R.id.layout_additionalServices)
@@ -346,8 +352,8 @@ class MyInfoFragment : Fragment() {
             it.findNavController().navigate(R.id.action_myInfoFragment_to_settingFragment)
         }
 
-        this.phoneNumber = arguments?.getString("phoneNumber") ?: ""
-        svcNum = this.phoneNumber
+        /*this.phoneNumber = arguments?.getString("phoneNumber") ?: ""
+        svcNum = this.phoneNumber*/
 
         Log.d("getString?","phoneNumber: $phoneNumber")
         val ifClCd = "R5"
@@ -358,17 +364,210 @@ class MyInfoFragment : Fragment() {
 
         // Add click listener for btn_refresh button
         btnRefresh.setOnClickListener {
+
             val serviceAcct = arguments?.getString("serviceAcct")
             val telecom = arguments?.getString("Telecom")
-            // Get the phoneNumber value from MyInfoFragment
+            this.phoneNumber = arguments?.getString("phoneNumber") ?: ""
+            svcNum = this.phoneNumber
+            //this.custName = arguments?.getString("custName") ?: ""
 
-            SktFetchDeductData(serviceAcct, telecom)
-            SktFetchBillingDetail()
-            SktFetchAddServiceDetail()
+            when (telecom) {
+                "SKT" -> {
+                    SktFetchDeductData(serviceAcct, telecom)
+                    SktFetchBillingDetail()
+                    SktFetchAddServiceDetail()
+                }
+                "LGT" -> {
+                    LgtDeductFetchData()
+                }
+                "KT" -> {
+                    // Perform actions specific to KT
+                    // Replace these comments with the actual actions
+                }
+                else -> {
+                    // Handle cases where telecom value is not recognized
+                    // Replace these comments with the actual handling code
+                }
+            }
         }
         btnRefresh.performClick() // 화면 전환 완료시 자동으로 버튼 클릭되는 이벤트
+    }
+
+    private fun LgtDeductFetchData() {
+
+        val baseUrl = "https://www.mysmartel.com/api/"
+        val phoneNumber = viewModel.phoneNumber
+        val custName = viewModel.custName
+        val apiRequestUrl = "${baseUrl}lguDeductibleAmt.php?serviceNum=$phoneNumber&custNm=$custName"
+
+        // Create a TrustManager that trusts all certificates
+        val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
+            @Throws(CertificateException::class)
+            override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {
+                // No-op
+            }
+
+            @Throws(CertificateException::class)
+            override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {
+                // No-op
+            }
+
+            override fun getAcceptedIssuers(): Array<X509Certificate> {
+                return arrayOf()
+            }
+        })
+
+        // Create a HostnameVerifier that accepts all hostnames
+        val hostnameVerifier = HostnameVerifier { _, _ -> true }
+
+        // Create an SSLContext with the custom TrustManager
+        val sslContext = SSLContext.getInstance("TLS")
+        sslContext.init(null, trustAllCerts, null)
+
+        // Create an OkHttpClient that trusts all certificates and uses the custom SSLContext
+        val client = OkHttpClient.Builder()
+            .sslSocketFactory(sslContext.socketFactory, trustAllCerts[0] as X509TrustManager)
+            .hostnameVerifier(hostnameVerifier)
+            .build()
+
+        val request = Request.Builder()
+            .url(apiRequestUrl)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                // Handle error
+                Log.d("LgtDeductDetailViewFragment", "API request failed: ${e.message}")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    val responseData = response.body?.string()
+                    Log.d("LgtDeductDetailViewFragment", "API response data: $responseData")
+                    val gson = Gson()
+                    val apiResponse = gson.fromJson(responseData, LgtDedcutApiResponse::class.java)
+                    handler.post { LgtDeductupdateUI(apiResponse) }
+                } else {
+                    Log.d("LgtDeductDetailViewFragment", "API request failed: ${response.code}")
+                }
+            }
+        })
+    }
+
+    private fun LgtDeductupdateUI(apiResponse: LgtDedcutApiResponse) {
+        val remainInfoList = apiResponse.remainInfo ?: emptyList()
+        val resultCode = apiResponse.ResultCode
+
+        val txtRefreshCall = view?.findViewById<TextView>(R.id.txt_refreshCall)
+        val txtRefreshM = view?.findViewById<TextView>(R.id.txt_refreshM)
+        val txtRefreshData = view?.findViewById<TextView>(R.id.txt_refreshData)
+
+        // Print the ResultCode
+        Log.d("LgtDeductDetailView", "ResultCode: $resultCode")
+
+        // Create a StringBuilder to build the data string
+        val dataStringBuilder = StringBuilder()
+
+        var totalRemainData = 0.0
+        var displayCall = ""
+        var displayM = ""
+
+        val remainData = StringBuilder()
+        val remainCallStr = StringBuilder()
+
+        // Iterate over the RemainInfo list and append the values to the data string
+        for (remainInfo in remainInfoList) {
+            val svcNm = remainInfo.svcNm
+            val svcTypNm = remainInfo.svcTypNm
+            val svcUnitCd = remainInfo.svcUnitCd
+            val alloValue = remainInfo.alloValue
+            val useValue = remainInfo.useValue
+            val prodTypeCd = remainInfo.prodTypeCd
+
+            val modifiedSvcNm = svcNm.replace("[SMT]", "")
+
+            // Modify svcTypNm if it contains "패킷데이터" or "음성+영상"
+            val modifiedSvcTypNm = when {
+                svcTypNm.contains("패킷데이터") -> {
+                    svcTypNm.replace("패킷데이터", "데이터")
+                }
+                svcTypNm.contains("음성+영상") -> {
+                    svcTypNm.replace("음성+영상", "부가통화")
+                }
+                else -> {
+                    svcTypNm
+                }
+            }
+            // Append the values to the data string with proper formatting
+            dataStringBuilder.append("$modifiedSvcNm\t")
+            dataStringBuilder.append(" $modifiedSvcTypNm\n\n")
+            dataStringBuilder.appendLine().appendLine()
+
+            if (svcUnitCd.contains("초")) {
+                if (alloValue.contains("Z")) {
+                    dataStringBuilder.append("총제공량 ${"무제한".padStart(40)}\n\n")
+                    val useValueInMinutes = useValue.toDouble() / 60
+                    dataStringBuilder.append("사용량  ${useValueInMinutes.format(0).padStart(40)}분\n\n\n\n")
+                    dataStringBuilder.appendLine().appendLine()
+                } else {
+                    val alloValueInMinutes = alloValue.toDouble() / 60
+                    val useValueInMinutes = useValue.toDouble() / 60
+                    val remainValueMin = alloValueInMinutes - useValueInMinutes
+                    dataStringBuilder.append("총제공량 ${alloValueInMinutes.format(0).padStart(40)}분\n\n")
+                    dataStringBuilder.append("사용량  ${useValueInMinutes.format(0).padStart(40)}분\n\n")
+                    dataStringBuilder.append("잔여량    ${remainValueMin.format(0).padStart(40)}분\n\n\n\n")
+                    dataStringBuilder.appendLine().appendLine()
+                }
+            } else if (svcUnitCd.contains("건")) {
+                if (alloValue.contains("Z")) {
+                    dataStringBuilder.append("총제공량 ${"무제한".padStart(40)}\n\n")
+                    dataStringBuilder.append("사용량  ${useValue.padStart(40)}건\n\n\n\n")
+                    dataStringBuilder.appendLine().appendLine()
+                } else {
+                    dataStringBuilder.append("총제공량 ${alloValue.padStart(40)}건\n\n")
+                    dataStringBuilder.append("사용량  ${useValue.padStart(40)}건\n\n")
+                    val remainValue = alloValue.toInt() - useValue.toInt()
+                    dataStringBuilder.append("잔여량:    ${remainValue.toString().padStart(40)}건\n\n\n\n")
+                    dataStringBuilder.appendLine().appendLine()
+                }
+            } else if (svcTypNm.contains("패킷")) {
+                val alloValueInGB = alloValue.toDouble() / 1024 / 1024
+                val useValueInGB = useValue.toDouble() / 1024 / 1024
+                val remainValueInGB = alloValueInGB - useValueInGB
+
+                dataStringBuilder.append("총제공량 ${alloValueInGB.format(1).padStart(40)}GB\n")
+                dataStringBuilder.append("사용량  ${useValueInGB.format(1).padStart(40)}GB\n")
+                dataStringBuilder.append("$remainValueInGB")
+
+                dataStringBuilder.appendLine().appendLine()
+
+                totalRemainData += remainValueInGB.toDouble()
+            } else {
+                dataStringBuilder.append("총제공량: $alloValue\n\n")
+                dataStringBuilder.append("사용량:  $useValue\n\n\n\n")
+                dataStringBuilder.appendLine().appendLine()
+            }
+        }
+
+        remainData.append("${totalRemainData.format(1)}GB")
+        txtRefreshData?.text = remainData.toString()
+        Log.d("-----------------잔여량 ", "총합: $remainData -----------")
 
     }
+
+    // Extension function to format a Double value with the specified number of decimal places
+    private fun Double.format(decimalPlaces: Int): String {
+        return String.format("%.${decimalPlaces}f", this)
+    }
+
+
+
+
+
+
+
+
+
     // SKT 부가서비스 API 조회
     private fun SktFetchAddServiceDetail() {
         // Use viewLifecycleOwner.lifecycleScope instead of GlobalScope
@@ -885,8 +1084,8 @@ class MyInfoFragment : Fragment() {
         }
     }
 
-    // Helper function to convert the value to GB or handle non-numeric cases
-    private fun parseValueToGB(value: String): Double {
+
+    private fun parseValueToGB(value: String): Double {   // KB를 GB로 변환하는 함수
         return try {
             if (!value.contains("무제한")) {
                 val number = value.replace(",", "").toDouble() / (1024 * 1024) // 기존 코드에서 단위 변환을 유지합니다.
@@ -900,8 +1099,8 @@ class MyInfoFragment : Fragment() {
         }
     }
 
-    // Helper function to convert the value to minutes or handle non-numeric cases
-    private fun parseValueToMinutes(value: String): String {
+
+    private fun parseValueToMinutes(value: String): String {   // 분 단위로 고쳐주는 함수
         return try {
             if (!value.contains("무제한") && value.replace(",", "").toDoubleOrNull() != null) {
                 val number = value.replace(",", "").toDouble() / 60

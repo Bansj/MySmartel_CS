@@ -28,7 +28,7 @@ class LgtDeductDetailViewFragment : Fragment() {
 
     private lateinit var binding: FragmentLgtDeductDetailViewBinding
     private val phoneNumber: String by lazy { arguments?.getString("phoneNumber") ?: "" }
-    private val custNm: String by lazy { arguments?.getString("custName") ?: "" }
+    private val custName: String by lazy { arguments?.getString("custName") ?: "" }
     private lateinit var dataTextView: TextView
     private lateinit var downButton: ImageButton
 
@@ -48,7 +48,7 @@ class LgtDeductDetailViewFragment : Fragment() {
             animateFragmentOut(binding.root)
         }
 
-        fetchData()
+        LgtDeductfetchData()
 
         return binding.root
     }
@@ -59,9 +59,9 @@ class LgtDeductDetailViewFragment : Fragment() {
         transaction.commit()
     }
 
-    private fun fetchData() {
+    private fun LgtDeductfetchData() {
         val baseUrl = "https://www.mysmartel.com/api/"
-        val apiRequestUrl = "${baseUrl}lguDeductibleAmt.php?serviceNum=$phoneNumber&custNm=$custNm"
+        val apiRequestUrl = "${baseUrl}lguDeductibleAmt.php?serviceNum=$phoneNumber&custNm=$custName"
 
         // Create a TrustManager that trusts all certificates
         val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
@@ -109,7 +109,7 @@ class LgtDeductDetailViewFragment : Fragment() {
                     Log.d("LgtDeductDetailViewFragment", "API response data: $responseData")
                     val gson = Gson()
                     val apiResponse = gson.fromJson(responseData, LgtDedcutApiResponse::class.java)
-                    handler.post { updateUI(apiResponse) }
+                    handler.post { LgtDeductupdateUI(apiResponse) }
                 } else {
                     Log.d("LgtDeductDetailViewFragment", "API request failed: ${response.code}")
                 }
@@ -117,7 +117,7 @@ class LgtDeductDetailViewFragment : Fragment() {
         })
     }
 
-    private fun updateUI(apiResponse: LgtDedcutApiResponse) {
+    private fun LgtDeductupdateUI(apiResponse: LgtDedcutApiResponse) {
         val remainInfoList = apiResponse.remainInfo ?: emptyList()
         val resultCode = apiResponse.ResultCode
 

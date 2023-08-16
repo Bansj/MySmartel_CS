@@ -30,10 +30,7 @@ import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
 class LgtPaymentDetailFragment : Fragment() {
-    private lateinit var paymentMethodTextView: TextView
-    private lateinit var paymentDateTextView: TextView
-    private lateinit var paymentAmountTextView: TextView
-    private lateinit var paymentNameTextView: TextView
+
     private lateinit var containerLayout: LinearLayout
 
     private val baseUrl = "https://www.mysmartel.com/api/lguPayment.php"
