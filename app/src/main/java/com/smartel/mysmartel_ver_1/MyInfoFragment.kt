@@ -505,18 +505,24 @@ class MyInfoFragment : Fragment() {
 
             if (svcUnitCd.contains("초")) {
                 if (alloValue.contains("Z")) {
-                    dataStringBuilder.append("총제공량 ${"무제한".padStart(40)}\n\n")
+                    remainCallStr.append("총제공량 ${"무제한".padStart(40)}\n\n")
                     val useValueInMinutes = useValue.toDouble() / 60
-                    dataStringBuilder.append("사용량  ${useValueInMinutes.format(0).padStart(40)}분\n\n\n\n")
+                    remainCallStr.append("사용량  ${useValueInMinutes.format(0).padStart(40)}분\n\n\n\n")
                     dataStringBuilder.appendLine().appendLine()
+
+                    displayCall = "✆ ${useValueInMinutes.format(0)}분/무제한"
+
                 } else {
                     val alloValueInMinutes = alloValue.toDouble() / 60
                     val useValueInMinutes = useValue.toDouble() / 60
                     val remainValueMin = alloValueInMinutes - useValueInMinutes
-                    dataStringBuilder.append("총제공량 ${alloValueInMinutes.format(0).padStart(40)}분\n\n")
+                    remainCallStr.append("총제공량 ${alloValueInMinutes.format(0).padStart(40)}분\n\n")
                     dataStringBuilder.append("사용량  ${useValueInMinutes.format(0).padStart(40)}분\n\n")
-                    dataStringBuilder.append("잔여량    ${remainValueMin.format(0).padStart(40)}분\n\n\n\n")
+                    remainCallStr.append("잔여량    ${remainValueMin.format(0).padStart(40)}분\n\n\n\n")
                     dataStringBuilder.appendLine().appendLine()
+
+                    displayCall = "${remainValueMin}/${alloValueInMinutes}"
+
                 }
             } else if (svcUnitCd.contains("건")) {
                 if (alloValue.contains("Z")) {
@@ -552,6 +558,9 @@ class MyInfoFragment : Fragment() {
         remainData.append("${totalRemainData.format(1)}GB")
         txtRefreshData?.text = remainData.toString()
         Log.d("-----------------잔여량 ", "총합: $remainData -----------")
+
+        txtRefreshCall?.text = displayCall
+        Log.d("-----------------잔여량 ", "총합: $displayCall -----------")
 
     }
 
