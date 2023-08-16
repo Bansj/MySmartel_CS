@@ -3,10 +3,14 @@ package com.smartel.mysmartel_ver_1
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
+import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.StyleSpan
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -34,8 +38,10 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.charset.Charset
+import java.security.SecureRandom
 import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
+import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -379,6 +385,7 @@ class MyInfoFragment : Fragment() {
                 }
                 "LGT" -> {
                     LgtDeductFetchData()
+                    LgtBillFetchData(phoneNumber, custName)
                 }
                 "KT" -> {
                     // Perform actions specific to KT
@@ -392,6 +399,155 @@ class MyInfoFragment : Fragment() {
         }
         btnRefresh.performClick() // 화면 전환 완료시 자동으로 버튼 클릭되는 이벤트
     }
+
+    private fun LgtBillFetchData(phoneNumber: String?, custName: String?) {
+        val currentDate = SimpleDateFormat("yyyyMM", Locale.getDefault()).format(Date())
+        val baseUrl = "https://www.mysmartel.com/api/lguChargeDtl.php"
+
+        val url = "$baseUrl?serviceNum=$phoneNumber&custNm=$custName&billTrgtYymm=$currentDate"
+        val request = Request.Builder()
+            .url(url)
+            .build()
+
+        val client = createOkHttpClient()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e("LgtBillDetailFragment", "API Call Failed: ${e.message}")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val responseData = response.body?.string()
+                Log.d("LgtBillDetailFragment", "API Response Data: $responseData")
+
+                if (responseData.isNullOrEmpty()) {
+                    Log.e("LgtBillDetailFragment", "Empty or null API response.")
+                    return
+                }
+
+                try {
+                    val apiResponse = Gson().fromJson(responseData, LgtBillApiResponse::class.java)
+                    if (apiResponse.billInfo.isNullOrEmpty()) {
+                        Log.e("LgtBillDetailFragment", "Bill Info is null or empty in API response.")
+                        return
+                    }
+
+                    activity?.runOnUiThread {
+                        updateUI(apiResponse)
+                    }
+                } catch (e: Exception) {
+                    Log.e("LgtBillDetailFragment", "Failed to parse API response: ${e.message}")
+                }
+            }
+        })
+    }
+
+    private fun handleApiCallFailure(errorMessage: String?) {
+        Log.e("LgtBillDetailFragment", "API Call Failed: $errorMessage")
+    }
+
+    private fun handleApiResponse(responseData: String?) {
+        if (responseData.isNullOrEmpty()) {
+            Log.e("LgtBillDetailFragment", "Empty or null API response.")
+            return
+        }
+
+        try {
+            val apiResponse = Gson().fromJson(responseData, LgtBillApiResponse::class.java)
+            if (apiResponse.billInfo.isNullOrEmpty()) {
+                Log.e("LgtBillDetailFragment", "Bill Info is null or empty in API response.")
+                return
+            }
+
+            activity?.runOnUiThread {
+                updateUI(apiResponse)
+            }
+        } catch (e: Exception) {
+            Log.e("LgtBillDetailFragment", "Failed to parse API response: ${e.message}")
+        }
+    }
+
+    private fun createOkHttpClient(): OkHttpClient {
+        // Create a trust manager that trusts all certificates
+        val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
+            override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {
+                // No implementation needed
+            }
+
+            override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {
+                // No implementation needed
+            }
+
+            override fun getAcceptedIssuers(): Array<X509Certificate> {
+                return arrayOf()
+            }
+        })
+
+        // Create a SSL context with the trust manager
+        val sslContext = SSLContext.getInstance("SSL")
+        sslContext.init(null, trustAllCerts, SecureRandom())
+
+        // Create a hostname verifier that bypasses all hostnames
+        val hostnameVerifier = HostnameVerifier { _, _ -> true }
+
+        // Create the OkHttpClient with the custom SSL socket factory and hostname verifier
+        return OkHttpClient.Builder()
+            .sslSocketFactory(sslContext.socketFactory, trustAllCerts[0] as X509TrustManager)
+            .hostnameVerifier(hostnameVerifier)
+            .build()
+    }
+    private fun updateUI(apiResponse: LgtBillApiResponse) {
+        if (apiResponse.billInfo.isNullOrEmpty()) {
+            Log.e("LgtBillDetailFragment", "Bill Info is null or empty in API response.")
+            return
+        }
+
+        val billInfoList = apiResponse.billInfo
+        var totalAmount: String? = null
+
+        val sb = StringBuilder()
+        val numberFormat = NumberFormat.getNumberInstance(Locale.getDefault()) as DecimalFormat
+        numberFormat.applyPattern("#,###")
+
+        for (billInfo in billInfoList) {
+            sb.append(String.format("\n%-60s\n\n", billInfo.blItemNm)) // Left align blItemNm column with 20 characters
+
+            if (billInfo.blItemNm.contains("총 납부하실 금액", ignoreCase = true)) {
+                val formattedAmount = numberFormat.format(billInfo.billAmt.toLong())
+                totalAmount = "${formattedAmount}원"
+                sb.append(String.format("%60s", totalAmount)) // Right align totalAmount value with padding
+            } else {
+                val formattedBillAmt = numberFormat.format(billInfo.billAmt.toLong())
+
+                // Create a SpannableString with bold style for billAmt
+                val spannableString = SpannableString("${formattedBillAmt}원")
+                spannableString.setSpan(StyleSpan(Typeface.BOLD), 0, spannableString.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+                sb.append(String.format("%64s", spannableString)) // Right align billAmt value with padding
+            }
+            sb.append("\n\n\n")
+        }
+
+        activity?.runOnUiThread {
+
+            val formattedDate = SimpleDateFormat("yyyy년 MM월", Locale.getDefault()).format(Date())
+
+            txtThisMonthBillDate.text = "$formattedDate"
+            // Set totalAmount in txt_sumAmount
+            if (totalAmount != null) {
+                sumAmount.text = "${totalAmount}"
+            } else {
+                // Handle the case when "Total amount to be paid" is not present
+                // You can set the txt_sumAmount to a default value or hide it if desired.
+            }
+        }
+    }
+
+
+
+
+
+
+
 
     private fun LgtDeductFetchData() {
 
@@ -526,15 +682,20 @@ class MyInfoFragment : Fragment() {
                 }
             } else if (svcUnitCd.contains("건")) {
                 if (alloValue.contains("Z")) {
-                    dataStringBuilder.append("총제공량 ${"무제한".padStart(40)}\n\n")
-                    dataStringBuilder.append("사용량  ${useValue.padStart(40)}건\n\n\n\n")
+                    dataStringBuilder.append("총제공량 ${"무제한"}\n\n")
+                    dataStringBuilder.append("사용량  ${useValue}건\n\n\n\n")
                     dataStringBuilder.appendLine().appendLine()
+
+                    displayM = "✉︎ ${useValue}건/무제한"
+
                 } else {
-                    dataStringBuilder.append("총제공량 ${alloValue.padStart(40)}건\n\n")
-                    dataStringBuilder.append("사용량  ${useValue.padStart(40)}건\n\n")
+                    dataStringBuilder.append("총제공량 ${alloValue}건\n\n")
+                    dataStringBuilder.append("사용량  ${useValue}건\n\n")
                     val remainValue = alloValue.toInt() - useValue.toInt()
-                    dataStringBuilder.append("잔여량:    ${remainValue.toString().padStart(40)}건\n\n\n\n")
+                    dataStringBuilder.append("잔여량:    ${remainValue.toString()}건\n\n\n\n")
                     dataStringBuilder.appendLine().appendLine()
+
+                    displayM = "✉︎ ${remainValue}건/${alloValue}건"
                 }
             } else if (svcTypNm.contains("패킷")) {
                 val alloValueInGB = alloValue.toDouble() / 1024 / 1024
@@ -561,6 +722,9 @@ class MyInfoFragment : Fragment() {
 
         txtRefreshCall?.text = displayCall
         Log.d("-----------------잔여량 ", "총합: $displayCall -----------")
+
+        txtRefreshM?.text = displayM
+        Log.d("-----------------잔여량 ", "총합: $displayM -----------")
 
     }
 
