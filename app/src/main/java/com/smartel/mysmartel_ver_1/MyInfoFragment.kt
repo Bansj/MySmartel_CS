@@ -388,7 +388,7 @@ class MyInfoFragment : Fragment() {
                 }
                 "KT" -> {
                     KtFetchDeductApiData()
-                    //KtFetchBillData()
+                    KtFetchBillData()
                 }
                 else -> {
                     // Handle cases where telecom value is not recognized
@@ -460,9 +460,10 @@ class MyInfoFragment : Fragment() {
     }
 
     private fun setDataToTextViews(bodyData: Body) {
-        txtThisMonthBillDate.text = "당월 ${bodyData.dateView}"
+        val formattedDate = SimpleDateFormat("yyyy년 MM월", Locale.getDefault()).format(Date())
+        txtThisMonthBillDate.text = "${formattedDate}"
 
-        Log.d("---------당월", "${bodyData.dateView}")
+        Log.d("---------MyInfoFragment----- 당월", "${bodyData.dateView}")
 
         val detListDtoText = StringBuilder()
         val sumAmountList = mutableListOf<String>()
@@ -479,7 +480,7 @@ class MyInfoFragment : Fragment() {
             detListDtoText.append(String.format("\n%66s", "${amount}원\n"))
 
             if (description.contains("납부하실 금액", ignoreCase = true)) {
-                sumAmountList.add("총 ${amount}원")
+                sumAmountList.add("${amount}원")
             }
         }
 
@@ -488,7 +489,7 @@ class MyInfoFragment : Fragment() {
             val sumAmount = sumAmountList.joinToString(separator = "\n")
             txtSumAmount.text = sumAmount
 
-            Log.d("-----------청구금액 합계", "$sumAmount")
+            Log.d("-----------MyInfoFragment----- 청구금액 합계", "$sumAmount")
         }
 
         Log.d(TAG, "Data set to TextViews: \n bodyData=$bodyData\n, \n detListDtoText=$detListDtoText \n")

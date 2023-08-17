@@ -133,6 +133,8 @@ class KtBillDetailFragment : Fragment() {
         textViewDateView.text = "당월 ${bodyData.dateView}"
         textViewDateView.gravity = Gravity.START
 
+        Log.d("---------당월", "${bodyData.dateView}")
+
         val screenWidth = Resources.getSystem().displayMetrics.widthPixels
 
         val detListDtoText = StringBuilder()
@@ -150,7 +152,7 @@ class KtBillDetailFragment : Fragment() {
             detListDtoText.append(String.format("\n%66s", "${amount}원\n"))
 
             if (description.contains("납부하실 금액", ignoreCase = true)) {
-                sumAmountList.add("\n총 ${amount}원")
+                sumAmountList.add("총 ${amount}원")
             }
         }
 
@@ -160,6 +162,8 @@ class KtBillDetailFragment : Fragment() {
         if (sumAmountList.isNotEmpty()) {
             val sumAmount = sumAmountList.joinToString(separator = "\n")
             txt_sumAmount.text = sumAmount
+
+            Log.d("-----------청구금액 합계", "$sumAmount")
 
             //txt_sumAmount2.text = sumAmount
             //txt_sumAmount2.gravity = Gravity.END
