@@ -148,12 +148,6 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
         })
 
     }
-
-    private fun calculateDataValue(value: String): Double {
-        val floatValue = value.toFloatOrNull()
-        return floatValue?.times(0.5)?.div(1024)?.div(1024) ?: 0.0
-    }
-
     private fun createRequestBody(phoneNumber: String): String {
         val requestBody = HashMap<String, List<HashMap<String, String>>>()
         val headerData = HashMap<String, String>()
@@ -261,28 +255,3 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
         }
     }
 }
-
-
-
-/*    private fun checkAndSendDataToMyInfoFragment(totaluseTimeList: List<KtDeductApiResponse.BodyData.TotaluseTimeDtoData>) {
-        for (totaluseTime in totaluseTimeList) {
-            val strSvcName = totaluseTime.strSvcName
-            val strFreeMinUse = totaluseTime.strFreeMinReMain
-
-            if (strSvcName.contains("데이터-합계")) {
-                val convertedValue = calculateDataValue(strFreeMinUse)
-                val formattedValue = String.format("%.2f GB", convertedValue)
-
-                val myInfoFragment = MyInfoFragment()
-                val args = Bundle()
-                args.putString("KtFreeMinRemain", formattedValue)
-                myInfoFragment.arguments = args
-
-                val fragmentManager = requireActivity().supportFragmentManager
-                fragmentManager.beginTransaction()
-                    .add(R.id.myInfoFragment, myInfoFragment)
-                    .commit()
-                break // Exit the loop after finding the matching value
-            }
-        }
-    }*/

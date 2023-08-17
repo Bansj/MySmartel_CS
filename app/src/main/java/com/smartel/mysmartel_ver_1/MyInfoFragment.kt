@@ -3,6 +3,7 @@ package com.smartel.mysmartel_ver_1
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
@@ -30,6 +31,7 @@ import com.example.mysmartel_ver_1.R
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
@@ -73,7 +75,7 @@ class MyInfoFragment : Fragment() {
     private lateinit var phoneNumber: String // Skt 사용량, 청구요금조회, 부가서비스 조회
 
     private lateinit var txtThisMonthBillDate: TextView
-    private lateinit var sumAmount: TextView
+    private lateinit var txtSumAmount: TextView
 
     private lateinit var svcNum: String
 
@@ -115,7 +117,7 @@ class MyInfoFragment : Fragment() {
         txtPhoneNumber = view.findViewById(R.id.txt_phoneNumber)
         txtTelecom = view.findViewById(R.id.txt_telecom)
 
-        sumAmount = view.findViewById(R.id.txt_thisMonthBill)
+        txtSumAmount = view.findViewById(R.id.txt_thisMonthBill)
         txtThisMonthBillDate =view.findViewById(R.id.txt_thisMonthBillDate)
 
         txtFreeService = view.findViewById(R.id.txt_freeService)
@@ -360,9 +362,6 @@ class MyInfoFragment : Fragment() {
             it.findNavController().navigate(R.id.action_myInfoFragment_to_settingFragment)
         }
 
-        /*this.phoneNumber = arguments?.getString("phoneNumber") ?: ""
-        svcNum = this.phoneNumber*/
-
         Log.d("getString?","phoneNumber: $phoneNumber")
 
         txt_refreshData = view.findViewById(R.id.txt_refreshData)
@@ -389,6 +388,7 @@ class MyInfoFragment : Fragment() {
                 }
                 "KT" -> {
                     KtFetchDeductApiData()
+                    //KtFetchBillData()
                 }
                 else -> {
                     // Handle cases where telecom value is not recognized
@@ -398,6 +398,118 @@ class MyInfoFragment : Fragment() {
         }
         btnRefresh.performClick() // 화면 전환 완료시 자동으로 버튼 클릭되는 이벤트
     }
+
+    private fun KtFetchBillData() {
+        val phoneNumber = arguments?.getString("phoneNumber") ?: ""
+        val apiUrl = "https://kt-self.smartelmobile.com/common/api/selfcare/selfcareAPIServer.aspx"
+
+        val requestBody = createBillRequestBody(phoneNumber)
+        val request = Request.Builder()
+            .url(apiUrl)
+            .post(requestBody)
+            .build()
+
+        val client = OkHttpClient()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e(TAG, "API request failed: ${e.message}")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val responseData = response.body?.string()
+                Log.d(TAG, "API response: $responseData")
+
+                val apiResponse = Gson().fromJson(responseData, KtBillApiResponse::class.java)
+
+                val bodyData = apiResponse.body.firstOrNull()
+
+                bodyData?.let {
+                    requireActivity().runOnUiThread {
+                        setDataToTextViews(it)
+                        //checkAndSendDataToMyInfoFragment()
+                    }
+                }
+            }
+        })
+    }
+    private fun createBillRequestBody(phoneNumber: String): RequestBody {  //Requerst body만들어 발신하기
+        val requestBody = HashMap<String, List<HashMap<String, String>>>()
+        val headerData = HashMap<String, String>()
+        val bodyData = HashMap<String, String>()
+
+        headerData["type"] = "X16"
+        bodyData["traceno"] = ""
+        bodyData["custId"] = ""
+        bodyData["ncn"] = ""
+        bodyData["ctn"] = phoneNumber
+        bodyData["clientIp"] = ""
+        bodyData["userId"] = ""
+        bodyData["billSeqNo"] = "0"
+        bodyData["billDueDateList"] = getCurrentYearMonth()
+        bodyData["billMonth"] = getCurrentYearMonth()
+        bodyData["billStartDate"] = "19990909"
+        bodyData["billEndDate"] = "19990909"
+
+        requestBody["header"] = listOf(headerData)
+        requestBody["body"] = listOf(bodyData)
+
+        val gson = Gson()
+        val jsonRequestBody = gson.toJson(requestBody)
+
+        return jsonRequestBody.toRequestBody(MEDIA_TYPE_JSON)
+    }
+
+    private fun setDataToTextViews(bodyData: Body) {
+        txtThisMonthBillDate.text = "당월 ${bodyData.dateView}"
+
+        Log.d("---------당월", "${bodyData.dateView}")
+
+        val detListDtoText = StringBuilder()
+        val sumAmountList = mutableListOf<String>()
+
+        val numberFormat = NumberFormat.getNumberInstance(Locale.getDefault())
+
+        bodyData.detListDto.forEach { detListDtoData ->
+            val description = detListDtoData.splitDescription
+            val amount = numberFormat.format(detListDtoData.actvAmt.toLong())
+
+            detListDtoText.append("\n\n")
+            detListDtoText.append(description)
+            detListDtoText.append("\n")
+            detListDtoText.append(String.format("\n%66s", "${amount}원\n"))
+
+            if (description.contains("납부하실 금액", ignoreCase = true)) {
+                sumAmountList.add("총 ${amount}원")
+            }
+        }
+
+        /// Set the sumAmountList values to txt_sumAmount
+        if (sumAmountList.isNotEmpty()) {
+            val sumAmount = sumAmountList.joinToString(separator = "\n")
+            txtSumAmount.text = sumAmount
+
+            Log.d("-----------청구금액 합계", "$sumAmount")
+        }
+
+        Log.d(TAG, "Data set to TextViews: \n bodyData=$bodyData\n, \n detListDtoText=$detListDtoText \n")
+    }
+    private fun getCurrentYearMonth(): String {
+        val currentDate = Calendar.getInstance().time
+        val yearMonthFormat = SimpleDateFormat("yyyyMM", Locale.getDefault())
+        return yearMonthFormat.format(currentDate)
+    }
+    companion object {
+        private const val TAG = "KtBillDetailFragment"
+        private val MEDIA_TYPE_JSON = "application/json; charset=utf-8".toMediaType()
+    }
+
+
+
+
+
+
+
+
 
     // KT 사용량 API 조회
     private fun KtFetchDeductApiData() {
@@ -446,16 +558,9 @@ class MyInfoFragment : Fragment() {
                         Log.e(TAG, "Error updating UI: ${e.message}")
                     }
                 }
-
             }
 
         })
-
-    }
-
-    private fun calculateDataValue(value: String): Double {
-        val floatValue = value.toFloatOrNull()
-        return floatValue?.times(0.5)?.div(1024)?.div(1024) ?: 0.0
     }
 
     private fun createRequestBody(phoneNumber: String): String {
@@ -519,7 +624,7 @@ class MyInfoFragment : Fragment() {
 
                 //displayCall = "✆ $strFreeMinReMain / $strFreeMinTotal"
             }
-            else if (strSvcName == "음성" || strSvcName == "음성/영") {
+            else if (strSvcName == "음성" || strSvcName == "음성/영상") {
                 val minutesUse = strFreeMinUse.toIntOrNull() ?: 0
                 val minutesRemain = strFreeMinReMain.toIntOrNull() ?: 0
                 strFreeMinReMain = "${minutesRemain /60}분" // Hide strFreeMinReMain
@@ -538,7 +643,6 @@ class MyInfoFragment : Fragment() {
                 }
 
             }
-
             else if (strSvcName.contains("부가")) {
                 val minutesTotal = strFreeMinTotal.toIntOrNull() ?: 0
                 val minutesRemain = strFreeMinReMain.toIntOrNull() ?: 0
@@ -755,7 +859,7 @@ class MyInfoFragment : Fragment() {
             txtThisMonthBillDate.text = "$formattedDate"
             // Set totalAmount in txt_sumAmount
             if (totalAmount != null) {
-                sumAmount.text = "${totalAmount}"
+                txtSumAmount.text = "${totalAmount}"
             } else {
                 // Handle the case when "Total amount to be paid" is not present
                 // You can set the txt_sumAmount to a default value or hide it if desired.
@@ -1249,9 +1353,7 @@ class MyInfoFragment : Fragment() {
 
             txtThisMonthBillDate.text = stringBuilderDate.toString()
 
-            sumAmount.text = "${formatNumber(TOT_INV_AMT.trimStart('0'))}원"
-
-            sumAmount.gravity = Gravity.END
+            txtSumAmount.text = "${formatNumber(TOT_INV_AMT.trimStart('0'))}원"
 
 
             // Log to show the length of each parsed field

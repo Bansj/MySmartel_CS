@@ -6,6 +6,7 @@ import android.util.DisplayMetrics
 import com.example.mysmartel_ver_1.R
 
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -34,6 +35,7 @@ class KtBillDetailFragment : Fragment() {
     private lateinit var textViewDetListDto: TextView
 
     private lateinit var txt_sumAmount: TextView
+    private lateinit var txt_sumAmount2: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -64,6 +66,7 @@ class KtBillDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         fetchBillData()
         txt_sumAmount = view.findViewById(R.id.txt_sumAmount)
+        txt_sumAmount2 = view.findViewById(R.id.txt_sumAmount2)
     }
 
     private fun fetchBillData() {
@@ -128,6 +131,7 @@ class KtBillDetailFragment : Fragment() {
 
     private fun setDataToTextViews(bodyData: Body) {
         textViewDateView.text = "당월 ${bodyData.dateView}"
+        textViewDateView.gravity = Gravity.START
 
         val screenWidth = Resources.getSystem().displayMetrics.widthPixels
 
@@ -142,11 +146,11 @@ class KtBillDetailFragment : Fragment() {
 
             detListDtoText.append("\n\n")
             detListDtoText.append(description)
-            detListDtoText.append("\n")
+            detListDtoText.append("\n\n")
             detListDtoText.append(String.format("\n%66s", "${amount}원\n"))
 
             if (description.contains("납부하실 금액", ignoreCase = true)) {
-                sumAmountList.add("총 ${amount}원")
+                sumAmountList.add("\n총 ${amount}원")
             }
         }
 
@@ -156,6 +160,9 @@ class KtBillDetailFragment : Fragment() {
         if (sumAmountList.isNotEmpty()) {
             val sumAmount = sumAmountList.joinToString(separator = "\n")
             txt_sumAmount.text = sumAmount
+
+            //txt_sumAmount2.text = sumAmount
+            //txt_sumAmount2.gravity = Gravity.END
         }
 
         Log.d(TAG, "Data set to TextViews: \n bodyData=$bodyData\n, \n detListDtoText=$detListDtoText \n")
