@@ -525,7 +525,7 @@ class MyInfoFragment : Fragment() {
 
 
 
-    private fun KtFetchDeductApiData() {  // KT 사용량 API 조회
+    private fun KtFetchDeductApiData() {  // KT 잔여량 API 조회
         val phoneNumber = arguments?.getString("phoneNumber") ?: ""
         val apiUrl = "https://kt-self.smartelmobile.com/common/api/selfcare/selfcareAPIServer.aspx"
 
@@ -1556,10 +1556,31 @@ class MyInfoFragment : Fragment() {
         val txtRefreshCall = view?.findViewById<TextView>(R.id.txt_refreshCall)
         val txtRefreshM = view?.findViewById<TextView>(R.id.txt_refreshM)
         val txtRefreshData = view?.findViewById<TextView>(R.id.txt_refreshData)
+        val txtRefreshDataTotal = view?.findViewById<TextView>(R.id.txt_totalData)
+        val pgBarTotalData = view?.findViewById<ProgressBar>(R.id.pgBar_leftData)
+
+        // 프로그레스바 커스텀
+        fun updateProgressBar(total: Double, remain: Double, durationInMillis:Long = 1000) {
+            val progressPercent = (remain / total) * 100
+            val animation = ObjectAnimator.ofInt(pgBarTotalData,"progress",
+                pgBarTotalData!!.progress,progressPercent.toInt())
+
+            // 애니메이션 지속시간 설정
+            animation.duration = durationInMillis
+
+            // 애니메이션 인터폴레이터 설정 (선택 사항)
+            val decelerateInterpolator: TimeInterpolator = DecelerateInterpolator()
+            animation.interpolator = decelerateInterpolator
+
+            // 애니메이션 시작
+            animation.start()
+            //pgBarTotalData.progress = progressPercent.toInt()
+        }
 
         if (apiResponse.remainInfo.isNotEmpty()) {
             val remainInfoStr = StringBuilder()
             var totalRemQtyData: Double = 0.0
+            var totalDataQty: Double = 0.0
             var displayCall = ""
             var displayM = ""
 
@@ -1587,7 +1608,11 @@ class MyInfoFragment : Fragment() {
                     remainInfoStr.append("잔여량".padEnd(1) + "%.1fGB".format(remQtyGB) + "\n\n\n\n")
 
                     // Add remQty to totalRemQtyData
-                    totalRemQtyData += remQtyGB.toDouble()
+                    totalDataQty += totalQtyGB.toDouble() // 총제공량 총합
+                    totalRemQtyData += remQtyGB.toDouble() // 잔여량 총합
+
+                    updateProgressBar(totalDataQty, totalRemQtyData)
+                    Log.d("-------------progressBar","${updateProgressBar(totalDataQty, totalRemQtyData)}-----------")
                 }
                 else if (displayName.contains("음성") || displayName.contains("전화")) {
                     // Handle the case where the values are "음성" or "전화"
@@ -1601,9 +1626,9 @@ class MyInfoFragment : Fragment() {
                     remainCallstr.append("$remQtyMin") // 통화 잔여량 표출
 
                     if (displayName.contains("부가")) {
-                        displayCall = "✆ 무제한/무제한"
+                        displayCall = "✆ 무제한 / 무제한"
                     } else {
-                        displayCall = "✆ $remQtyMin/$totalQtyMin"
+                        displayCall = "✆ $remQtyMin / $totalQtyMin"
                     }
 
                     Log.d("displayCall","$displayCall")
@@ -1616,7 +1641,7 @@ class MyInfoFragment : Fragment() {
                     remainInfoStr.append("사용량".padEnd(1) + "${remainInfo.useQty}\n\n")
                     remainInfoStr.append("${remainInfo.remQty}원\n\n\n\n") // 잔여량
 
-                    displayM = " ✉︎ ${remainInfo.remQty}원/${remainInfo.totalQty}원"
+                    displayM = " ✉︎ ${remainInfo.remQty}원 / ${remainInfo.totalQty}원"
                 }
                 else {
                     // Default case for other freePlanName values
@@ -1625,14 +1650,15 @@ class MyInfoFragment : Fragment() {
                     remainInfoStr.append("사용량".padEnd(1) + "${remainInfo.useQty}\n\n")
                     remainInfoStr.append("${remainInfo.remQty}\n\n\n\n") // 잔여량
 
-                    displayM = "✉︎ ${remainInfo.remQty}/${remainInfo.totalQty}"
+                    displayM = "✉︎ ${remainInfo.remQty} / ${remainInfo.totalQty}"
                 }
             }
             remainInfoTextView?.text = remainInfoStr.toString()
             remainInfoTextView!!.gravity = Gravity.CENTER
 
             // Set the value of totalRemQtyData to txtRefreshData
-            txtRefreshData?.text = "%.1fGB".format(totalRemQtyData)
+            txtRefreshData?.text = "%.1fGB".format(totalRemQtyData) // 잔여량 총합
+            txtRefreshDataTotal?.text = "%.1fGB".format(totalDataQty) // 총제공량 총합
 
             txtRefreshCall?.text = displayCall
             Log.d("txt통화량", "$remainCallstr")
@@ -1671,10 +1697,6 @@ class MyInfoFragment : Fragment() {
             value
         }
     }
-
-
-
-
 
 
     override fun onDestroyView() {
