@@ -10,6 +10,7 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Spannable
 import android.text.SpannableString
+import android.text.style.AbsoluteSizeSpan
 import android.text.style.StyleSpan
 import android.util.Log
 import android.view.Gravity
@@ -29,6 +30,7 @@ import com.example.mysmartel_ver_1.R
 import com.google.gson.Gson
 import kotlinx.coroutines.*
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
@@ -362,8 +364,6 @@ class MyInfoFragment : Fragment() {
         svcNum = this.phoneNumber*/
 
         Log.d("getString?","phoneNumber: $phoneNumber")
-        val ifClCd = "R5"
-
 
         txt_refreshData = view.findViewById(R.id.txt_refreshData)
         btnRefresh = view.findViewById(R.id.btn_refresh)
@@ -388,8 +388,7 @@ class MyInfoFragment : Fragment() {
                     LgtBillFetchData(phoneNumber, custName)
                 }
                 "KT" -> {
-                    // Perform actions specific to KT
-                    // Replace these comments with the actual actions
+                    KtFetchDeductApiData()
                 }
                 else -> {
                     // Handle cases where telecom value is not recognized
@@ -400,6 +399,228 @@ class MyInfoFragment : Fragment() {
         btnRefresh.performClick() // 화면 전환 완료시 자동으로 버튼 클릭되는 이벤트
     }
 
+    // KT 사용량 API 조회
+    private fun KtFetchDeductApiData() {
+        val phoneNumber = arguments?.getString("phoneNumber") ?: ""
+        val apiUrl = "https://kt-self.smartelmobile.com/common/api/selfcare/selfcareAPIServer.aspx"
+
+        val requestBody = RequestBody.create(
+            "application/json; charset=utf-8".toMediaTypeOrNull(),
+            createRequestBody(phoneNumber)
+        )
+        val request = Request.Builder()
+            .url(apiUrl)
+            .post(requestBody)
+            .build()
+
+        val client = OkHttpClient()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e(TAG, "API request failed: ${e.message}")
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val responseData = response.body?.string()
+                Log.d(TAG, "API response: $responseData")
+
+                val apiResponse = Gson().fromJson(responseData, KtDeductApiResponse::class.java)
+
+                val totaluseTimeList = mutableListOf<KtDeductApiResponse.BodyData.TotaluseTimeDtoData>()
+                val voiceCallDetailList = mutableListOf<KtDeductApiResponse.BodyData.VoiceCallDetailDtoData>()
+                val voiceCallDetailTotList = mutableListOf<KtDeductApiResponse.BodyData.VoiceCallDetailTotDtoData>()
+                val totUseTimeCntList = mutableListOf<KtDeductApiResponse.BodyData.TotUseTimeCntDtoData>()
+                val totUseTimeCntTotList = mutableListOf<KtDeductApiResponse.BodyData.TotUseTimeCntTotDtoData>()
+
+                apiResponse.body?.forEach { bodyData ->
+                    bodyData.totaluseTimeDto?.let { totaluseTimeList.addAll(it) }
+                    bodyData.voiceCallDetailDto?.let { voiceCallDetailList.addAll(it) }
+                    bodyData.voiceCallDetailTotDto?.let { voiceCallDetailTotList.addAll(it) }
+                    bodyData.totUseTimeCntDto?.let { totUseTimeCntList.addAll(it) }
+                    bodyData.totUseTimeCntTotDto?.let { totUseTimeCntTotList.addAll(it) }
+                }
+                requireActivity().runOnUiThread {
+                    try {
+                        setDataToTextViews(totaluseTimeList)
+                        //checkAndSendDataToMyInfoFragment(totaluseTimeList)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error updating UI: ${e.message}")
+                    }
+                }
+
+            }
+
+        })
+
+    }
+
+    private fun calculateDataValue(value: String): Double {
+        val floatValue = value.toFloatOrNull()
+        return floatValue?.times(0.5)?.div(1024)?.div(1024) ?: 0.0
+    }
+
+    private fun createRequestBody(phoneNumber: String): String {
+        val requestBody = HashMap<String, List<HashMap<String, String>>>()
+        val headerData = HashMap<String, String>()
+        val bodyData = HashMap<String, String>()
+
+        headerData["type"] = "X12"
+        bodyData["traceno"] = ""
+        bodyData["custId"] = ""
+        bodyData["ncn"] = ""
+        bodyData["ctn"] = phoneNumber
+        bodyData["clientIp"] = ""
+        bodyData["userId"] = ""
+        bodyData["useMonth"] = ""
+
+        requestBody["header"] = listOf(headerData)
+        requestBody["body"] = listOf(bodyData)
+
+        return Gson().toJson(requestBody)
+    }
+
+    private fun setDataToTextViews(totaluseTimeList: List<KtDeductApiResponse.BodyData.TotaluseTimeDtoData>) {
+
+        val txtRefreshCall = view?.findViewById<TextView>(R.id.txt_refreshCall)
+        val txtRefreshM = view?.findViewById<TextView>(R.id.txt_refreshM)
+        val txtRefreshData = view?.findViewById<TextView>(R.id.txt_refreshData)
+
+        val totalUseTimeStringBuilder = StringBuilder()
+        var totalStrFreeMinRemain: Double = 0.0
+        var displayCall = ""
+        var displayM = ""
+
+        val strFreeMinRemainCall = StringBuilder()
+
+        totaluseTimeList.forEach { totaluseTime ->
+            val strSvcName = totaluseTime.strSvcName
+            var strFreeMinTotal = formatValue(totaluseTime.strFreeMinTotal)
+            var strFreeMinReMain = formatValue(totaluseTime.strFreeMinReMain)
+            var strFreeMinUse = formatValue(totaluseTime.strFreeMinUse)
+
+            // 'strFreeMinReMain' 값을 합산하기 위해 조건에 맞게 더합니다.
+            if (strSvcName.contains("데이터")) {
+                val floatValue = strFreeMinReMain.toFloatOrNull()
+                if (floatValue != null) {
+                    totalStrFreeMinRemain += floatValue * 0.5 / (1024 * 1024)
+                }
+            } else if (strSvcName.contains("속도제어")) {
+                val floatValue = strFreeMinReMain.toFloatOrNull()
+                if (floatValue != null) {
+                    totalStrFreeMinRemain += floatValue
+                }
+            }
+            else if (strSvcName =="영상/부가") {
+                val minutesTotal = strFreeMinTotal.toIntOrNull() ?: 0
+                val minutesRemain = strFreeMinReMain.toIntOrNull() ?: 0
+                val minutesUse = strFreeMinUse.toIntOrNull() ?: 0
+                strFreeMinTotal = "${minutesTotal / 60}분"
+                strFreeMinReMain = "${minutesRemain / 60}분"
+                strFreeMinUse = "${minutesUse / 60}분"
+
+                //displayCall = "✆ $strFreeMinReMain / $strFreeMinTotal"
+            }
+            else if (strSvcName == "음성" || strSvcName == "음성/영") {
+                val minutesUse = strFreeMinUse.toIntOrNull() ?: 0
+                val minutesRemain = strFreeMinReMain.toIntOrNull() ?: 0
+                strFreeMinReMain = "${minutesRemain /60}분" // Hide strFreeMinReMain
+                strFreeMinUse = "${minutesUse / 60}분"
+
+                // Check if strFreeMinTotal is not "무제한" and is numeric
+                if (strFreeMinTotal != "무제한") {
+                    val minutesTotal = strFreeMinTotal.toIntOrNull() ?: 0
+                    strFreeMinTotal = "${minutesTotal / 60}분"
+                }
+
+                displayCall = if (strFreeMinTotal.equals("무제한", ignoreCase = true)) {
+                    "✆︎ 무제한 / 무제한"
+                } else {
+                    "✆︎ $strFreeMinReMain / $strFreeMinTotal"
+                }
+
+            }
+
+            else if (strSvcName.contains("부가")) {
+                val minutesTotal = strFreeMinTotal.toIntOrNull() ?: 0
+                val minutesRemain = strFreeMinReMain.toIntOrNull() ?: 0
+                val minutesUse = strFreeMinUse.toIntOrNull() ?: 0
+                strFreeMinTotal = "${minutesTotal / 60}분"
+                strFreeMinReMain = "${minutesRemain / 60}분"
+                strFreeMinUse = "${minutesUse / 60}분"
+
+                //displayCall = "✆ $strFreeMinReMain / $strFreeMinTotal"
+            }
+            else if (strSvcName.contains("SMS")) {
+                val intValue = strFreeMinReMain.toIntOrNull() ?: 0
+                if (intValue > 99999) {
+                    strFreeMinReMain = "무제한"
+                } else {
+                    strFreeMinReMain = "${strFreeMinReMain}건"
+                }
+                strFreeMinTotal = "${strFreeMinTotal}건"
+                strFreeMinUse = "${strFreeMinUse}건"
+
+                displayM = if (strFreeMinReMain.equals("무제한", ignoreCase = true)) {
+                    "✉︎ $strFreeMinUse / 무제한"
+                } else {
+                    "✉︎ $strFreeMinReMain / $strFreeMinTotal"
+                }
+            }
+
+           /* totalUseTimeStringBuilder.append("\n")
+            val spannableSvcName = SpannableString("${totaluseTime.strSvcName}\n")
+            spannableSvcName.setSpan(AbsoluteSizeSpan(32, true), 0, spannableSvcName.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            totalUseTimeStringBuilder.append(spannableSvcName)
+            totalUseTimeStringBuilder.append("\n")*/
+
+            strFreeMinRemainCall.append(String, strFreeMinTotal) // 총제공량
+            if (strSvcName.contains("음성") && strFreeMinReMain == "0") {
+                // Do not include "잔여량" if strFreeMinReMain is 0
+                totalUseTimeStringBuilder.append(String, strFreeMinReMain)
+            } else {
+                if (strFreeMinReMain != "0") {
+                    totalUseTimeStringBuilder.append(String, strFreeMinReMain) // 잔여량
+                }
+                totalUseTimeStringBuilder.append(String, strFreeMinUse) // 사용량
+            }
+        }
+
+        txtRefreshData?.text = String.format("%.2f GB", totalStrFreeMinRemain)
+
+        txtRefreshCall?.text = displayCall
+        Log.d("---------------------Check Call","$displayCall--------------")
+
+        txtRefreshM?.text = displayM
+    }
+
+    private fun formatValue(value: String): String {
+        val intValue = value.toIntOrNull()
+        return if (intValue != null && intValue >= 999999999) {
+            "무제한"
+        } else {
+            value
+        }
+    }
+    private fun formatDataValue(value: String, multiplier: Double): String {
+        val floatValue = value.toFloatOrNull()
+        return if (floatValue != null) {
+            val formattedValue = String.format("%.2f GB", floatValue * multiplier)
+            formattedValue
+        } else {
+            value
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+    // LGT 당월 청구요금 API조회
     private fun LgtBillFetchData(phoneNumber: String?, custName: String?) {
         val currentDate = SimpleDateFormat("yyyyMM", Locale.getDefault()).format(Date())
         val baseUrl = "https://www.mysmartel.com/api/lguChargeDtl.php"
@@ -549,7 +770,7 @@ class MyInfoFragment : Fragment() {
 
 
 
-    private fun LgtDeductFetchData() {
+    private fun LgtDeductFetchData() { // Lgt 잔여량 조회 API
 
         val baseUrl = "https://www.mysmartel.com/api/"
         val phoneNumber = viewModel.phoneNumber
@@ -1257,7 +1478,6 @@ class MyInfoFragment : Fragment() {
         }
     }
 
-
     private fun parseValueToGB(value: String): Double {   // KB를 GB로 변환하는 함수
         return try {
             if (!value.contains("무제한")) {
@@ -1271,7 +1491,6 @@ class MyInfoFragment : Fragment() {
             0.0
         }
     }
-
 
     private fun parseValueToMinutes(value: String): String {   // 분 단위로 고쳐주는 함수
         return try {

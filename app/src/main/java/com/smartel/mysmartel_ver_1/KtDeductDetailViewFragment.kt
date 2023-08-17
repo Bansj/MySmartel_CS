@@ -149,8 +149,6 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
 
     }
 
-
-
     private fun calculateDataValue(value: String): Double {
         val floatValue = value.toFloatOrNull()
         return floatValue?.times(0.5)?.div(1024)?.div(1024) ?: 0.0
@@ -213,7 +211,7 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
                 strFreeMinReMain = "${minutesRemain / 60}분"
                 strFreeMinUse = "${minutesUse / 60}분"
             }
-            else if (strSvcName.contains("SMS")) {
+            else if (strSvcName.contains("SMS") || strSvcName.contains("문자")) {
                 val intValue = strFreeMinReMain.toIntOrNull() ?: 0
                 if (intValue > 99999) {
                     strFreeMinReMain = "무제한"
