@@ -1,32 +1,25 @@
 package com.smartel.mysmartel_ver_1
 
-import android.content.ContentValues.TAG
-import android.content.Context
-import android.content.Intent
-import android.content.res.Resources
+import android.animation.ObjectAnimator
+import android.animation.TimeInterpolator
 import android.graphics.Typeface
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Spannable
 import android.text.SpannableString
-import android.text.style.AbsoluteSizeSpan
 import android.text.style.StyleSpan
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import android.widget.*
-import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
-import com.bumptech.glide.Glide
 import com.example.mysmartel_ver_1.R
 import com.google.gson.Gson
 import kotlinx.coroutines.*
@@ -57,6 +50,8 @@ import javax.net.ssl.X509TrustManager
 class MyInfoFragment : Fragment() {
 
     private val yearMonthFormat = SimpleDateFormat("yyyyMM", Locale.getDefault())
+
+    private lateinit var pgBarTotalData: ProgressBar
 
     private lateinit var txtcustName: TextView
     private lateinit var txtPhoneNumber: TextView
@@ -608,6 +603,25 @@ class MyInfoFragment : Fragment() {
         val txtRefreshData = view?.findViewById<TextView>(R.id.txt_refreshData)
         val txtRefreshTotalData = view?.findViewById<TextView>(R.id.txt_totalData)
 
+        pgBarTotalData = view?.findViewById(R.id.pgBar_leftData)!!
+
+        // 프로그레스바 커스텀
+        fun updateProgressBar(total: Double, remain: Double, durationInMillis:Long = 1000) {
+            val progressPercent = (remain / total) * 100
+            val animation = ObjectAnimator.ofInt(pgBarTotalData,"progress",pgBarTotalData.progress,progressPercent.toInt())
+
+            // 애니메이션 지속시간 설정
+            animation.duration = durationInMillis
+
+            // 애니메이션 인터폴레이터 설정 (선택 사항)
+            val decelerateInterpolator: TimeInterpolator = DecelerateInterpolator()
+            animation.interpolator = decelerateInterpolator
+
+            // 애니메이션 시작
+            animation.start()
+            //pgBarTotalData.progress = progressPercent.toInt()
+        }
+
         val totalUseTimeStringBuilder = StringBuilder()
         var totalStrFreeMinTotal: Double = 0.0
         var totalStrFreeMinRemain: Double = 0.0
@@ -630,6 +644,8 @@ class MyInfoFragment : Fragment() {
                     totalStrFreeMinRemain += floatValue!! * 0.5 / (1024 * 1024)
 
                     Log.d("-----------MyInfoFragment----------총제공량", "$totalStrFreeMinTotal---------")
+
+                updateProgressBar(totalStrFreeMinTotal, totalStrFreeMinRemain)
                 }
             } else if (strSvcName.contains("속도제어")) {
                 val floatValue = strFreeMinReMain.toFloatOrNull()
@@ -637,6 +653,7 @@ class MyInfoFragment : Fragment() {
                     totalStrFreeMinRemain += floatValue
                 }
             }
+
             else if (strSvcName =="영상/부가") {
                 val minutesTotal = strFreeMinTotal.toIntOrNull() ?: 0
                 val minutesRemain = strFreeMinReMain.toIntOrNull() ?: 0
