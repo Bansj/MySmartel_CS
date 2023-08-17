@@ -109,6 +109,20 @@ class MyInfoFragment : Fragment() {
         outState.putString("Telecom", viewModel.Telecom)
         outState.putString("serviceAcct", viewModel.serviceAcct)
     }
+    fun formatPhoneNumber(rawPhoneNumber: String?): String {
+        if (rawPhoneNumber == null) {
+            return "Unknown"
+        }
+
+        val normalizedPhoneNumber = rawPhoneNumber.replace("[^0-9]".toRegex(), "")
+
+        if (normalizedPhoneNumber.length != 10) {
+            return rawPhoneNumber
+        }
+
+        val formattedPhoneNumber = "${normalizedPhoneNumber.substring(0, 3)}-${normalizedPhoneNumber.substring(3, 7)}-${normalizedPhoneNumber.substring(7)}"
+        return formattedPhoneNumber
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -126,9 +140,6 @@ class MyInfoFragment : Fragment() {
         sharedPrefs = MyInfoSharedPreferences(requireContext())
 
         bannerImage = view.findViewById(R.id.img_banner)
-
-        // SharedPreferences 초기화
-
 
         //loadBanners()
 
@@ -152,9 +163,15 @@ class MyInfoFragment : Fragment() {
         Log.d("MyInfoFragment", "from get viewModel -----> Telecom: $Telecom")
         Log.d("MyInfoFragment", "from get viewModel -----> serviceAcct: $serviceAcct")
 
+        // 전화번호 형시으로 커스텀 함수
+        val formattedPhoneNumber = if (phoneNumber != null) {
+            String.format("%s-%s-%s", phoneNumber.substring(0, 3), phoneNumber.substring(3, 7), phoneNumber.substring(7))
+        } else {
+            "Unknown"
+        }
         // Set the data in the views
         txtcustName.text = "  ${custName}님, 안녕하세요. "
-        txtPhoneNumber.text = "  ✆ [$Telecom] ${phoneNumber ?: "Unknown"} "
+        txtPhoneNumber.text = " ✆ [$Telecom] $formattedPhoneNumber"
         txtTelecom.text = Telecom
 
         // Set the data in the ViewModel
@@ -399,7 +416,7 @@ class MyInfoFragment : Fragment() {
         btnRefresh.performClick() // 화면 전환 완료시 자동으로 버튼 클릭되는 이벤트
     }
 
-    private fun KtFetchBillData() {
+    private fun KtFetchBillData() {  // KT 당월 청구요금 API 조회
         val phoneNumber = arguments?.getString("phoneNumber") ?: ""
         val apiUrl = "https://kt-self.smartelmobile.com/common/api/selfcare/selfcareAPIServer.aspx"
 
@@ -512,8 +529,8 @@ class MyInfoFragment : Fragment() {
 
 
 
-    // KT 사용량 API 조회
-    private fun KtFetchDeductApiData() {
+
+    private fun KtFetchDeductApiData() {  // KT 사용량 API 조회
         val phoneNumber = arguments?.getString("phoneNumber") ?: ""
         val apiUrl = "https://kt-self.smartelmobile.com/common/api/selfcare/selfcareAPIServer.aspx"
 
@@ -589,8 +606,10 @@ class MyInfoFragment : Fragment() {
         val txtRefreshCall = view?.findViewById<TextView>(R.id.txt_refreshCall)
         val txtRefreshM = view?.findViewById<TextView>(R.id.txt_refreshM)
         val txtRefreshData = view?.findViewById<TextView>(R.id.txt_refreshData)
+        val txtRefreshTotalData = view?.findViewById<TextView>(R.id.txt_totalData)
 
         val totalUseTimeStringBuilder = StringBuilder()
+        var totalStrFreeMinTotal: Double = 0.0
         var totalStrFreeMinRemain: Double = 0.0
         var displayCall = ""
         var displayM = ""
@@ -603,11 +622,14 @@ class MyInfoFragment : Fragment() {
             var strFreeMinReMain = formatValue(totaluseTime.strFreeMinReMain)
             var strFreeMinUse = formatValue(totaluseTime.strFreeMinUse)
 
-            // 'strFreeMinReMain' 값을 합산하기 위해 조건에 맞게 더합니다.
-            if (strSvcName.contains("데이터")) {
+            if (strSvcName == "데이터-합계") {
                 val floatValue = strFreeMinReMain.toFloatOrNull()
-                if (floatValue != null) {
-                    totalStrFreeMinRemain += floatValue * 0.5 / (1024 * 1024)
+                val floatTotalValue = strFreeMinTotal.toFloatOrNull()
+                if (floatValue != null || floatTotalValue != null) {
+                    totalStrFreeMinTotal += floatTotalValue!! * 0.5 / (1024 * 1024)
+                    totalStrFreeMinRemain += floatValue!! * 0.5 / (1024 * 1024)
+
+                    Log.d("-----------MyInfoFragment----------총제공량", "$totalStrFreeMinTotal---------")
                 }
             } else if (strSvcName.contains("속도제어")) {
                 val floatValue = strFreeMinReMain.toFloatOrNull()
@@ -623,7 +645,6 @@ class MyInfoFragment : Fragment() {
                 strFreeMinReMain = "${minutesRemain / 60}분"
                 strFreeMinUse = "${minutesUse / 60}분"
 
-                //displayCall = "✆ $strFreeMinReMain / $strFreeMinTotal"
             }
             else if (strSvcName == "음성" || strSvcName == "음성/영상") {
                 val minutesUse = strFreeMinUse.toIntOrNull() ?: 0
@@ -671,12 +692,6 @@ class MyInfoFragment : Fragment() {
                 }
             }
 
-           /* totalUseTimeStringBuilder.append("\n")
-            val spannableSvcName = SpannableString("${totaluseTime.strSvcName}\n")
-            spannableSvcName.setSpan(AbsoluteSizeSpan(32, true), 0, spannableSvcName.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            totalUseTimeStringBuilder.append(spannableSvcName)
-            totalUseTimeStringBuilder.append("\n")*/
-
             strFreeMinRemainCall.append(String, strFreeMinTotal) // 총제공량
             if (strSvcName.contains("음성") && strFreeMinReMain == "0") {
                 // Do not include "잔여량" if strFreeMinReMain is 0
@@ -690,6 +705,10 @@ class MyInfoFragment : Fragment() {
         }
 
         txtRefreshData?.text = String.format("%.2f GB", totalStrFreeMinRemain)
+        Log.d("------------------MyInfoFragment  Check Data", "$totalStrFreeMinRemain")
+
+        txtRefreshTotalData?.text = String.format("%.2f GB", totalStrFreeMinTotal)
+        Log.d("------------------MyInfoFragment  Check Data", "$totalStrFreeMinTotal")
 
         txtRefreshCall?.text = displayCall
         Log.d("---------------------Check Call","$displayCall--------------")
