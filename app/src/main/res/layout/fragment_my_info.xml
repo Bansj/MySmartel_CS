@@ -175,7 +175,7 @@
                             android:layout_marginHorizontal="10dp"
                             android:indeterminate="false"
                             android:max="100"
-                            android:progress="82"
+                            android:progress="100"
                             android:progressDrawable="@drawable/progressbar_coralpink"
                             app:layout_constraintTop_toBottomOf="@+id/txt_refreshData"
                             android:layout_marginTop="5dp" />

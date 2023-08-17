@@ -976,9 +976,14 @@ class MyInfoFragment : Fragment() {
         val remainInfoList = apiResponse.remainInfo ?: emptyList()
         val resultCode = apiResponse.ResultCode
 
+        val txtRefreshDataTotal = view?.findViewById<TextView>(R.id.txt_totalData)
         val txtRefreshCall = view?.findViewById<TextView>(R.id.txt_refreshCall)
         val txtRefreshM = view?.findViewById<TextView>(R.id.txt_refreshM)
         val txtRefreshData = view?.findViewById<TextView>(R.id.txt_refreshData)
+
+        pgBarTotalData = view?.findViewById(R.id.pgBar_leftData)!!
+
+
 
         // Print the ResultCode
         Log.d("LgtDeductDetailView", "ResultCode: $resultCode")
@@ -986,11 +991,30 @@ class MyInfoFragment : Fragment() {
         // Create a StringBuilder to build the data string
         val dataStringBuilder = StringBuilder()
 
+        // 프로그레스바 커스텀
+        fun updateProgressBar(total: Double, remain: Double, durationInMillis:Long = 1000) {
+            val progressPercent = (remain / total) * 100
+            val animation = ObjectAnimator.ofInt(pgBarTotalData,"progress",pgBarTotalData.progress,progressPercent.toInt())
+
+            // 애니메이션 지속시간 설정
+            animation.duration = durationInMillis
+
+            // 애니메이션 인터폴레이터 설정 (선택 사항)
+            val decelerateInterpolator: TimeInterpolator = DecelerateInterpolator()
+            animation.interpolator = decelerateInterpolator
+
+            // 애니메이션 시작
+            animation.start()
+            //pgBarTotalData.progress = progressPercent.toInt()
+        }
+
+        var totalRemainDataTotal = 0.0
         var totalRemainData = 0.0
         var displayCall = ""
         var displayM = ""
 
         val remainData = StringBuilder()
+        val totalData = StringBuilder()
         val remainCallStr = StringBuilder()
 
         // Iterate over the RemainInfo list and append the values to the data string
@@ -1028,7 +1052,7 @@ class MyInfoFragment : Fragment() {
                     remainCallStr.append("사용량  ${useValueInMinutes.format(0).padStart(40)}분\n\n\n\n")
                     dataStringBuilder.appendLine().appendLine()
 
-                    displayCall = "✆ ${useValueInMinutes.format(0)}분/무제한"
+                    displayCall = "✆ ${useValueInMinutes.format(0)}분 / 무제한"
 
                 } else {
                     val alloValueInMinutes = alloValue.toDouble() / 60
@@ -1039,48 +1063,51 @@ class MyInfoFragment : Fragment() {
                     remainCallStr.append("잔여량    ${remainValueMin.format(0).padStart(40)}분\n\n\n\n")
                     dataStringBuilder.appendLine().appendLine()
 
-                    displayCall = "${remainValueMin}/${alloValueInMinutes}"
+                    displayCall = "${remainValueMin} / ${alloValueInMinutes}"
 
                 }
             } else if (svcUnitCd.contains("건")) {
                 if (alloValue.contains("Z")) {
                     dataStringBuilder.append("총제공량 ${"무제한"}\n\n")
                     dataStringBuilder.append("사용량  ${useValue}건\n\n\n\n")
-                    dataStringBuilder.appendLine().appendLine()
 
-                    displayM = "✉︎ ${useValue}건/무제한"
+                    displayM = "✉︎ ${useValue}건 / 무제한"
 
                 } else {
                     dataStringBuilder.append("총제공량 ${alloValue}건\n\n")
                     dataStringBuilder.append("사용량  ${useValue}건\n\n")
                     val remainValue = alloValue.toInt() - useValue.toInt()
                     dataStringBuilder.append("잔여량:    ${remainValue.toString()}건\n\n\n\n")
-                    dataStringBuilder.appendLine().appendLine()
 
-                    displayM = "✉︎ ${remainValue}건/${alloValue}건"
+                    displayM = "✉︎ ${remainValue}건 / ${alloValue}건"
                 }
             } else if (svcTypNm.contains("패킷")) {
                 val alloValueInGB = alloValue.toDouble() / 1024 / 1024
                 val useValueInGB = useValue.toDouble() / 1024 / 1024
                 val remainValueInGB = alloValueInGB - useValueInGB
 
-                dataStringBuilder.append("총제공량 ${alloValueInGB.format(1).padStart(40)}GB\n")
+                dataStringBuilder.append("$alloValueInGB\n") // 총제공량
                 dataStringBuilder.append("사용량  ${useValueInGB.format(1).padStart(40)}GB\n")
-                dataStringBuilder.append("$remainValueInGB")
-
-                dataStringBuilder.appendLine().appendLine()
+                dataStringBuilder.append("$remainValueInGB") // 잔여량
 
                 totalRemainData += remainValueInGB.toDouble()
+                totalRemainDataTotal += alloValueInGB.toDouble()
+
+                updateProgressBar(totalRemainDataTotal, totalRemainData)
+
             } else {
                 dataStringBuilder.append("총제공량: $alloValue\n\n")
                 dataStringBuilder.append("사용량:  $useValue\n\n\n\n")
-                dataStringBuilder.appendLine().appendLine()
             }
         }
 
         remainData.append("${totalRemainData.format(1)}GB")
         txtRefreshData?.text = remainData.toString()
         Log.d("-----------------잔여량 ", "총합: $remainData -----------")
+
+        totalData.append("${totalRemainDataTotal.format(1)}GB")
+        txtRefreshDataTotal?.text = totalData.toString()
+        Log.d("-----------------총제공량 ", "총합: $totalData -----------")
 
         txtRefreshCall?.text = displayCall
         Log.d("-----------------잔여량 ", "총합: $displayCall -----------")
