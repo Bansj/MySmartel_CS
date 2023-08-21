@@ -42,7 +42,6 @@ abstract class BaseActivity : AppCompatActivity() {
 
                         override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
                     })
-
                     try {
                         val sc = SSLContext.getInstance("SSL")
                         sc.init(null, trustAllCerts, java.security.SecureRandom())
@@ -56,7 +55,7 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
-    fun sktDeductAmountRequest(serviceAccount: String) {
+    private fun sktDeductAmountRequest(serviceAccount: String) {
         val deductUrl = "http://vacs.smartelmobile.com/SKTRealTime/GetDeductAmount.php"
         val deductParams = JSONObject()
         deductParams.put("sv_acnt_num", serviceAccount)

@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import androidx.viewpager2.widget.ViewPager2
 import com.example.mysmartel_ver_1.R
 import com.google.gson.Gson
 import kotlinx.coroutines.*
@@ -46,8 +47,11 @@ import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
+//import com.android.volley.Request
 
 class MyInfoFragment : Fragment() {
+
+    private lateinit var viewPagerAdapter: ViewPagerAdapter
 
     private val yearMonthFormat = SimpleDateFormat("yyyyMM", Locale.getDefault())
 
@@ -74,13 +78,18 @@ class MyInfoFragment : Fragment() {
 
     private lateinit var svcNum: String
 
-    private lateinit var txtFreeService: TextView
-    private lateinit var txtPaidService: TextView
+    private lateinit var txtFreeService: TextView // 무료 부가서비스
+    private lateinit var txtPaidService: TextView // 유료 부가서비스
 
     private val handler = Handler(Looper.getMainLooper())
 
     // Obtain an instance of the ViewModel from the shared ViewModelStoreOwner
     private val viewModel: MyInfoViewModel by viewModels({ requireActivity() })
+
+    private val handlers = Handler(Looper.getMainLooper())
+    private lateinit var bannerAdapter: BannerAdapter
+    private lateinit var viewPager2: ViewPager2
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -95,15 +104,21 @@ class MyInfoFragment : Fragment() {
             viewModel.Telecom = savedInstanceState.getString("Telecom")
             viewModel.serviceAcct = savedInstanceState.getString("serviceAcct")
         }
+
         return view
     }
+
+
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putString("custName", viewModel.custName)
         outState.putString("phoneNumber", viewModel.phoneNumber)
         outState.putString("Telecom", viewModel.Telecom)
         outState.putString("serviceAcct", viewModel.serviceAcct)
+
     }
+
     fun formatPhoneNumber(rawPhoneNumber: String?): String {
         if (rawPhoneNumber == null) {
             return "Unknown"
@@ -115,7 +130,12 @@ class MyInfoFragment : Fragment() {
             return rawPhoneNumber
         }
 
-        val formattedPhoneNumber = "${normalizedPhoneNumber.substring(0, 3)}-${normalizedPhoneNumber.substring(3, 7)}-${normalizedPhoneNumber.substring(7)}"
+        val formattedPhoneNumber = "${normalizedPhoneNumber.substring(0, 3)}-${
+            normalizedPhoneNumber.substring(
+                3,
+                7
+            )
+        }-${normalizedPhoneNumber.substring(7)}"
         return formattedPhoneNumber
     }
 
@@ -127,7 +147,7 @@ class MyInfoFragment : Fragment() {
         txtTelecom = view.findViewById(R.id.txt_telecom)
 
         txtSumAmount = view.findViewById(R.id.txt_thisMonthBill)
-        txtThisMonthBillDate =view.findViewById(R.id.txt_thisMonthBillDate)
+        txtThisMonthBillDate = view.findViewById(R.id.txt_thisMonthBillDate)
 
         txtFreeService = view.findViewById(R.id.txt_freeService)
         txtPaidService = view.findViewById(R.id.txt_paidService)
@@ -136,13 +156,15 @@ class MyInfoFragment : Fragment() {
 
         bannerImage = view.findViewById(R.id.img_banner)
 
-        //loadBanners()
-
         // Retrieve the data from the ViewModel or arguments
-        val custName = viewModel.custName ?: arguments?.getString("custName")?.also { viewModel.custName = it }
-        val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")?.also { viewModel.phoneNumber = it }
-        val Telecom = viewModel.Telecom ?: arguments?.getString("Telecom")?.also { viewModel.Telecom = it }
-        val serviceAcct = viewModel.serviceAcct ?: arguments?.getString("serviceAcct")?.also { viewModel.serviceAcct = it }
+        val custName =
+            viewModel.custName ?: arguments?.getString("custName")?.also { viewModel.custName = it }
+        val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")
+            ?.also { viewModel.phoneNumber = it }
+        val Telecom =
+            viewModel.Telecom ?: arguments?.getString("Telecom")?.also { viewModel.Telecom = it }
+        val serviceAcct = viewModel.serviceAcct ?: arguments?.getString("serviceAcct")
+            ?.also { viewModel.serviceAcct = it }
 
         // Get a reference to the layout_additionalServices view
         val layoutAdditionalServices = view.findViewById<View>(R.id.layout_additionalServices)
@@ -160,7 +182,12 @@ class MyInfoFragment : Fragment() {
 
         // 전화번호 형시으로 커스텀 함수
         val formattedPhoneNumber = if (phoneNumber != null) {
-            String.format("%s-%s-%s", phoneNumber.substring(0, 3), phoneNumber.substring(3, 7), phoneNumber.substring(7))
+            String.format(
+                "%s-%s-%s",
+                phoneNumber.substring(0, 3),
+                phoneNumber.substring(3, 7),
+                phoneNumber.substring(7)
+            )
         } else {
             "Unknown"
         }
@@ -184,7 +211,7 @@ class MyInfoFragment : Fragment() {
         //버튼 클릭시 밑에서 위로 올라오는 사용량 상세보기 페이지 클릭이벤트
         val btnDeductDetailFragment = view?.findViewById<Button>(R.id.btn_detailDeduct)
         btnDeductDetailFragment?.setOnClickListener {
-            val Telecom = viewModel.Telecom ?:arguments?. getString("Telecom")
+            val Telecom = viewModel.Telecom ?: arguments?.getString("Telecom")
             val fragment: Fragment? = when (Telecom) {
                 "SKT" -> {
                     val sktDeductDetailViewFragment = SktDeductDetailViewFragment()
@@ -194,8 +221,14 @@ class MyInfoFragment : Fragment() {
                     sktDeductDetailViewFragment.arguments = bundle
 
                     // Log the values for SKT
-                    Log.d("MyInfoFragment", "to SktBillDetailFragment--------------------serviceAcct: $serviceAcct--------------------")
-                    Log.d("MyInfoFragment", "to SktBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+                    Log.d(
+                        "MyInfoFragment",
+                        "to SktBillDetailFragment--------------------serviceAcct: $serviceAcct--------------------"
+                    )
+                    Log.d(
+                        "MyInfoFragment",
+                        "to SktBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------"
+                    )
 
                     sktDeductDetailViewFragment
                 }
@@ -206,7 +239,10 @@ class MyInfoFragment : Fragment() {
                     ktDeductDetailViewFragment.arguments = bundle
 
                     // Log the values for KT
-                    Log.d("MyInfoFragment", "to KtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+                    Log.d(
+                        "MyInfoFragment",
+                        "to KtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------"
+                    )
 
                     ktDeductDetailViewFragment
                 }
@@ -218,8 +254,14 @@ class MyInfoFragment : Fragment() {
                     lgtDeductDetailViewFragment.arguments = bundle
 
                     // Log the values for SKT
-                    Log.d("MyInfoFragment", "to LgtBillDetailFragment--------------------custName: $custName--------------------")
-                    Log.d("MyInfoFragment", "to LgtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+                    Log.d(
+                        "MyInfoFragment",
+                        "to LgtBillDetailFragment--------------------custName: $custName--------------------"
+                    )
+                    Log.d(
+                        "MyInfoFragment",
+                        "to LgtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------"
+                    )
 
                     lgtDeductDetailViewFragment
                 }
@@ -255,8 +297,14 @@ class MyInfoFragment : Fragment() {
                     skBillDetailFragment.arguments = bundle
 
                     // Log the values for SKT
-                    Log.d("MyInfoFragment", "to SktBillDetailFragment--------------------serviceAcct: $serviceAcct--------------------")
-                    Log.d("MyInfoFragment", "to SktBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+                    Log.d(
+                        "MyInfoFragment",
+                        "to SktBillDetailFragment--------------------serviceAcct: $serviceAcct--------------------"
+                    )
+                    Log.d(
+                        "MyInfoFragment",
+                        "to SktBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------"
+                    )
                     skBillDetailFragment
                 }
                 "KT" -> {
@@ -266,7 +314,10 @@ class MyInfoFragment : Fragment() {
                     ktBillDetailFragment.arguments = bundle
 
                     // Log the values for KT
-                    Log.d("MyInfoFragment", "to KtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+                    Log.d(
+                        "MyInfoFragment",
+                        "to KtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------"
+                    )
 
                     ktBillDetailFragment
                 }
@@ -278,8 +329,14 @@ class MyInfoFragment : Fragment() {
                     lgtBillDetailFragment.arguments = bundle
 
                     // Log the values for LGT
-                    Log.d("MyInfoFragment", "to LgtBillDetailFragment--------------------custName: $custName--------------------")
-                    Log.d("MyInfoFragment", "to LgtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+                    Log.d(
+                        "MyInfoFragment",
+                        "to LgtBillDetailFragment--------------------custName: $custName--------------------"
+                    )
+                    Log.d(
+                        "MyInfoFragment",
+                        "to LgtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------"
+                    )
 
                     lgtBillDetailFragment
                 }
@@ -316,8 +373,14 @@ class MyInfoFragment : Fragment() {
                     sktAddServiceFragment.arguments = bundle
 
                     // Log the values for SKT
-                    Log.d("MyInfoFragment", "to SktBillDetailFragment--------------------serviceAcct: $serviceAcct--------------------")
-                    Log.d("MyInfoFragment", "to SktBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+                    Log.d(
+                        "MyInfoFragment",
+                        "to SktBillDetailFragment--------------------serviceAcct: $serviceAcct--------------------"
+                    )
+                    Log.d(
+                        "MyInfoFragment",
+                        "to SktBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------"
+                    )
                     sktAddServiceFragment
                 }
                 "KT" -> {
@@ -327,7 +390,10 @@ class MyInfoFragment : Fragment() {
                     ktBillDetailFragment.arguments = bundle
 
                     // Log the values for KT
-                    Log.d("MyInfoFragment", "to KtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+                    Log.d(
+                        "MyInfoFragment",
+                        "to KtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------"
+                    )
 
                     ktBillDetailFragment
                 }
@@ -339,8 +405,14 @@ class MyInfoFragment : Fragment() {
                     lgtBillDetailFragment.arguments = bundle
 
                     // Log the values for LGT
-                    Log.d("MyInfoFragment", "to LgtBillDetailFragment--------------------custName: $custName--------------------")
-                    Log.d("MyInfoFragment", "to LgtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------")
+                    Log.d(
+                        "MyInfoFragment",
+                        "to LgtBillDetailFragment--------------------custName: $custName--------------------"
+                    )
+                    Log.d(
+                        "MyInfoFragment",
+                        "to LgtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------"
+                    )
 
                     lgtBillDetailFragment
                 }
@@ -364,7 +436,7 @@ class MyInfoFragment : Fragment() {
             }
         }
 
-            // Set click listener for btn_menu button 하단 메뉴이동 네비게이션바 컨트롤러
+        // Set click listener for btn_menu button 하단 메뉴이동 네비게이션바 컨트롤러
         view.findViewById<ImageButton>(R.id.btn_menu).setOnClickListener {
             it.findNavController().navigate(R.id.action_myInfoFragment_to_menuFragment)
         }
@@ -374,7 +446,7 @@ class MyInfoFragment : Fragment() {
             it.findNavController().navigate(R.id.action_myInfoFragment_to_settingFragment)
         }
 
-        Log.d("getString?","phoneNumber: $phoneNumber")
+        Log.d("getString?", "phoneNumber: $phoneNumber")
 
         txt_refreshData = view.findViewById(R.id.txt_refreshData)
         btnRefresh = view.findViewById(R.id.btn_refresh)
@@ -408,8 +480,84 @@ class MyInfoFragment : Fragment() {
                 }
             }
         }
+
         btnRefresh.performClick() // 화면 전환 완료시 자동으로 버튼 클릭되는 이벤트
+
+        viewPager2 = view.findViewById(R.id.viewPager2)
+        requestBannerAPI()
+
     }
+    private fun requestBannerAPI() {
+        val url = "https://api.smartel.kr/banner"
+        val client = OkHttpClient()
+
+        val request = Request.Builder()
+            .url(url)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    if (!response.isSuccessful) throw IOException("Unexpected code $response")
+
+                    val bodyString = response.body!!.string()
+                    val jsonArray = JSONArray(bodyString)
+                    val banners = mutableListOf<BannerItem>()
+
+                    for (i in 0 until jsonArray.length()) {
+                        val jsonObject = jsonArray.getJSONObject(i)
+                        banners.add(
+                            BannerItem(
+                                id = jsonObject.getInt("id"),
+                                imageBucketName = jsonObject.getString("imageBucketName"),
+                                imagePath = jsonObject.getString("imagePath"),
+                                imageFileName = jsonObject.getString("imageFileName"),
+                                imageExtension = jsonObject.getString("imageExtension"),
+                                imageContentType = jsonObject.getString("imageContentType"),
+                                imageLink = jsonObject.getString("imageLink")
+                            )
+                        )
+                    }
+                    Log.d("----------Check Banners","$banners")
+
+                    handlers.post {
+                        setupViewPager2(banners)
+                    }
+                }
+            }
+        })
+    }
+
+    private fun setupViewPager2(banners: List<BannerItem>) {
+        bannerAdapter = BannerAdapter(requireContext(), banners)
+        viewPager2.adapter = bannerAdapter
+
+        val runnable = object : Runnable {
+            override fun run() {
+                if (viewPager2.currentItem == banners.size - 1) {
+                    viewPager2.setCurrentItem(0, true)
+                } else {
+                    viewPager2.setCurrentItem(viewPager2.currentItem + 1, true)
+                }
+                handlers.postDelayed(this, 2000)
+            }
+        }
+
+        handler.postDelayed(runnable, 2000)
+    }
+
+
+
+
+
+
+
+
+
 
     private fun KtFetchBillData() {  // KT 당월 청구요금 API 조회
         val phoneNumber = arguments?.getString("phoneNumber") ?: ""
@@ -1702,6 +1850,7 @@ class MyInfoFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
 
+        handler.removeCallbacksAndMessages(null)
         // Save the data to SharedPreferences before the fragment view is destroyed
         sharedPrefs.custName = txtcustName.text.toString()
         sharedPrefs.phoneNumber = txtPhoneNumber.text.toString()
