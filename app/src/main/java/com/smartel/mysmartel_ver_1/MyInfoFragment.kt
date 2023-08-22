@@ -146,18 +146,20 @@ class MyInfoFragment : Fragment() {
         viewPager2.orientation = ViewPager2.ORIENTATION_HORIZONTAL
         viewPager2.setPageTransformer(ZoomOutPageTransformer())
 
-        // Set auto-scrolling
         val handlers = Handler(Looper.getMainLooper())
         val runnable = object : Runnable {
             override fun run() {
                 val currentItem = viewPager2.currentItem
-                viewPager2.setCurrentItem(currentItem + 1, true)
+                val newItem = (currentItem + 1) % bannerList.size // Calculate the new item index
 
-                handlers.postDelayed(this, 2000) // 2초마다 넘겨주기
+                viewPager2.setCurrentItem(newItem, true)
+
+                handlers.postDelayed(this, 3000) // Scroll every 2 seconds
             }
         }
         handlers.postDelayed(runnable, 2000)
     }
+
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -165,7 +167,6 @@ class MyInfoFragment : Fragment() {
         outState.putString("phoneNumber", viewModel.phoneNumber)
         outState.putString("Telecom", viewModel.Telecom)
         outState.putString("serviceAcct", viewModel.serviceAcct)
-
     }
 
     fun formatPhoneNumber(rawPhoneNumber: String?): String {

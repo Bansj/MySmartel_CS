@@ -1,11 +1,18 @@
 package com.smartel.mysmartel_ver_1
 
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.ImageView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
@@ -20,10 +27,20 @@ class BannerViewPagerAdapter(private val context: Context, private val bannerLis
         init {
             webView.settings.javaScriptEnabled = true
             webView.webViewClient = WebViewClient()
+
+            webView.setOnTouchListener { v, event ->
+                if (event.action == MotionEvent.ACTION_UP) {
+                    bannerList[adapterPosition].imageLink?.let { openUrlInBrowser(it) }
+                    return@setOnTouchListener true
+                }
+                false
+            }
         }
 
         fun bind(bannerItem: BannerItem) {
-            webView.loadUrl(bannerItem.imageLink)
+            val imageUrl = bannerItem.imagePath
+            val htmlContent = "<html><head><style>img{max-width: 100%; height: auto;}</style></head><body><img src=\"$imageUrl\"></body></html>"
+            webView.loadDataWithBaseURL(null, htmlContent, "text/html", "UTF-8", null)
         }
     }
 
@@ -37,4 +54,14 @@ class BannerViewPagerAdapter(private val context: Context, private val bannerLis
     }
 
     override fun getItemCount(): Int = bannerList.size
+
+    private fun openUrlInBrowser(url: String) {
+        try {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            context.startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            // 사용 가능한 인터넷 브라우저 앱이 없는 경우 오류 메시지를 표시
+            Toast.makeText(context, "인터넷 브라우저를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show()
+        }
+    }
 }

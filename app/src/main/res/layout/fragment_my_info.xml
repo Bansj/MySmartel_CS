@@ -223,20 +223,11 @@
                         android:orientation="vertical"
                         app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
 
-                        <ImageView
-                            android:id="@+id/img_banner"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:scaleType="fitXY"
-                            android:adjustViewBounds="true"
-                            android:visibility="gone"
-                            android:src="@drawable/banner_1" />
-
                         <androidx.viewpager2.widget.ViewPager2
                             android:id="@+id/viewPager2"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"/>
+                            android:orientation="horizontal" />
 
                     </LinearLayout>
 
@@ -317,7 +308,7 @@
                         android:background="@drawable/box_whitesmoke"
                         android:elevation="4dp"
                         android:outlineProvider="background"
-                        android:visibility="visible"
+                        android:visibility="gone"
                         app:layout_constraintTop_toBottomOf="@+id/constraintLayout">
 
                         <androidx.viewpager2.widget.ViewPager2
