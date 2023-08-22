@@ -16,6 +16,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name="com.smartel.mysmartel_ver_1.NewPasswordActivity"
+            android:exported="false" />
+        <activity
             android:name="com.smartel.mysmartel_ver_1.SendCheckNumberActivity"
             android:exported="false" />
         <activity
@@ -28,7 +31,8 @@
             android:name="com.smartel.mysmartel_ver_1.WebViewActivity"
             android:exported="false"
             android:label="Web View Activity" />
-       <!-- <activity
+        <!--
+ <activity
             android:name=".Setting"
             android:exported="false" />
         <activity
@@ -42,7 +46,8 @@
             android:exported="false" />
         <activity
             android:name=".prepaid.PrepaidPhoneEasyCheck"
-            android:exported="false" />-->
+            android:exported="false" />
+        -->
         <activity
             android:name="com.smartel.mysmartel_ver_1.LoginActivity"
             android:exported="false" />
