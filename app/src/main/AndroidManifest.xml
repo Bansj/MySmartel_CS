@@ -29,16 +29,16 @@
             android:name="com.smartel.mysmartel_ver_1.Setting"
             android:exported="false" />
         <activity
-            android:name="com.smartel.mysmartel_ver_1.PagerActivity"
+            android:name="com.smartel.mysmartel_ver_1.prepaid.PagerActivity"
             android:exported="false" />
         <activity
-            android:name="com.smartel.mysmartel_ver_1.PrepaidDetail"
+            android:name="com.smartel.mysmartel_ver_1.prepaid.PrepaidDetail"
             android:exported="false" />
         <activity
-            android:name="com.smartel.mysmartel_ver_1.PrepaidAccount"
+            android:name="com.smartel.mysmartel_ver_1.prepaid.PrepaidAccount"
             android:exported="false" />
         <activity
-            android:name="com.smartel.mysmartel_ver_1.PrepaidPhoneEasyCheck"
+            android:name="com.smartel.mysmartel_ver_1.prepaid.PrepaidPhoneEasyCheck"
             android:exported="false" />
         <activity
             android:name="com.smartel.mysmartel_ver_1.LoginActivity"

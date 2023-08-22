@@ -2,12 +2,10 @@ package com.smartel.mysmartel_ver_1
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.ContentValues.TAG
 import android.content.Intent
 import android.net.Uri
-import android.nfc.Tag
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -15,7 +13,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
-import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -23,6 +20,13 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import com.example.mysmartel_ver_1.R
 import com.example.mysmartel_ver_1.databinding.FragmentMenuBinding
+import com.smartel.mysmartel_ver_1.KT.KtBillDetailFragment
+import com.smartel.mysmartel_ver_1.KT.KtPaymentDetailFragment
+import com.smartel.mysmartel_ver_1.LGT.LgtBillDetailFragment
+import com.smartel.mysmartel_ver_1.LGT.LgtPaymentDetailFragment
+import com.smartel.mysmartel_ver_1.SKT.SktAddServiceFragment
+import com.smartel.mysmartel_ver_1.SKT.SktBillDetailFragment
+import com.smartel.mysmartel_ver_1.SKT.SktPaymentDetailFragment
 
 
 class MenuFragment : Fragment() {

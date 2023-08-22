@@ -8,37 +8,47 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import com.bumptech.glide.Glide
+import android.widget.ListAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.mysmartel_ver_1.R
+import com.example.mysmartel_ver_1.databinding.ItemBannerBinding
 
-class BannerAdapter(private val context: Context, private val banners: List<BannerItem>) :
-    RecyclerView.Adapter<BannerAdapter.BannerViewHolder>() {
+// 배너 어댑터 클래스
+/*class BannerAdapter(private val onBannerClick: (String) -> Unit) :
+    ListAdapter<Banner, BannerAdapter.ViewHolder>(BannerDiffCallback()) {
 
-    inner class BannerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val imageView: ImageView = view.findViewById(R.id.bannerImage)
-    }
+    // 뷰홀더 클래스
+    inner class ViewHolder(private val binding: ItemBannerBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BannerViewHolder {
-        val view = LayoutInflater.from(context).inflate(R.layout.item_banner, parent, false)
-        return BannerViewHolder(view)
-    }
-
-    override fun onBindViewHolder(holder: BannerViewHolder, position: Int) {
-        Glide.with(context).load(banners[position].imagePath).into(holder.imageView)
-        holder.itemView.setOnClickListener {
-            // 웹 페이지로 이동하는 코드
-            val intent = Intent(Intent.ACTION_VIEW)
-            intent.data = Uri.parse(banners[position].imageLink)
-            context.startActivity(intent)
+        // 배너를 뷰에 바인딩
+        fun bind(banner: Banner) {
+            binding.apply {
+                // 이미지 로드 및 이벤트 설정
+                Glide.with(itemView).load(banner.imagePath).into(ivBanner)
+                root.setOnClickListener { onBannerClick(banner.imageLink) }
+            }
         }
     }
 
-    override fun getItemCount(): Int {
-        return banners.size
+    // 뷰홀더 생성
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val binding = ItemBannerBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(binding)
+    }
+
+    // 데이터 바인딩
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(getItem(position % itemCount))
     }
 }
 
-
-
+// 배너 변경 감지를 위한 Diff Callback 클래스
+class BannerDiffCallback : DiffUtil.ItemCallback<Banner>() {
+    override fun areItemsTheSame(oldItem: Banner, newItem: Banner) = oldItem.id == newItem.id
+    override fun areContentsTheSame(oldItem: Banner, newItem: Banner) = oldItem == newItem
+}
+*/
 

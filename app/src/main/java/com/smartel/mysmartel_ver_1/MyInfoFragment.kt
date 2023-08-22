@@ -23,6 +23,14 @@ import androidx.navigation.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.example.mysmartel_ver_1.R
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.smartel.mysmartel_ver_1.KT.*
+import com.smartel.mysmartel_ver_1.LGT.LgtBillApiResponse
+import com.smartel.mysmartel_ver_1.LGT.LgtBillDetailFragment
+import com.smartel.mysmartel_ver_1.LGT.LgtDedcutApiResponse
+import com.smartel.mysmartel_ver_1.LGT.LgtDeductDetailViewFragment
+import com.smartel.mysmartel_ver_1.SKT.*
+import com.smartel.mysmartel_ver_1.prepaid.ViewPagerAdapter
 import kotlinx.coroutines.*
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
@@ -47,11 +55,9 @@ import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
-//import com.android.volley.Request
+import kotlin.concurrent.fixedRateTimer
 
 class MyInfoFragment : Fragment() {
-
-    private lateinit var viewPagerAdapter: ViewPagerAdapter
 
     private val yearMonthFormat = SimpleDateFormat("yyyyMM", Locale.getDefault())
 
@@ -63,8 +69,6 @@ class MyInfoFragment : Fragment() {
     private lateinit var sharedPrefs: MyInfoSharedPreferences
 
     private var doubleBackToExitPressedOnce = false
-
-    private lateinit var bannerImage: ImageView
 
     private lateinit var txt_refreshData: TextView
     private lateinit var btnRefresh: ImageButton
@@ -86,9 +90,8 @@ class MyInfoFragment : Fragment() {
     // Obtain an instance of the ViewModel from the shared ViewModelStoreOwner
     private val viewModel: MyInfoViewModel by viewModels({ requireActivity() })
 
-    private val handlers = Handler(Looper.getMainLooper())
-    private lateinit var bannerAdapter: BannerAdapter
     private lateinit var viewPager2: ViewPager2
+    private lateinit var viewPagerAdapter: BannerViewPagerAdapter
 
 
     override fun onCreateView(
@@ -105,10 +108,56 @@ class MyInfoFragment : Fragment() {
             viewModel.serviceAcct = savedInstanceState.getString("serviceAcct")
         }
 
+        viewPager2 = view.findViewById(R.id.viewPager2)
+
+        fetchBannerList()
+
         return view
     }
 
+    private fun fetchBannerList() {
+        val request = Request.Builder()
+            .url("https://api.smartel.kr/banner")
+            .build()
 
+        val client = OkHttpClient()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                // Handle error
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (response.isSuccessful) {
+                    val resultListJson = response.body?.string()
+                    val gson = Gson()
+                    val bannerItemList = gson.fromJson<List<BannerItem>>(resultListJson, object : TypeToken<List<BannerItem>>(){}.type)
+
+                    activity?.runOnUiThread {
+                        setupViewPager(bannerItemList)
+                    }
+                }
+            }
+        })
+    }
+
+    private fun setupViewPager(bannerList: List<BannerItem>) {
+        viewPagerAdapter = BannerViewPagerAdapter(requireContext(), bannerList)
+        viewPager2.adapter = viewPagerAdapter
+        viewPager2.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+        viewPager2.setPageTransformer(ZoomOutPageTransformer())
+
+        // Set auto-scrolling
+        val handlers = Handler(Looper.getMainLooper())
+        val runnable = object : Runnable {
+            override fun run() {
+                val currentItem = viewPager2.currentItem
+                viewPager2.setCurrentItem(currentItem + 1, true)
+
+                handlers.postDelayed(this, 2000) // 2초마다 넘겨주기
+            }
+        }
+        handlers.postDelayed(runnable, 2000)
+    }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -154,7 +203,7 @@ class MyInfoFragment : Fragment() {
 
         sharedPrefs = MyInfoSharedPreferences(requireContext())
 
-        bannerImage = view.findViewById(R.id.img_banner)
+       // bannerImage = view.findViewById(R.id.img_banner)
 
         // Retrieve the data from the ViewModel or arguments
         val custName =
@@ -483,72 +532,16 @@ class MyInfoFragment : Fragment() {
 
         btnRefresh.performClick() // 화면 전환 완료시 자동으로 버튼 클릭되는 이벤트
 
-        viewPager2 = view.findViewById(R.id.viewPager2)
-        requestBannerAPI()
+
 
     }
-    private fun requestBannerAPI() {
-        val url = "https://api.smartel.kr/banner"
-        val client = OkHttpClient()
 
-        val request = Request.Builder()
-            .url(url)
-            .build()
 
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                e.printStackTrace()
-            }
 
-            override fun onResponse(call: Call, response: Response) {
-                response.use {
-                    if (!response.isSuccessful) throw IOException("Unexpected code $response")
 
-                    val bodyString = response.body!!.string()
-                    val jsonArray = JSONArray(bodyString)
-                    val banners = mutableListOf<BannerItem>()
 
-                    for (i in 0 until jsonArray.length()) {
-                        val jsonObject = jsonArray.getJSONObject(i)
-                        banners.add(
-                            BannerItem(
-                                id = jsonObject.getInt("id"),
-                                imageBucketName = jsonObject.getString("imageBucketName"),
-                                imagePath = jsonObject.getString("imagePath"),
-                                imageFileName = jsonObject.getString("imageFileName"),
-                                imageExtension = jsonObject.getString("imageExtension"),
-                                imageContentType = jsonObject.getString("imageContentType"),
-                                imageLink = jsonObject.getString("imageLink")
-                            )
-                        )
-                    }
-                    Log.d("----------Check Banners","$banners")
 
-                    handlers.post {
-                        setupViewPager2(banners)
-                    }
-                }
-            }
-        })
-    }
 
-    private fun setupViewPager2(banners: List<BannerItem>) {
-        bannerAdapter = BannerAdapter(requireContext(), banners)
-        viewPager2.adapter = bannerAdapter
-
-        val runnable = object : Runnable {
-            override fun run() {
-                if (viewPager2.currentItem == banners.size - 1) {
-                    viewPager2.setCurrentItem(0, true)
-                } else {
-                    viewPager2.setCurrentItem(viewPager2.currentItem + 1, true)
-                }
-                handlers.postDelayed(this, 2000)
-            }
-        }
-
-        handler.postDelayed(runnable, 2000)
-    }
 
 
 
