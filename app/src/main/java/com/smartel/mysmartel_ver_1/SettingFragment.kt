@@ -26,25 +26,25 @@ class SettingFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val rootView = inflater.inflate(R.layout.fragment_setting, container, false)
+        val view = inflater.inflate(R.layout.fragment_setting, container, false)
 
         sharedPrefs = requireContext().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
-        switchAutoLogin = rootView.findViewById(R.id.switch_autoLogin)
+        switchAutoLogin = view.findViewById(R.id.switch_autoLogin)
 
         // Set the switch status based on the value stored in shared preferences
         switchAutoLogin.isChecked = sharedPrefs.getBoolean("autoLogin", false)
 
         // Set click listener for btn_menu button
-        rootView.findViewById<ImageButton>(R.id.btn_menu).setOnClickListener {
+        view.findViewById<ImageButton>(R.id.btn_menu).setOnClickListener {
             it.findNavController().navigate(R.id.action_settingFragment_to_menuFragment)
         }
 
         // Set click listener for btn_home button
-        rootView.findViewById<ImageButton>(R.id.btn_myInfo).setOnClickListener {
+        view.findViewById<ImageButton>(R.id.btn_myInfo).setOnClickListener {
             it.findNavController().navigate(R.id.action_settingFragment_to_myInfoFragment)
         }
 
-        rootView.findViewById<ImageButton>(R.id.btn_logOut).setOnClickListener {
+        view.findViewById<ImageButton>(R.id.btn_logOut).setOnClickListener {
             // Clear the autoLogin status in shared preferences when logging out
             sharedPrefs.edit().remove("autoLogin").apply()
 
@@ -59,6 +59,6 @@ class SettingFragment : Fragment() {
             }
         }
 
-        return rootView
+        return view
     }
 }

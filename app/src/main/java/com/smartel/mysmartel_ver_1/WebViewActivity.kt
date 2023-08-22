@@ -9,7 +9,7 @@ import android.webkit.*
 import android.widget.Button
 import com.example.mysmartel_ver_1.R
 
-
+// 로그인 웹뷰
 class WebViewActivity : AppCompatActivity() {
     private lateinit var webView: WebView
     private lateinit var toLoginButton: Button

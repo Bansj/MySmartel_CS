@@ -4,11 +4,16 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
@@ -40,6 +45,8 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var signUpButton: Button
 
+    private lateinit var findPW: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -47,6 +54,7 @@ class LoginActivity : AppCompatActivity() {
         phoneNumberEditText = findViewById(R.id.edit_id)
         passwordEditText = findViewById(R.id.edit_password)
         loginButton = findViewById(R.id.btn_login)
+        findPW = findViewById(R.id.txt_findPW)
 
         loadingDialog = createLoadingDialog()
 
@@ -64,6 +72,16 @@ class LoginActivity : AppCompatActivity() {
         signUpButton.setOnClickListener {
             val message = "회원가입 완료후에 로그인하기 버튼을 클릭하여 주십시오. "
             showAlertDialog(message)
+        }
+
+        // 추후 업데이트 후에 웹뷰 방식으로 비밀번호 찾기 기능 구현
+        val webView = findViewById<WebView>(R.id.webviewFindPW)
+        webView.webViewClient = WebViewClient()
+
+        findPW.setOnClickListener {
+            val url = "https://www.mysmartel.com/page/user_pw.php"
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+            startActivity(intent)
         }
     }
 

@@ -14,7 +14,11 @@
         android:orientation="vertical"
         android:background="#fff"
         android:layout_gravity="center">
-
+        <WebView
+            android:id="@+id/webviewFindPW"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
         <androidx.constraintlayout.widget.ConstraintLayout
             android:background="#fff"
             android:layout_width="match_parent"
@@ -42,6 +46,9 @@
             android:background="#fff"
             android:orientation="vertical"
             tools:layout_editor_absoluteY="80dp">
+
+
+
 
             <EditText
                 android:id="@+id/edit_id"

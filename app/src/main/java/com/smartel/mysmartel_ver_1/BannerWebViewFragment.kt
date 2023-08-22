@@ -9,6 +9,7 @@ import android.webkit.WebViewClient
 import androidx.fragment.app.Fragment
 import com.example.mysmartel_ver_1.R
 
+// 추후에 업데이트 후 배너 페이지를 웹뷰로 띄워줄 예정
 class BannerWebViewFragment : Fragment() {
     private var imageLink: String? = null
 

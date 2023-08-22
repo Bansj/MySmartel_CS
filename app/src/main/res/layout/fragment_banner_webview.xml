@@ -10,3 +10,5 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </FrameLayout>
+
+   <!--추후에 업데이트후 웹뷰 방식으로 열리게 할 예정-->
