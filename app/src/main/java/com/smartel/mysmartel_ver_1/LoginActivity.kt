@@ -85,8 +85,6 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    // Assume this function is triggered after the login process is completed
-
     private fun showAlertDialog(message: String) {
         val alertDialog = AlertDialog.Builder(this)
             .setMessage(message)
@@ -95,6 +93,7 @@ class LoginActivity : AppCompatActivity() {
                 navigateToSignupActivity()
             }
             .create()
+
         // AlertDialog 확인버튼 글자색 변경 코드
         alertDialog.setOnShowListener {
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(resources.getColor(R.color.orange))

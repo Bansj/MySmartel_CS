@@ -44,6 +44,12 @@ class SettingFragment : Fragment() {
             it.findNavController().navigate(R.id.action_settingFragment_to_myInfoFragment)
         }
 
+        // Set click listener for newPW button
+        view.findViewById<ImageButton>(R.id.btn_newPW).setOnClickListener {
+            val intent = Intent(requireActivity(), IdentificationSelfActivity::class.java)
+            startActivity(intent)
+        }
+
         view.findViewById<ImageButton>(R.id.btn_logOut).setOnClickListener {
             // Clear the autoLogin status in shared preferences when logging out
             sharedPrefs.edit().remove("autoLogin").apply()

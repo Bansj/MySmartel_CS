@@ -47,9 +47,6 @@
             android:orientation="vertical"
             tools:layout_editor_absoluteY="80dp">
 
-
-
-
             <EditText
                 android:id="@+id/edit_id"
                 android:layout_width="match_parent"
@@ -57,7 +54,7 @@
                 android:layout_marginTop="100dp"
                 android:layout_marginHorizontal="20dp"
                 android:background="@drawable/editbox_action_shape"
-                android:hint=" Phone Number (ex. 01012345678)"
+                android:hint=" 회선번 (ex. 01012345678)"
                 android:inputType="number"
                 android:textSize="14dp" />
 
@@ -68,7 +65,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginHorizontal="20dp"
                 android:background="@drawable/editbox_action_shape"
-                android:hint=" PassWords"
+                android:hint=" 비밀번호"
                 android:inputType="textPassword"
                 android:textSize="14dp" />
 

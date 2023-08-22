@@ -16,27 +16,33 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name="com.smartel.mysmartel_ver_1.SendCheckNumberActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.smartel.mysmartel_ver_1.IdentificationSelfActivity"
+            android:exported="false" />
+        <activity
             android:name="com.smartel.mysmartel_ver_1.FindPWActivity"
             android:exported="false" />
         <activity
             android:name="com.smartel.mysmartel_ver_1.WebViewActivity"
             android:exported="false"
             android:label="Web View Activity" />
-        <activity
-            android:name="com.smartel.mysmartel_ver_1.Setting"
+       <!-- <activity
+            android:name=".Setting"
             android:exported="false" />
         <activity
-            android:name="com.smartel.mysmartel_ver_1.prepaid.PagerActivity"
+            android:name=".prepaid.PagerActivity"
             android:exported="false" />
         <activity
-            android:name="com.smartel.mysmartel_ver_1.prepaid.PrepaidDetail"
+            android:name=".prepaid.PrepaidDetail"
             android:exported="false" />
         <activity
-            android:name="com.smartel.mysmartel_ver_1.prepaid.PrepaidAccount"
+            android:name=".prepaid.PrepaidAccount"
             android:exported="false" />
         <activity
-            android:name="com.smartel.mysmartel_ver_1.prepaid.PrepaidPhoneEasyCheck"
-            android:exported="false" />
+            android:name=".prepaid.PrepaidPhoneEasyCheck"
+            android:exported="false" />-->
         <activity
             android:name="com.smartel.mysmartel_ver_1.LoginActivity"
             android:exported="false" />
