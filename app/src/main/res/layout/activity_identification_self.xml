@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#fffafa"
-    tools:context="com.smartel.mysmartel_ver_1.IdentificationSelfActivity">
+    tools:context="com.smartelmall.mysmartel_ver_1.IdentificationSelfActivity">
 
     <LinearLayout
         android:id="@+id/linearLayout4"

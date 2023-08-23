@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/myInfoFragment"
-        android:name="com.smartel.mysmartel_ver_1.MyInfoFragment"
+        android:name="com.smartelmall.mysmartel_ver_1.MyInfoFragment"
         android:label="fragment_my_info"
         tools:layout="@layout/fragment_my_info" >
         <action
@@ -22,7 +22,7 @@
     </fragment>
     <fragment
         android:id="@+id/benefitFragment"
-        android:name="com.smartel.mysmartel_ver_1.BenefitFragment"
+        android:name="com.smartelmall.mysmartel_ver_1.BenefitFragment"
         android:label="fragment_benefit"
         tools:layout="@layout/fragment_benefit" >
         <action
@@ -34,7 +34,7 @@
     </fragment>
     <fragment
         android:id="@+id/menuFragment"
-        android:name="com.smartel.mysmartel_ver_1.MenuFragment"
+        android:name="com.smartelmall.mysmartel_ver_1.MenuFragment"
         android:label="fragment_menu"
         tools:layout="@layout/fragment_menu" >
         <action
@@ -52,7 +52,7 @@
     </fragment>
     <fragment
         android:id="@+id/settingFragment"
-        android:name="com.smartel.mysmartel_ver_1.SettingFragment"
+        android:name="com.smartelmall.mysmartel_ver_1.SettingFragment"
         android:label="fragment_setting"
         tools:layout="@layout/fragment_setting" >
         <action

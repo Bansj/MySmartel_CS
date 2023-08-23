@@ -6,7 +6,7 @@
     android:layout_weight="0.8"
     android:background="#fffafa"
     android:orientation="vertical"
-    tools:context="com.smartel.mysmartel_ver_1.LGT.LgtDeductDetailViewFragment"
+    tools:context="com.smartelmall.mysmartel_ver_1.LGT.LgtDeductDetailViewFragment"
     android:id="@+id/fragmentLgtDeductDetailView"
     android:padding="15dp">
 

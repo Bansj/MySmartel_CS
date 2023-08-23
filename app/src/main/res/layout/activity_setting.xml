@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#FFFAFA"
-    tools:context="com.smartel.mysmartel_ver_1.Setting">
+    tools:context="com.smartelmall.mysmartel_ver_1.Setting">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

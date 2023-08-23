@@ -16,22 +16,41 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name="com.smartel.mysmartel_ver_1.NewPasswordActivity"
+            android:name="com.smartelmall.mysmartel_ver_1.NewPasswordActivity"
             android:exported="false" />
         <activity
-            android:name="com.smartel.mysmartel_ver_1.SendCheckNumberActivity"
+            android:name="com.smartelmall.mysmartel_ver_1.SendCheckNumberActivity"
             android:exported="false" />
         <activity
-            android:name="com.smartel.mysmartel_ver_1.IdentificationSelfActivity"
+            android:name="com.smartelmall.mysmartel_ver_1.IdentificationSelfActivity"
             android:exported="false" />
         <activity
-            android:name="com.smartel.mysmartel_ver_1.FindPWActivity"
+            android:name="com.smartelmall.mysmartel_ver_1.FindPWActivity"
             android:exported="false" />
         <activity
-            android:name="com.smartel.mysmartel_ver_1.WebViewActivity"
+            android:name="com.smartelmall.mysmartel_ver_1.WebViewActivity"
             android:exported="false"
             android:label="Web View Activity" />
-        <!--
+
+        <activity
+            android:name="com.smartelmall.mysmartel_ver_1.LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name="com.smartelmall.mysmartel_ver_1.Splash"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.smartelmall.mysmartel_ver_1.MainActivity"
+            android:exported="true" />
+    </application>
+
+</manifest>
+    <!--
  <activity
             android:name=".Setting"
             android:exported="false" />
@@ -48,21 +67,3 @@
             android:name=".prepaid.PrepaidPhoneEasyCheck"
             android:exported="false" />
         -->
-        <activity
-            android:name="com.smartel.mysmartel_ver_1.LoginActivity"
-            android:exported="false" />
-        <activity
-            android:name="com.smartel.mysmartel_ver_1.Splash"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name="com.smartel.mysmartel_ver_1.MainActivity"
-            android:exported="true" />
-    </application>
-
-</manifest>
