@@ -1,4 +1,4 @@
-package com.smartelmall.mysmartel_ver_1
+package com.smartelmall.mysmartel_ver_1.Banner
 
 data class BannerItem(
     val id: Int,

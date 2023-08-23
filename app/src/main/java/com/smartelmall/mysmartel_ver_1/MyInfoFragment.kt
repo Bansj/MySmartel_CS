@@ -23,6 +23,9 @@ import androidx.navigation.findNavController
 import androidx.viewpager2.widget.ViewPager2
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.smartelmall.mysmartel_ver_1.Banner.BannerItem
+import com.smartelmall.mysmartel_ver_1.Banner.BannerViewPagerAdapter
+import com.smartelmall.mysmartel_ver_1.Banner.ZoomOutPageTransformer
 import com.smartelmall.mysmartel_ver_1.KT.*
 import com.smartelmall.mysmartel_ver_1.LGT.LgtBillApiResponse
 import com.smartelmall.mysmartel_ver_1.LGT.LgtBillDetailFragment

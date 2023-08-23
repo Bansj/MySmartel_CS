@@ -41,7 +41,9 @@ class SettingFragment : Fragment() {
 
         // Set click listener for newPW button
         view.findViewById<ImageButton>(R.id.btn_newPW).setOnClickListener {
+            val phoneNumber = arguments?.getString("phoneNumber")
             val intent = Intent(requireActivity(), IdentificationSelfActivity::class.java)
+            intent.putExtra("phoneNumber", phoneNumber)
             startActivity(intent)
         }
 

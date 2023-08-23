@@ -1,4 +1,4 @@
-package com.smartelmall.mysmartel_ver_1
+package com.smartelmall.mysmartel_ver_1.Banner
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.fragment.app.Fragment
+import com.smartelmall.mysmartel_ver_1.R
 
 // 추후에 업데이트 후 배너 페이지를 웹뷰로 띄워줄 예정
 class BannerWebViewFragment : Fragment() {

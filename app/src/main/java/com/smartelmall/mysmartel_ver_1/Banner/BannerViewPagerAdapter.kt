@@ -1,4 +1,4 @@
-package com.smartelmall.mysmartel_ver_1
+package com.smartelmall.mysmartel_ver_1.Banner
 
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -12,7 +12,10 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.smartelmall.mysmartel_ver_1.R
 
+
+// 광고 배너 어댑터
 class BannerViewPagerAdapter(private val context: Context, private val bannerList: List<BannerItem>) :
     RecyclerView.Adapter<BannerViewPagerAdapter.BannerViewHolder>() {
 

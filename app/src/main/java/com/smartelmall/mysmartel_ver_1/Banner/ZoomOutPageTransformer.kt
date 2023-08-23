@@ -1,4 +1,4 @@
-package com.smartelmall.mysmartel_ver_1
+package com.smartelmall.mysmartel_ver_1.Banner
 
 import android.view.View
 import androidx.viewpager2.widget.ViewPager2
