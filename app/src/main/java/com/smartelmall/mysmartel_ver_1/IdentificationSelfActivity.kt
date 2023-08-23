@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.AsyncTask
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
@@ -27,6 +28,7 @@ class IdentificationSelfActivity : AppCompatActivity() {
     private fun sendTextMessage() {
         val phoneNumber = getPhoneNumberFromSettingFragment() // Replace with actual function
         val certificationNumber = generateCertificationNumber()
+        Log.d("-----------------------------IdentificationSelf", "Generated certification number: $certificationNumber----------------------")
         val msgType = 1
 
         // Construct the URL
@@ -52,13 +54,19 @@ class IdentificationSelfActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     // Handle success: Show a toast with the success message
                     runOnUiThread {
+                        Log.d("IdentificationSelf", "SMS sent successfully. Response: $responseBody")
                         Toast.makeText(this@IdentificationSelfActivity, responseBody, Toast.LENGTH_SHORT).show()
-                        // Navigate to SendCheckNumberActivity.kt
-                        startActivity(Intent(this@IdentificationSelfActivity, SendCheckNumberActivity::class.java))
+
+                        // Navigate to SendCheckNumberActivity.kt and pass the generated certification number.
+                        Intent(this@IdentificationSelfActivity, SendCheckNumberActivity::class.java).apply{
+                            putExtra("CERTIFICATION_NUMBER", certificationNumber)
+                            startActivity(this)
+                        }
                     }
                 } else {
                     // Handle failure: Show a toast with the failure message
                     runOnUiThread {
+                        Log.d("IdentificationSelf", "SMS sending failed. Response: $responseBody")
                         Toast.makeText(this@IdentificationSelfActivity, "Please check your mobile phone number.", Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -67,20 +75,19 @@ class IdentificationSelfActivity : AppCompatActivity() {
             override fun onFailure(call: Call, e: IOException) {
                 // Handle failure: Show a toast indicating a network error
                 runOnUiThread {
-                    Toast.makeText(this@IdentificationSelfActivity, "Network error occurred.", Toast.LENGTH_SHORT).show()
+                    Log.e("IdentificationSelf", "Network error occurred:${e.message}")
+                    Toast.makeText(this@IdentificationSelfActivity,"Network error occurred.",Toast.LENGTH_SHORT).show()
                 }
             }
         })
     }
 
-    // Replace with actual implementation
     private fun getPhoneNumberFromSettingFragment(): String {
-        // Retrieve and return the phone number from SettingFragment
         return "01075244523"
     }
 
     private fun generateCertificationNumber(): String {
-        // Implement a function to generate a random certification number
         return (100000..999999).random().toString()
     }
 }
+
