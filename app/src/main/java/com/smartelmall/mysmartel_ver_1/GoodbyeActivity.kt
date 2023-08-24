@@ -57,7 +57,7 @@ class GoodbyeActivity : AppCompatActivity() {
                     AlertDialog.Builder(this@GoodbyeActivity)
                         .setMessage("스마텔 계정이 탈퇴되었습니다.")
                         .setPositiveButton("확인") { _, _ ->
-                            finish()
+                            exitApplication()
                         }
                         .setCancelable(false)
                         .show()
@@ -68,6 +68,12 @@ class GoodbyeActivity : AppCompatActivity() {
                 Log.e(TAG, "Failed to delete account", e)
             }
         })
+    }
+
+    // 어플 종료 함수
+    private fun exitApplication() {
+        finishAffinity()
+        System.exit(0)
     }
 }
 
