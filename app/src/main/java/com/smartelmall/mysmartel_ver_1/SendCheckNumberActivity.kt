@@ -14,12 +14,14 @@ class SendCheckNumberActivity : AppCompatActivity() {
         setContentView(R.layout.activity_send_check_number)
 
         val editText = findViewById<EditText>(R.id.edit_checkNumber)
-        val button = findViewById<Button>(R.id.btn_checkSendNumber)
+        val btnCheck = findViewById<Button>(R.id.btn_checkSendNumber)
 
         val correctNumber = intent.getStringExtra("CERTIFICATION_NUMBER")
-        Log.d("------------------------check correctNumber","certificaionNumber: $correctNumber")
+        val phoneNumber = intent.getStringExtra("phoneNumber")
+        Log.d("SendCheckNumberActivity------------------------get correctNumber","RandomNumber: $correctNumber")
+        Log.d("SendCheckNumberActivity------------------------get phoneNumber","phoneNumber: $phoneNumber")
 
-        button.setOnClickListener {
+        btnCheck.setOnClickListener {
             val userEnteredNumber = editText.text.toString()
 
             // Log user-entered and correct verification numbers
@@ -28,7 +30,12 @@ class SendCheckNumberActivity : AppCompatActivity() {
             if (userEnteredNumber == correctNumber) {
                 // Correct verification number entered, navigate to NewPasswordActivity
                 Log.d("Verification", "Verification successful")
-                startActivity(Intent(this@SendCheckNumberActivity, NewPasswordActivity::class.java))
+                // Pass phoneNumber to NewPasswordActivity along with the intent
+                Intent(this@SendCheckNumberActivity, NewPasswordActivity::class.java).apply {
+                    putExtra("phoneNumber", phoneNumber)
+                    Log.d("-------------CheckSendNumber","send phoneNumber: $phoneNumber-------")
+                    startActivity(this)
+                }
             } else {
                 // Incorrect verification number, show a toast
                 Log.d("Verification", "Verification failed")

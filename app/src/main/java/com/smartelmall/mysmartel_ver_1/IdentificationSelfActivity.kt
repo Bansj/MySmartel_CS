@@ -15,9 +15,14 @@ import java.net.URL
 import java.util.*
 
 class IdentificationSelfActivity : AppCompatActivity() {
+
+    private lateinit var phoneNumber: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_identification_self)
+
+        phoneNumber = intent.getStringExtra("phoneNumber") ?: getPhoneNumberFromSettingFragment()
+        Log.d("IdentificationSelfActivity","------------------check phoneNumber: $phoneNumber---------------------------")
 
         val button = findViewById<Button>(R.id.btn_identification)
         button.setOnClickListener {
@@ -60,6 +65,9 @@ class IdentificationSelfActivity : AppCompatActivity() {
                         // Navigate to SendCheckNumberActivity.kt and pass the generated certification number.
                         Intent(this@IdentificationSelfActivity, SendCheckNumberActivity::class.java).apply{
                             putExtra("CERTIFICATION_NUMBER", certificationNumber)
+                            putExtra("phoneNumber",phoneNumber)
+                            Log.d("IdentificationSelfActivity","-----------------send certificationNumber: $certificationNumber---------")
+                            Log.d("IdentificationSelfActivity","-----------------send phoneNumber: $phoneNumber---------")
                             startActivity(this)
                         }
                     }
@@ -83,7 +91,7 @@ class IdentificationSelfActivity : AppCompatActivity() {
     }
 
     private fun getPhoneNumberFromSettingFragment(): String {
-        return "01075244523"
+        return intent.getStringExtra("phoneNumber") ?: "null"
     }
 
     private fun generateCertificationNumber(): String {

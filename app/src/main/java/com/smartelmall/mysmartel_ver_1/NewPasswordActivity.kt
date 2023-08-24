@@ -1,10 +1,12 @@
 package com.smartelmall.mysmartel_ver_1
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.Button
@@ -31,7 +33,8 @@ class NewPasswordActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_new_password)
 
-        serviceNum = intent.getStringExtra("serviceNum") ?: ""
+        serviceNum = intent.getStringExtra("phoneNumber") ?: ""
+        Log.d("------------NewPasswordActivity check phoneNumber","get phoneNumber: $serviceNum--------")
 
         val editNewPassword = findViewById<EditText>(R.id.edit_newPassword)
         val editPasswordCheck = findViewById<EditText>(R.id.edit_passwordCheck)
@@ -99,12 +102,16 @@ class NewPasswordActivity : AppCompatActivity() {
             put("serviceNum",serviceNum)
             put("passwd",newPasswd)
         }
+
+        Log.d("API_LOG", "Service number: $serviceNum, New password: $newPasswd")
+
         val requestBody=jsonObject.toString().toRequestBody(jsonMediaType)
 
         Request.Builder().url(url).post(requestBody).build().also { request->
             client.newCall(request).enqueue(object :Callback{
                 override fun onFailure(call :Call,e :IOException){
                     e.printStackTrace()
+                    Log.e("API_LOG", "Request failed with exception: ${e.message}")
                 }
 
                 override fun onResponse(call :Call,response :Response){
@@ -112,17 +119,33 @@ class NewPasswordActivity : AppCompatActivity() {
                         JSONObject(responseBody)?.getString("ResultCode")?.let{resultCode->
                             if(resultCode=="0000"){
                                 // Password update was successful
+                                runOnUiThread {
+                                    showToastMessage("비밀번호 변경완료")
+                                    val intent = Intent(this@NewPasswordActivity, LoginActivity::class.java)
+                                    startActivity(intent)
+                                    finish()
+                                }
+                                Log.i("API_LOG", "Password update was successful")
                             }else{
                                 // Password update failed
+                                runOnUiThread {
+                                    showToastMessage("비밀번호 변경 실패")
+                                }
+                                Log.i("API_LOG", "Password update failed with resultCode: $resultCode")
                             }
                         }
+                    } ?: run {
+                        Log.e("API_LOG", "Response body is null or empty.")
                     }
                 }
 
             })
+            Log.d("API_LOG","Request sent to URL: $url with body: ${requestBody.contentLength()}")
+
         }
 
     }
+
     private fun showToastMessage(message:String){
         Toast.makeText(this@NewPasswordActivity,message,Toast.LENGTH_SHORT).apply{
             setGravity(Gravity.TOP or Gravity.CENTER_HORIZONTAL, 0 ,600 )

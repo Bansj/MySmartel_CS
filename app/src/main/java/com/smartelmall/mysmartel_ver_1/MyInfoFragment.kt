@@ -115,7 +115,7 @@ class MyInfoFragment : Fragment() {
         return view
     }
 
-    private fun fetchBannerList() {
+    private fun fetchBannerList() { // 배너 api
         val request = Request.Builder()
             .url("https://api.smartel.kr/banner")
             .build()
@@ -140,7 +140,7 @@ class MyInfoFragment : Fragment() {
         })
     }
 
-    private fun setupViewPager(bannerList: List<BannerItem>) {
+    private fun setupViewPager(bannerList: List<BannerItem>) { // 배너 뷰페이저 셋업
         viewPagerAdapter = BannerViewPagerAdapter(requireContext(), bannerList)
         viewPager2.adapter = viewPagerAdapter
         viewPager2.orientation = ViewPager2.ORIENTATION_HORIZONTAL
@@ -209,7 +209,7 @@ class MyInfoFragment : Fragment() {
         // Retrieve the data from the ViewModel or arguments
         val custName =
             viewModel.custName ?: arguments?.getString("custName")?.also { viewModel.custName = it }
-        val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")
+        val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")?.also { viewModel.phoneNumber = it }
             ?.also { viewModel.phoneNumber = it }
         val Telecom =
             viewModel.Telecom ?: arguments?.getString("Telecom")?.also { viewModel.Telecom = it }
@@ -243,7 +243,7 @@ class MyInfoFragment : Fragment() {
         }
         // Set the data in the views
         txtcustName.text = "  ${custName}님, 안녕하세요. "
-        txtPhoneNumber.text = " ✆ [$Telecom] $formattedPhoneNumber"
+        txtPhoneNumber.text = " ✆ $formattedPhoneNumber [$Telecom]"
         txtTelecom.text = Telecom
 
         // Set the data in the ViewModel
