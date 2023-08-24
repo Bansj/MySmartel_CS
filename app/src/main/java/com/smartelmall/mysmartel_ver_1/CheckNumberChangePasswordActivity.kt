@@ -8,10 +8,10 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 
-class SendCheckNumberActivity : AppCompatActivity() {
+class CheckNumberChangePasswordActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_send_check_number)
+        setContentView(R.layout.activity_check_number_change_password)
 
         val editText = findViewById<EditText>(R.id.edit_checkNumber)
         val btnCheck = findViewById<Button>(R.id.btn_checkSendNumber)
@@ -31,7 +31,7 @@ class SendCheckNumberActivity : AppCompatActivity() {
                 // Correct verification number entered, navigate to NewPasswordActivity
                 Log.d("Verification", "Verification successful")
                 // Pass phoneNumber to NewPasswordActivity along with the intent
-                Intent(this@SendCheckNumberActivity, NewPasswordActivity::class.java).apply {
+                Intent(this@CheckNumberChangePasswordActivity, NewPasswordActivity::class.java).apply {
                     putExtra("phoneNumber", phoneNumber)
                     Log.d("-------------CheckSendNumber","send phoneNumber: $phoneNumber-------")
                     startActivity(this)
@@ -39,7 +39,7 @@ class SendCheckNumberActivity : AppCompatActivity() {
             } else {
                 // Incorrect verification number, show a toast
                 Log.d("Verification", "Verification failed")
-                Toast.makeText(this@SendCheckNumberActivity, "Incorrect verification number", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@CheckNumberChangePasswordActivity, "Incorrect verification number", Toast.LENGTH_SHORT).show()
             }
         }
     }

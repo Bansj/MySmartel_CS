@@ -75,8 +75,8 @@ class SettingFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // MainActivity.kt로 부터 phoneNumber 받아오기
-        // Retrieve the data from the ViewModel or arguments
+        // MainActivity.kt로 부터
+        // 뷰모델에서 데이터 받아오기
         val custName =
             viewModel.custName ?: arguments?.getString("custName")?.also { viewModel.custName = it }
         val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")?.also { viewModel.phoneNumber = it }
@@ -87,11 +87,21 @@ class SettingFragment : Fragment() {
             ?.also { viewModel.serviceAcct = it }
 
 
-        // Set click listener for newPW button
+        // 비밀번호 변경 버튼
         view.findViewById<ImageButton>(R.id.btn_newPW).setOnClickListener {
             val intent = Intent(requireActivity(), IdentificationSelfActivity::class.java)
             intent.putExtra("phoneNumber", phoneNumber)
             Log.d("----------------SettingFragment","send phoneNumber: $phoneNumber--------------------")
+            startActivity(intent)
+        }
+
+        // 회원 탈퇴 버튼
+        view.findViewById<ImageButton>(R.id.btn_out).setOnClickListener {
+            val intent = Intent(requireActivity(), DeleteAccountActivity::class.java)
+            intent.putExtra("phoneNumber",phoneNumber)
+            intent.putExtra("custNm",custName)
+            Log.d("----------------SettingFragment","send phoneNumber: $phoneNumber--------------------")
+            Log.d("----------------SettingFragment","send custNm: $custName--------------------")
             startActivity(intent)
         }
         //val phoneNumber = arguments?.getString("phoneNumber")

@@ -9,26 +9,32 @@ import android.widget.Toast
 import okhttp3.*
 import java.io.IOException
 
-class IdentificationSelfActivity : AppCompatActivity() {
+class DeleteAccountActivity : AppCompatActivity() {
 
     private lateinit var phoneNumber: String
+    private lateinit var custNm: String
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_identification_self)
+        setContentView(R.layout.activity_delete_account)
 
-        phoneNumber = intent.getStringExtra("phoneNumber") ?: getPhoneNumberFromSettingFragment()
-        Log.d("IdentificationSelfActivity","------------------check phoneNumber: $phoneNumber---------------------------\n")
+        phoneNumber = intent.getStringExtra("phoneNumber") ?: ""
+        custNm = intent.getStringExtra("custNm")?:""
+        Log.d("DeleteAccountActivity", "------------------get phoneNumber: $phoneNumber---------------------------")
+        Log.d("DeleteAccountActivity", "------------------get custNm: $custNm---------------------------")
 
-        val button = findViewById<Button>(R.id.btn_identification)
+        val button = findViewById<Button>(R.id.btn_check)
         button.setOnClickListener {
             sendTextMessage()
         }
     }
 
     private fun sendTextMessage() {
-        val phoneNumber = getPhoneNumberFromSettingFragment() // Replace with actual function
+        //val phoneNumber = getPhoneNumberFromSettingFragment() // Replace with actual function
         val certificationNumber = generateCertificationNumber()
-        Log.d("-----------------------------IdentificationSelf", "Generated certification number: $certificationNumber----------------------")
+        Log.d(
+            "-----------------------------DeleteAccountActivity", "Generated certification number: $certificationNumber----------------------"
+        )
         val msgType = 1
 
         // Construct the URL
@@ -54,23 +60,26 @@ class IdentificationSelfActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     // Handle success: Show a toast with the success message
                     runOnUiThread {
-                        Log.d("IdentificationSelf", "SMS sent successfully. Response: $responseBody")
-                        Toast.makeText(this@IdentificationSelfActivity, responseBody, Toast.LENGTH_SHORT).show()
+                        Log.d("DeleteAccountActivity", "SMS sent successfully. Response: $responseBody")
+                        Toast.makeText(this@DeleteAccountActivity, responseBody, Toast.LENGTH_SHORT).show()
 
                         // Navigate to SendCheckNumberActivity.kt and pass the generated certification number.
-                        Intent(this@IdentificationSelfActivity, CheckNumberChangePasswordActivity::class.java).apply{
+                        Intent(
+                            this@DeleteAccountActivity, CheckNumberDeleteAccountActivity::class.java
+                        ).apply {
                             putExtra("CERTIFICATION_NUMBER", certificationNumber)
-                            putExtra("phoneNumber",phoneNumber)
-                            Log.d("IdentificationSelfActivity","-----------------send certificationNumber: $certificationNumber---------")
-                            Log.d("IdentificationSelfActivity","-----------------send phoneNumber: $phoneNumber---------")
+                            putExtra("phoneNumber", phoneNumber)
+                            putExtra("custNm",custNm)
+                            Log.d("DeleteAccountActivity", "-----------------send certificationNumber: $certificationNumber---------")
+                            Log.d("DeleteAccountActivity", "-----------------send phoneNumber: $phoneNumber---------")
                             startActivity(this)
                         }
                     }
                 } else {
                     // Handle failure: Show a toast with the failure message
                     runOnUiThread {
-                        Log.d("IdentificationSelf", "SMS sending failed. Response: $responseBody")
-                        Toast.makeText(this@IdentificationSelfActivity, "Please check your mobile phone number.", Toast.LENGTH_SHORT).show()
+                        Log.d("DeleteAccountActivity", "SMS sending failed. Response: $responseBody")
+                        Toast.makeText(this@DeleteAccountActivity, "Please check your mobile phone number.", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -78,8 +87,8 @@ class IdentificationSelfActivity : AppCompatActivity() {
             override fun onFailure(call: Call, e: IOException) {
                 // Handle failure: Show a toast indicating a network error
                 runOnUiThread {
-                    Log.e("IdentificationSelf", "Network error occurred:${e.message}")
-                    Toast.makeText(this@IdentificationSelfActivity,"Network error occurred.",Toast.LENGTH_SHORT).show()
+                    Log.e("DeleteAccountActivity", "Network error occurred:${e.message}")
+                    Toast.makeText(this@DeleteAccountActivity, "Network error occurred.", Toast.LENGTH_SHORT).show()
                 }
             }
         })
@@ -93,4 +102,3 @@ class IdentificationSelfActivity : AppCompatActivity() {
         return (100000..999999).random().toString()
     }
 }
-

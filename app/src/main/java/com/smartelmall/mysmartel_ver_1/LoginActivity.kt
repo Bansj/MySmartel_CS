@@ -149,7 +149,7 @@ class LoginActivity : AppCompatActivity() {
         try {
             val loginResult = response.getString("resultCd")
 
-            if (loginResult == "true") {
+            if (loginResult == "true" || loginResult == "1818") {
                 val phoneNumber = phoneNumberEditText.text.toString()
                 Log.d("LoginActivity",
                     "--------------------Login successful - Phone number: $phoneNumber--------------------")

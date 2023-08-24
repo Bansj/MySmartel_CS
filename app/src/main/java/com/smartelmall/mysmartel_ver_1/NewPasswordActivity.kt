@@ -56,23 +56,44 @@ class NewPasswordActivity : AppCompatActivity() {
                         editNewPassword.text.toString() == editPasswordCheck.text.toString()) {
                         btnCheck.visibility = View.VISIBLE
 
-                        // Display the message to user when passwords match.
-                        showToastMessage("Passwords match")
-
+                        // edit_passwordCheck에 입력이 있는 경우에만 토스트 메시지를 표시합니다.
+                        if (editPasswordCheck.text.isNotBlank()) {
+                            // "일치합니다." 메시지 표시
+                            showToastMessage("일치합니다.")
+                        }
                     } else {
                         btnCheck.visibility = View.INVISIBLE
-                        if(editNewPassword.text.toString() != editPasswordCheck.text.toString()){
-                            // Display the message to user when passwords do not match.
-                            showToastMessage("Passwords do not match")
+                        if (editNewPassword.text.isNotBlank() && editPasswordCheck.text.isNotBlank()) {
+                            // "일치하지 않습니다." 메시지 표시
+                            showToastMessage("일치하지 않습니다.")
+                        }
+
+                        // 각 조건을 확인하고 어떤 요소가 누락되었는지 확인합니다.
+                        val newPassword = editNewPassword.text.toString()
+                        val hasEnglish = newPassword.any { it.isLetter() }
+                        val hasNumber = newPassword.any { it.isDigit() }
+                        val hasSpecialCharacter = newPassword.any { !it.isLetterOrDigit() }
+
+                        if (!hasEnglish) {
+                            showToastMessage("영어 포함되지 않았습니다.")
+                        }
+
+                        if (!hasNumber) {
+                            showToastMessage("숫자 포함되지 않았습니다.")
+                        }
+
+                        if (!hasSpecialCharacter) {
+                            showToastMessage("특수문자 포함되지 않았습니다.")
                         }
                     }
                 }
 
                 // Delay the execution of the runnable by 500 milliseconds
-                handler.postDelayed(runnable!!, 500)
+                handler.postDelayed(runnable!!, 800)
             }
 
         }
+
 
         // Set the text watchers to both EditTexts
         editNewPassword.addTextChangedListener(passwordTextWatcher)
