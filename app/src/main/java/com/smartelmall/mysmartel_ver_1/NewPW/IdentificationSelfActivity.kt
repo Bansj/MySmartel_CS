@@ -1,4 +1,4 @@
-package com.smartelmall.mysmartel_ver_1
+package com.smartelmall.mysmartel_ver_1.NewPW
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
+import com.smartelmall.mysmartel_ver_1.R
 import okhttp3.*
 import java.io.IOException
 

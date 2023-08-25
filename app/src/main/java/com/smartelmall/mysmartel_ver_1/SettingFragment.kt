@@ -13,6 +13,7 @@ import android.widget.ImageButton
 import android.widget.Switch
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
+import com.smartelmall.mysmartel_ver_1.NewPW.IdentificationSelfActivity
 
 
 class SettingFragment : Fragment() {

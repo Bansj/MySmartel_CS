@@ -32,6 +32,7 @@ import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 
 class LoginActivity : AppCompatActivity() {
+
     private lateinit var phoneNumberEditText: EditText
     private lateinit var passwordEditText: EditText
     private lateinit var loginButton: Button
@@ -156,13 +157,71 @@ class LoginActivity : AppCompatActivity() {
                 fetchUserInfo(phoneNumber)
             } else {
                 hideLoadingDialog()
-                showErrorDialog("Login failed")
+                showErrorDialog("로그인에 실패하였습니다.")
             }
         } catch (e: JSONException) {
             hideLoadingDialog()
             showErrorDialog("Failed to parse login response")
         }
     }
+
+/*    private fun handleLoginResponse(response: JSONObject) {
+        try {
+            val type = response.getString("typ")
+            val loginResult = response.getString("resultCd")
+
+            if (loginResult == "1818") {
+                val startTime = response.getString("startTime")
+                val endTime = response.getString("endTime")
+                showErrorDialogAndFinishApp("서버 점검중\n점검 시간: $startTime ~ $endTime")
+                return
+            }
+
+            if (loginResult != "true") {
+                when (type) {
+                    "join" -> showErrorDialog("스마텔 개통 고객이 아닙니다. 회원가입이 필요합니다.")
+                    "accnt" -> showErrorDialog("로그인 계정이 없습니다. 회원가입이 필요합니다.")
+                    "pwd" -> showErrorDialog("비밀번호가 일치하지 않습니다. 비밀번호를 재입력해주세요.")
+                    else -> showErrorDialog("알 수 없는 오류입니다.")
+                }
+                hideLoadingDialog()
+                return
+            }
+
+            val phoneNumber = phoneNumberEditText.text.toString()
+            Log.d(
+                "LoginActivity",
+                "--------------------Login successful - Phone number: $phoneNumber--------------------"
+            )
+
+            fetchUserInfo(phoneNumber)
+
+        } catch (e: JSONException) {
+            hideLoadingDialog()
+            showErrorDialog("Failed to parse login response")
+        }
+    }
+
+    private fun showErrorDialog(message: String) {
+        val dialogBuilder = AlertDialog.Builder(this)
+        dialogBuilder.setMessage(message)
+            .setCancelable(false)
+            .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+
+        val alert = dialogBuilder.create()
+        alert.show()
+    }
+
+    private fun showErrorDialogAndFinishApp(message: String) {
+        val dialogBuilder = AlertDialog.Builder(this)
+        dialogBuilder.setMessage(message)
+            .setCancelable(false)
+            .setPositiveButton("OK") { _, _ -> finish() }
+
+        // Create and show the AlertDialog
+        val alert = dialogBuilder.create()
+        alert.show()
+    }*/
 
     private fun fetchUserInfo(phoneNumber: String) {
         val infoParams = JSONObject()

@@ -112,9 +112,9 @@ class SktBillDetailFragment : Fragment() {
                     // Decrement the month for the next iteration
                     currentMonth.add(Calendar.MONTH, -1)
                 }
-
                 // Display the data in the textView
                 displayData(currentResponse)
+
             } catch (e: Exception) {
                 Log.e("BillingDetail", "Error fetching billing detail: ${e.message}")
             }
@@ -165,7 +165,7 @@ class SktBillDetailFragment : Fragment() {
             // Format the year and month
             val formattedDate = "${year}년 ${month}월"
 
-            val TOT_INV_AMT = consumeBytes(22)
+            val TOT_INV_AMT = consumeBytes(22).trim()
             val BILL_REC_CNT = consumeBytes(5).trim(' ')
             // 수정된 부분: BILL_REC_CNT가 빈 문자열인 경우에 default 값을 "0"으로 설정
             val billRecCnt = if (BILL_REC_CNT.isEmpty()) 0 else BILL_REC_CNT.toInt()
@@ -178,12 +178,13 @@ class SktBillDetailFragment : Fragment() {
             val stringBuilder2 = StringBuilder()
 
             fun formatNumber(number: String): String {
-                return if (number.isNotEmpty()) {
+                return if (number.isNotEmpty() && number.all { it.isDigit() }) {
                     NumberFormat.getInstance().format(number.toInt())
                 } else {
                     "0"
                 }
             }
+
 
             for (i in 0 until billRecCnt) {
                 val BILL_ITM_LCL_NM = removeStrangeChars(consumeBytes(80).trim())
@@ -244,9 +245,6 @@ class SktBillDetailFragment : Fragment() {
                     " ErrorCode: ${ErrorCode.length}")
         }
     }
-
-
-
 }
 
 

@@ -8,7 +8,7 @@ import android.os.Bundle
 import android.webkit.*
 import android.widget.Button
 
-// 로그인 웹뷰
+// 회원가입 웹뷰 페이지
 class WebViewActivity : AppCompatActivity() {
     private lateinit var webView: WebView
     private lateinit var toLoginButton: Button

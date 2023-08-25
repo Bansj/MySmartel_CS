@@ -1,4 +1,4 @@
-package com.smartelmall.mysmartel_ver_1
+package com.smartelmall.mysmartel_ver_1.NewPW
 
 import android.content.Intent
 import android.os.Bundle
@@ -13,8 +13,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.addTextChangedListener
-import com.google.gson.GsonBuilder
+import com.smartelmall.mysmartel_ver_1.LoginActivity
+import com.smartelmall.mysmartel_ver_1.R
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody

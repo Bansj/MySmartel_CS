@@ -1,4 +1,4 @@
-package com.smartelmall.mysmartel_ver_1
+package com.smartelmall.mysmartel_ver_1.NewPW
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -7,6 +7,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import com.smartelmall.mysmartel_ver_1.R
 
 class CheckNumberChangePasswordActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

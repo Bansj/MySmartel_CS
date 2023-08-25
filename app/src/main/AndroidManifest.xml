@@ -25,13 +25,13 @@
             android:name=".DeleteAccountActivity"
             android:exported="false" />
         <activity
-            android:name=".NewPasswordActivity"
+            android:name=".NewPW.NewPasswordActivity"
             android:exported="false" />
         <activity
-            android:name=".CheckNumberChangePasswordActivity"
+            android:name=".NewPW.CheckNumberChangePasswordActivity"
             android:exported="false" />
         <activity
-            android:name=".IdentificationSelfActivity"
+            android:name=".NewPW.IdentificationSelfActivity"
             android:exported="false" />
         <activity
             android:name=".FindPWActivity"
