@@ -533,8 +533,6 @@ class MyInfoFragment : Fragment() {
 
         btnRefresh.performClick() // 화면 전환 완료시 자동으로 버튼 클릭되는 이벤트
 
-
-
     }
 
 
@@ -555,6 +553,7 @@ class MyInfoFragment : Fragment() {
 
     private fun KtFetchBillData() {  // KT 당월 청구요금 API 조회
         val phoneNumber = arguments?.getString("phoneNumber") ?: ""
+
         val apiUrl = "https://kt-self.smartelmobile.com/common/api/selfcare/selfcareAPIServer.aspx"
 
         val requestBody = createBillRequestBody(phoneNumber)

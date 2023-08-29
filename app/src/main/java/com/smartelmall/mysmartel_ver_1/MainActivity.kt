@@ -1,6 +1,7 @@
 package com.smartelmall.mysmartel_ver_1
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
@@ -9,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 class MainActivity : AppCompatActivity() {
 
     private val TAG = "MainActivity" // 로그 태그
+    private lateinit var sharedPref: SharedPreferences
 
     private val viewModel: MyInfoViewModel by viewModels()
 
@@ -16,15 +18,32 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val phoneNumber = intent.getStringExtra("PhoneNumber")
+        val custName = intent.getStringExtra("custName")
+        val Telecom = intent.getStringExtra("Telecom")
+        val serviceAcct = intent.getStringExtra("serviceAcct")
+
+        sharedPref = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+
+        // Check if auto login is enabled
+        if (sharedPref.getBoolean("autoLogin", false)) {
+            val telecom = intent.getStringExtra("telecom")
+            val custName = intent.getStringExtra("custName")
+            val serviceAcct = intent.getStringExtra ("serviceAcct")
+            val phoneNumber =intent.getStringExtra ("phoneNumber")
+
+            // 이제 telecom, custName, serviceAcct, phoneNumber 변수들을 사용하여 원하는 동작을 수행하면 됩니다.
+        }
+
         // Retrieve the phoneNumber from SharedPreferences
         val sharedPrefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-        val phoneNumber = sharedPrefs.getString("phoneNumber", "")
+    /*    val phoneNumber = sharedPrefs.getString("phoneNumber", "")
 
         // Retrieve the data from the intent extras
         val custName = intent.getStringExtra("custName")
         //val phoneNumber = intent.getStringExtra("phoneNumber")
         val Telecom = intent.getStringExtra("Telecom")
-        val serviceAcct = intent.getStringExtra("serviceAcct")
+        val serviceAcct = intent.getStringExtra("serviceAcct")*/
 
         // Log the data before creating the fragment
         Log.d(TAG, "---------------getStringExtra -> custName: $custName, phoneNumber: $phoneNumber, Telecom: $Telecom, serviceAcct: $serviceAcct---------------")

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#fffcf6"
     tools:context="com.smartelmall.mysmartel_ver_1.SettingFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -42,7 +43,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginHorizontal="15dp"
-            android:background="#FFFAFA"
+            android:background="#fffcf6"
             android:orientation="vertical"
             tools:layout_editor_absoluteX="15dp">
 

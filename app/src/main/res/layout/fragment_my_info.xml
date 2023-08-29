@@ -4,11 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/myInfoFragment"
+    android:background="#fffcf6"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#FFFAFA">
+        android:background="#fffcf6">
 
         <LinearLayout
             android:id="@+id/linearLayout4"
@@ -23,7 +24,7 @@
                 android:id="@+id/linearLayout"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:background="#FFFAFA"
+                android:background="#fffcf6"
                 android:gravity="center"
                 android:orientation="horizontal"
                 app:layout_constraintTop_toTopOf="parent">
