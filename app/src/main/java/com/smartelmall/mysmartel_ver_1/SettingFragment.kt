@@ -57,12 +57,16 @@ class SettingFragment : Fragment() {
         }
 
         view.findViewById<ImageButton>(R.id.btn_logOut).setOnClickListener {
-            // Clear the autoLogin status in shared preferences when logging out
-            sharedPrefs.edit().remove("autoLogin").apply()
+            val editor = sharedPrefs?.edit()
 
-            val intent = Intent(requireActivity(), LoginActivity::class.java)
-            startActivity(intent)
-            requireActivity().finish()
+            if (editor != null) {
+                editor.clear() // Clear all saved data
+                editor.apply()
+
+                // Navigate to LoginActivity after logging out.
+                startActivity(Intent(activity, LoginActivity::class.java))
+                activity?.finish()
+            }
         }
         // Handle switch changes and save the status in shared preferences
         switchAutoLogin.setOnCheckedChangeListener { _, isChecked ->
