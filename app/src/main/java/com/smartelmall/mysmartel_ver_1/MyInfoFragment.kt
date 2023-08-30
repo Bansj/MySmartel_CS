@@ -204,17 +204,11 @@ class MyInfoFragment : Fragment() {
 
         sharedPrefs = MyInfoSharedPreferences(requireContext())
 
-       // bannerImage = view.findViewById(R.id.img_banner)
-
         // Retrieve the data from the ViewModel or arguments
-        val custName =
-            viewModel.custName ?: arguments?.getString("custName")?.also { viewModel.custName = it }
-        val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")?.also { viewModel.phoneNumber = it }
-            ?.also { viewModel.phoneNumber = it }
-        val Telecom =
-            viewModel.Telecom ?: arguments?.getString("Telecom")?.also { viewModel.Telecom = it }
-        val serviceAcct = viewModel.serviceAcct ?: arguments?.getString("serviceAcct")
-            ?.also { viewModel.serviceAcct = it }
+        val custName = viewModel.custName ?: arguments?.getString("custName")?.also { viewModel.custName = it }
+        val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")?.also { viewModel.phoneNumber = it }?.also { viewModel.phoneNumber = it }
+        val Telecom = viewModel.Telecom ?: arguments?.getString("Telecom")?.also { viewModel.Telecom = it }
+        val serviceAcct = viewModel.serviceAcct ?: arguments?.getString("serviceAcct")?.also { viewModel.serviceAcct = it }?.also { viewModel.serviceAcct = it }
 
         // Get a reference to the layout_additionalServices view
         val layoutAdditionalServices = view.findViewById<View>(R.id.layout_additionalServices)
@@ -413,8 +407,8 @@ class MyInfoFragment : Fragment() {
         // 버튼을 클릭시 아래에서 위로 올라오는 부가서비스 상세보기 페이지 클릭이벤트
         val btnAddServiceFragment = view?.findViewById<Button>(R.id.btn_addService)
         btnAddServiceFragment?.setOnClickListener {
-            val telecom = viewModel.Telecom ?: arguments?.getString("Telecom")
-            val fragment: Fragment? = when (telecom) {
+            val Telecom = viewModel.Telecom ?: arguments?.getString("Telecom")
+            val fragment: Fragment? = when (Telecom) {
                 "SKT" -> {
                     val sktAddServiceFragment = SktAddServiceFragment()
                     val bundle = Bundle()
@@ -467,7 +461,7 @@ class MyInfoFragment : Fragment() {
                     lgtBillDetailFragment
                 }
                 else -> {
-                    Log.e("MyInfoFragment", "Invalid Telecom value: $telecom")
+                    Log.e("MyInfoFragment", "Invalid Telecom value: $Telecom")
                     null
                 }
             }
@@ -504,15 +498,14 @@ class MyInfoFragment : Fragment() {
         // Add click listener for btn_refresh button
         btnRefresh.setOnClickListener {
 
-            val serviceAcct = arguments?.getString("serviceAcct")
-            val telecom = arguments?.getString("Telecom")
-            this.phoneNumber = arguments?.getString("phoneNumber") ?: ""
-            svcNum = this.phoneNumber
-            //this.custName = arguments?.getString("custName") ?: ""
+            Log.d("MyInfoFragment","---------------get Reload serviceAcct: $serviceAcct--------------")
+            Log.d("MyInfoFragment","---------------get Reload telecom: $Telecom--------------")
+            Log.d("MyInfoFragment","---------------get Reload phoneNumber: $phoneNumber--------------")
+            Log.d("MyInfoFragment","---------------get Reload custName: $custName--------------")
 
-            when (telecom) {
+            when (Telecom) {
                 "SKT" -> {
-                    SktFetchDeductData(serviceAcct, telecom)
+                    SktFetchDeductData(serviceAcct, Telecom)
                     SktFetchBillingDetail()
                     SktFetchAddServiceDetail()
                 }
@@ -532,7 +525,6 @@ class MyInfoFragment : Fragment() {
         }
 
         btnRefresh.performClick() // 화면 전환 완료시 자동으로 버튼 클릭되는 이벤트
-
     }
 
 
@@ -545,15 +537,9 @@ class MyInfoFragment : Fragment() {
 
 
 
-
-
-
-
-
-
     private fun KtFetchBillData() {  // KT 당월 청구요금 API 조회
-        val phoneNumber = arguments?.getString("phoneNumber") ?: ""
 
+        val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")?.also { viewModel.phoneNumber = it }?.also { viewModel.phoneNumber = it }?:""
         val apiUrl = "https://kt-self.smartelmobile.com/common/api/selfcare/selfcareAPIServer.aspx"
 
         val requestBody = createBillRequestBody(phoneNumber)
@@ -667,7 +653,7 @@ class MyInfoFragment : Fragment() {
 
 
     private fun KtFetchDeductApiData() {  // KT 잔여량 API 조회
-        val phoneNumber = arguments?.getString("phoneNumber") ?: ""
+        val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")?.also { viewModel.phoneNumber = it }?.also { viewModel.phoneNumber = it }?:""
         val apiUrl = "https://kt-self.smartelmobile.com/common/api/selfcare/selfcareAPIServer.aspx"
 
         val requestBody = RequestBody.create(
@@ -1271,11 +1257,12 @@ class MyInfoFragment : Fragment() {
 
 
 
-    // SKT 부가서비스 API 조회
-    private fun SktFetchAddServiceDetail() {
+
+    private fun SktFetchAddServiceDetail() {  // SKT 부가서비스 API 조회
         // Use viewLifecycleOwner.lifecycleScope instead of GlobalScope
         viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            val apiUrl = "https://www.mysmartel.com/api/sktGetInfo.php?svcNum=$svcNum&ifClCd=R2"
+            val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")?.also { viewModel.phoneNumber = it }?.also { viewModel.phoneNumber = it }
+            val apiUrl = "https://www.mysmartel.com/api/sktGetInfo.php?svcNum=$phoneNumber&ifClCd=R2"
             try {
                 val url = URL(apiUrl)
                 val connection = url.openConnection()
@@ -1400,8 +1387,10 @@ class MyInfoFragment : Fragment() {
 
 
 
-    // SKT 당월 청구요금 조회 API
-    private fun SktFetchBillingDetail() {
+
+    private fun SktFetchBillingDetail() { // SKT 당월 청구요금 조회 API
+        val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")?.also { viewModel.phoneNumber = it }?.also { viewModel.phoneNumber = it }
+
         GlobalScope.launch(Dispatchers.IO) {
             try {
                 var currentResponse = ""
@@ -1434,11 +1423,9 @@ class MyInfoFragment : Fragment() {
                         // If "E6" is not found, break the loop and display the data
                         break
                     }
-
                     // Decrement the month for the next iteration
                     currentMonth.add(Calendar.MONTH, -1)
                 }
-
                 // Display the data in the textView
                 displayData(currentResponse)
             } catch (e: Exception) {
@@ -1451,8 +1438,7 @@ class MyInfoFragment : Fragment() {
         return input.replace(Regex("[^가-힣0-9\\s]+"), "")
     }
 
-    // 조회된 데이터 처리 및 결과 출력 코드 수정
-    private fun displayData(data: String) {
+    private fun displayData(data: String) { // 조회된 데이터 처리 및 결과 출력 코드 수정
         GlobalScope.launch(Dispatchers.Main) {
             val encodedData = String(data.toByteArray(Charset.forName("UTF-8")), Charset.forName("UTF-8"))
 
@@ -1471,7 +1457,6 @@ class MyInfoFragment : Fragment() {
                 if (currentIndex >= trueValue.length) {
                     return ""
                 }
-
                 val endIndex = if (currentIndex + count > trueValue.length) trueValue.length else currentIndex + count
                 val substring = trueValue.substring(currentIndex, endIndex)
                 currentIndex += count
@@ -1579,6 +1564,8 @@ class MyInfoFragment : Fragment() {
 
    // SKT 잔여량 조회 API
     private fun SktFetchDeductData(serviceAcct: String?, telecom: String?) {
+
+       val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")?.also { viewModel.phoneNumber = it }?.also { viewModel.phoneNumber = it }
         GlobalScope.launch(Dispatchers.IO) {
             try {
                 val serviceAcct = viewModel.serviceAcct

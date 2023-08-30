@@ -10,7 +10,7 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/appicon_smartel_original"
-        android:label="스마텔 고객센터"
+        android:label="스마텔"
         android:supportsRtl="true"
         android:theme="@style/Theme.MySmartel_ver_1"
         android:usesCleartextTraffic="true"
