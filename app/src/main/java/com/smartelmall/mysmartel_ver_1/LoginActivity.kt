@@ -45,7 +45,7 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var findPW: TextView
 
-    private lateinit var autoLoginSwitch: Switch // 자동로그인 스위
+    private lateinit var autoLoginSwitch: Switch // 자동로그인 스위치
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,28 +63,39 @@ class LoginActivity : AppCompatActivity() {
         requestQueue = Volley.newRequestQueue(this, ignoreSslErrorHurlStack())
 
         autoLoginSwitch = findViewById(R.id.switch_autoLogin)
-        val sharedPrefs = getSharedPreferences("Myprefs", Context.MODE_PRIVATE)
 
+        autoLoginSwitch = findViewById(R.id.switch_autoLogin)
+
+        val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val sharedPrefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         if (sharedPrefs.getBoolean("autoLogin", false)) {
-            val intent = Intent(this, MainActivity::class.java).apply {
-                putExtra("custName", sharedPrefs.getString("custName", ""))
-                putExtra("PhoneNumber", sharedPrefs.getString("phoneNumber", ""))
-                putExtra("Telecom", sharedPrefs.getString("telecom",""))
-                putExtra("serviceAcct", sharedPrefs.getString("serviceAcct",""))
-            }
-            startActivity(intent)
-            finish()
+            phoneNumberEditText.setText(sharedPrefs.getString("phoneNumber", ""))
+            passwordEditText.setText(sharedPrefs.getString("password", ""))
+            loginUser()
         }
 
-        loginButton.setOnClickListener {
+        loginButton.setOnClickListener { // 로그인 버튼
             Log.d(
                 "LoginActivity",
                 "============================== Login button clicked =============================="
             )
             loginUser()
-            val editor = sharedPrefs.edit()
-            editor.putBoolean("autoLogin", autoLoginSwitch.isChecked)
-            editor.apply()
+
+            if (autoLoginSwitch.isChecked) {
+                with(sharedPrefs.edit()) {
+                    putString("phoneNumber", phoneNumberEditText.text.toString())
+                    putString("password", passwordEditText.text.toString())
+                    putBoolean("autoLogin", true)
+                    apply()
+                }
+            } else {
+                with(sharedPrefs.edit()) {
+                    remove("phoneNumber")
+                    remove("password")
+                    putBoolean("autoLogin", false)
+                    apply()
+                }
+            }
         }
         signUpButton = findViewById(R.id.btn_signUp)
         signUpButton.setOnClickListener {
@@ -103,37 +114,11 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun showAlertDialog(message: String) {
-        val alertDialog = AlertDialog.Builder(this)
-            .setMessage(message)
-            .setPositiveButton("확인") { dialog: DialogInterface, _: Int ->
-                dialog.dismiss()
-                navigateToSignupActivity()
-            }
-            .create()
-
-        // AlertDialog 확인버튼 글자색 변경 코드
-        alertDialog.setOnShowListener {
-            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(resources.getColor(R.color.orange))
-        }
-        alertDialog.show()
-    }
     private fun navigateToSignupActivity() {
         val intent = Intent(this, WebViewActivity::class.java)
         startActivity(intent)
     }
-    private fun createLoadingDialog(): AlertDialog {
-        val dialogBuilder = AlertDialog.Builder(this)
-        val dialogView = layoutInflater.inflate(R.layout.loading_dialog, null)
-        val progressBar = dialogView.findViewById<ProgressBar>(R.id.loading_spinner)
-        progressBar.indeterminateDrawable.setColorFilter(
-            ContextCompat.getColor(this, R.color.orange),
-            android.graphics.PorterDuff.Mode.SRC_IN
-        )
-        dialogBuilder.setView(dialogView)
-        dialogBuilder.setCancelable(false)
-        return dialogBuilder.create()
-    }
+
     private fun loginUser() {
         val phoneNumber = phoneNumberEditText.text.toString()
         val password = passwordEditText.text.toString()
@@ -247,6 +232,21 @@ class LoginActivity : AppCompatActivity() {
     private fun hideLoadingDialog() {
         loadingDialog.dismiss()
     }
+    private fun showAlertDialog(message: String) {
+        val alertDialog = AlertDialog.Builder(this)
+            .setMessage(message)
+            .setPositiveButton("확인") { dialog: DialogInterface, _: Int ->
+                dialog.dismiss()
+                navigateToSignupActivity()
+            }
+            .create()
+
+        // AlertDialog 확인버튼 글자색 변경 코드
+        alertDialog.setOnShowListener {
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(resources.getColor(R.color.orange))
+        }
+        alertDialog.show()
+    }
     private fun showErrorDialog(message: String) {
         val dialogBuilder = AlertDialog.Builder(this)
         dialogBuilder.setMessage(message)
@@ -255,6 +255,18 @@ class LoginActivity : AppCompatActivity() {
 
         val alert = dialogBuilder.create()
         alert.show()
+    }
+    private fun createLoadingDialog(): AlertDialog {
+        val dialogBuilder = AlertDialog.Builder(this)
+        val dialogView = layoutInflater.inflate(R.layout.loading_dialog, null)
+        val progressBar = dialogView.findViewById<ProgressBar>(R.id.loading_spinner)
+        progressBar.indeterminateDrawable.setColorFilter(
+            ContextCompat.getColor(this, R.color.orange),
+            android.graphics.PorterDuff.Mode.SRC_IN
+        )
+        dialogBuilder.setView(dialogView)
+        dialogBuilder.setCancelable(false)
+        return dialogBuilder.create()
     }
     // https 통신 허용
     private fun ignoreSslErrorHurlStack(): HurlStack {

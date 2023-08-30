@@ -1,11 +1,11 @@
 package com.smartelmall.mysmartel_ver_1
 
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.content.SharedPreferences
+import android.app.AlertDialog
 import android.os.Handler
 import android.util.Log
 import android.widget.ProgressBar
@@ -35,22 +35,18 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val sharedPrefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val phoneNumber= sharedPrefs.getString("phoneNumber","")
+        val password= sharedPrefs.getString("password","")
+        val autoLoginEnabled= sharedPrefs.getBoolean("autoLoginEnabled",false)
 
-        val phoneNumber = sharedPrefs.getString("phoneNumber", null)
-
-        if (phoneNumber != null) {
-            val intent = Intent(this@SplashActivity, MainActivity::class.java).apply{
-                putExtra("PhoneNumber", phoneNumber )
-                putExtra("custName" ,sharedPrefs.getString( "custName",""))
-                putExtra( "Telecom" ,sharedPrefs.getString( "Telecom",""))
-                putExtra( "serviceAcct" ,sharedPrefs.getString( "serviceAcct",""))
-            }
-            startActivity(intent)
+        if(autoLoginEnabled && !phoneNumber.isNullOrEmpty() && !password.isNullOrEmpty()){
+            startActivity(Intent(this, MainActivity::class.java))
             finish()
-        } else {
-            startActivity(Intent(this@SplashActivity, LoginActivity::class.java))
+        }else{
+            startActivity(Intent(this, LoginActivity::class.java))
             finish()
         }
     }
 }
+
 

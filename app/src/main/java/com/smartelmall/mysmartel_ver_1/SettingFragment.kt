@@ -17,6 +17,8 @@ import com.smartelmall.mysmartel_ver_1.NewPW.IdentificationSelfActivity
 
 class SettingFragment : Fragment() {
 
+    private lateinit var autoLoginSwitch: Switch
+
     // Obtain an instance of the ViewModel from the shared ViewModelStoreOwner
     private val viewModel: MyInfoViewModel by viewModels({ requireActivity() })
 
@@ -66,6 +68,27 @@ class SettingFragment : Fragment() {
         switchAutoLogin.setOnCheckedChangeListener { _, isChecked ->
             if(isChecked){
                 sharedPrefs.edit().putBoolean("autoLogin", isChecked).apply()
+            }
+        }
+        autoLoginSwitch = view.findViewById(R.id.switch_autoLogin)
+
+        val sharedPreferences =
+            activity?.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE) ?: return view
+
+        val sharedPrefs = activity?.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+
+        if (sharedPrefs != null) {
+            autoLoginSwitch.isChecked = sharedPrefs.getBoolean("autoLogin", false)
+        }
+
+        autoLoginSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (!isChecked) {
+                val editor = sharedPrefs?.edit()
+
+                if (editor != null) {
+                    editor.clear() // Clear all saved data
+                    editor.apply()
+                }
             }
         }
 
