@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.Toast
 import okhttp3.*
 import java.io.IOException
@@ -26,6 +27,11 @@ class DeleteAccountActivity : AppCompatActivity() {
         val button = findViewById<Button>(R.id.btn_check)
         button.setOnClickListener {
             sendTextMessage()
+        }
+        // 뒤로가기 버튼 클릭 이벤트
+        val btnBack = findViewById<ImageButton>(R.id.btn_back)
+        btnBack.setOnClickListener {
+            onBackPressed()
         }
     }
 

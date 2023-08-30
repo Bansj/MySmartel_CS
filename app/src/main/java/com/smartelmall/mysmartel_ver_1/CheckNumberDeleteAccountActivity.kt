@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.Toast
 
 class CheckNumberDeleteAccountActivity : AppCompatActivity() {
@@ -56,6 +57,11 @@ class CheckNumberDeleteAccountActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
+        }
+        // 뒤로가기 버튼 클릭 이벤트
+        val btnBack = findViewById<ImageButton>(R.id.btn_back)
+        btnBack.setOnClickListener {
+            onBackPressed()
         }
 
     }
