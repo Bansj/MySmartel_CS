@@ -146,6 +146,7 @@
                     android:layout_marginTop="10dp">
 
                     <TextView
+                        android:id="@+id/textView5"
                         android:layout_width="wrap_content"
                         android:layout_height="18dp"
                         android:layout_gravity="center"
@@ -157,7 +158,19 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <Switch
+                    <ImageButton
+                        android:id="@+id/btn_permit"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@color/white"
+                        android:src="@drawable/ic_arrow_forward_ios_24"
+                        android:layout_marginEnd="20dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                   <!-- <Switch
+                        android:id="@+id/switch1"
                         android:layout_width="50dp"
                         android:layout_height="30dp"
                         android:layout_marginEnd="16dp"
@@ -166,7 +179,7 @@
                         android:track="@drawable/switch_track"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent" />-->
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
