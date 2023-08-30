@@ -6,10 +6,13 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.Toast
 import com.smartelmall.mysmartel_ver_1.R
+import com.smartelmall.mysmartel_ver_1.SettingFragment
 
 class CheckNumberChangePasswordActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_check_number_change_password)
@@ -42,6 +45,11 @@ class CheckNumberChangePasswordActivity : AppCompatActivity() {
                 Log.d("Verification", "Verification failed")
                 Toast.makeText(this@CheckNumberChangePasswordActivity, "Incorrect verification number", Toast.LENGTH_SHORT).show()
             }
+        }
+        // 뒤로가기 버튼 클릭 이벤트
+        val btnBack = findViewById<ImageButton>(R.id.btn_back)
+        btnBack.setOnClickListener {
+            onBackPressed()
         }
     }
 }

@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#fffcf6"
+    android:id="@+id/fragmentSetting"
     tools:context="com.smartelmall.mysmartel_ver_1.SettingFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout

@@ -11,10 +11,12 @@ import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.smartelmall.mysmartel_ver_1.LoginActivity
 import com.smartelmall.mysmartel_ver_1.R
+import com.smartelmall.mysmartel_ver_1.SettingFragment
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -28,6 +30,8 @@ class NewPasswordActivity : AppCompatActivity() {
     private val url = "https://www.mysmartel.com/smartel/api_set_passwd.php"
     private val handler = Handler(Looper.getMainLooper())
     private var runnable: Runnable? = null
+
+    private lateinit var btnBack: ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -99,8 +103,14 @@ class NewPasswordActivity : AppCompatActivity() {
         editNewPassword.addTextChangedListener(passwordTextWatcher)
         editPasswordCheck.addTextChangedListener(passwordTextWatcher)
 
+        // 확인버튼 클릭 이벤트
         btnCheck.setOnClickListener{
             setNewPasswd(serviceNum,editNewPassword.text.toString())
+        }
+        // 뒤로가기 버튼 클릭 이벤트
+        val btnBack = findViewById<ImageButton>(R.id.btn_back)
+        btnBack.setOnClickListener {
+            onBackPressed()
         }
 
     }

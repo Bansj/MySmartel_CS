@@ -5,8 +5,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.Toast
 import com.smartelmall.mysmartel_ver_1.R
+import com.smartelmall.mysmartel_ver_1.SettingFragment
 import okhttp3.*
 import java.io.IOException
 
@@ -23,6 +25,11 @@ class IdentificationSelfActivity : AppCompatActivity() {
         val button = findViewById<Button>(R.id.btn_identification)
         button.setOnClickListener {
             sendTextMessage()
+        }
+
+        val btnBack = findViewById<ImageButton>(R.id.btn_back)
+        btnBack.setOnClickListener {
+            onBackPressed()
         }
     }
 

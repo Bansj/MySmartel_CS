@@ -73,14 +73,11 @@ class MyInfoFragment : Fragment() {
     private lateinit var txt_refreshData: TextView
     private lateinit var btnRefresh: ImageButton
 
-
     private lateinit var custName: String // Lgt 사용량, 청구요금조회, 부가서비스조회
     private lateinit var phoneNumber: String // Skt 사용량, 청구요금조회, 부가서비스 조회
 
     private lateinit var txtThisMonthBillDate: TextView
     private lateinit var txtSumAmount: TextView
-
-    private lateinit var svcNum: String
 
     private lateinit var txtFreeService: TextView // 무료 부가서비스
     private lateinit var txtPaidService: TextView // 유료 부가서비스
@@ -273,7 +270,6 @@ class MyInfoFragment : Fragment() {
                         "MyInfoFragment",
                         "to SktBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------"
                     )
-
                     sktDeductDetailViewFragment
                 }
                 "KT" -> {
@@ -287,7 +283,6 @@ class MyInfoFragment : Fragment() {
                         "MyInfoFragment",
                         "to KtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------"
                     )
-
                     ktDeductDetailViewFragment
                 }
                 "LGT" -> {
@@ -306,7 +301,6 @@ class MyInfoFragment : Fragment() {
                         "MyInfoFragment",
                         "to LgtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------"
                     )
-
                     lgtDeductDetailViewFragment
                 }
                 else -> {
@@ -362,7 +356,6 @@ class MyInfoFragment : Fragment() {
                         "MyInfoFragment",
                         "to KtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------"
                     )
-
                     ktBillDetailFragment
                 }
                 "LGT" -> {
@@ -381,7 +374,6 @@ class MyInfoFragment : Fragment() {
                         "MyInfoFragment",
                         "to LgtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------"
                     )
-
                     lgtBillDetailFragment
                 }
                 else -> {
@@ -438,7 +430,6 @@ class MyInfoFragment : Fragment() {
                         "MyInfoFragment",
                         "to KtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------"
                     )
-
                     ktBillDetailFragment
                 }
                 "LGT" -> {
@@ -457,7 +448,6 @@ class MyInfoFragment : Fragment() {
                         "MyInfoFragment",
                         "to LgtBillDetailFragment--------------------phoneNumber: $phoneNumber--------------------"
                     )
-
                     lgtBillDetailFragment
                 }
                 else -> {
@@ -523,10 +513,8 @@ class MyInfoFragment : Fragment() {
                 }
             }
         }
-
         btnRefresh.performClick() // 화면 전환 완료시 자동으로 버튼 클릭되는 이벤트
     }
-
 
 
 
@@ -565,7 +553,7 @@ class MyInfoFragment : Fragment() {
                 bodyData?.let {
                     requireActivity().runOnUiThread {
                         setDataToTextViews(it)
-                        //checkAndSendDataToMyInfoFragment()
+
                     }
                 }
             }
@@ -622,7 +610,6 @@ class MyInfoFragment : Fragment() {
                 sumAmountList.add("${amount}원")
             }
         }
-
         /// Set the sumAmountList values to txt_sumAmount
         if (sumAmountList.isNotEmpty()) {
             val sumAmount = sumAmountList.joinToString(separator = "\n")
@@ -887,7 +874,6 @@ class MyInfoFragment : Fragment() {
 
 
 
-
     // LGT 당월 청구요금 API조회
     private fun LgtBillFetchData(phoneNumber: String?, custName: String?) {
         val currentDate = SimpleDateFormat("yyyyMM", Locale.getDefault()).format(Date())
@@ -1110,8 +1096,6 @@ class MyInfoFragment : Fragment() {
 
         pgBarTotalData = view?.findViewById(R.id.pgBar_leftData)!!
 
-
-
         // Print the ResultCode
         Log.d("LgtDeductDetailView", "ResultCode: $resultCode")
 
@@ -1241,14 +1225,12 @@ class MyInfoFragment : Fragment() {
 
         txtRefreshM?.text = displayM
         Log.d("-----------------잔여량 ", "총합: $displayM -----------")
-
     }
 
     // Extension function to format a Double value with the specified number of decimal places
     private fun Double.format(decimalPlaces: Int): String {
         return String.format("%.${decimalPlaces}f", this)
     }
-
 
 
 
@@ -1379,10 +1361,6 @@ class MyInfoFragment : Fragment() {
                         "                      prodRecCnt: ${prodRecCnt}\n")
         }
     }
-
-
-
-
 
 
 
@@ -1557,6 +1535,7 @@ class MyInfoFragment : Fragment() {
                     " ErrorCode: ${ErrorCd.length}")
         }
     }
+
 
 
 
@@ -1758,7 +1737,6 @@ class MyInfoFragment : Fragment() {
                     } else {
                         displayCall = "✆ $remQtyMin / $totalQtyMin"
                     }
-
                     Log.d("displayCall","$displayCall")
 
                 }
@@ -1825,7 +1803,6 @@ class MyInfoFragment : Fragment() {
             value
         }
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
