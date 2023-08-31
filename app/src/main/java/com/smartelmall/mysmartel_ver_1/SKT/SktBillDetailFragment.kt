@@ -20,7 +20,7 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-class SktBillDetailFragment : Fragment() {
+class SktBillDetailFragment : Fragment() { // 당월 청구요금 조회
 
     private lateinit var phoneNumber: String
     private lateinit var currentYearMonth: String
@@ -178,8 +178,18 @@ class SktBillDetailFragment : Fragment() {
             val stringBuilder2 = StringBuilder()
 
             fun formatNumber(number: String): String {
-                return if (number.isNotEmpty() && number.all { it.isDigit() }) {
-                    NumberFormat.getInstance().format(number.toInt())
+                return if (number.isNotEmpty()) {
+                    val cleanNumber = number.replace("-", "")  // Remove the negative sign for processing
+                    if (cleanNumber.all { it.isDigit() }) {
+                        val formattedNumber = NumberFormat.getInstance().format(cleanNumber.toInt())
+                        if (number.startsWith("-")) {
+                            "-$formattedNumber"  // Add back the negative sign to the formatted number
+                        } else {
+                            formattedNumber
+                        }
+                    } else {
+                        "0"
+                    }
                 } else {
                     "0"
                 }
@@ -203,19 +213,29 @@ class SktBillDetailFragment : Fragment() {
                 val formattedBillItnNM = BILL_ITM_NM.padEnd(BILL_ITM_LCL_NM.length + minGap, ' ')
                 //val formattedInvAmt = INV_AMT.padStart()
 
+                //아래 문단은 리사이클러뷰를 이용한 반복작업 텍스트뷰가 필요함
+               /* val textView1 = view?.findViewById<TextView>(R.id.txt_title)
+                val textView3 = view?.findViewById<TextView>(R.id.txt_title2)
+                val textView2 = view?.findViewById<TextView>(R.id.txt_value)
+
+                textView1!!.text = formattedLclNm
+                textView3!!.text = formattedBillItnNM
+                textView2!!.text = INV_AMT*/
+
                 stringBuilder2.append("$formattedLclNm\n\n")
-               // stringBuilder2.append("청구서 소분류명: $BILL_ITM_SCL_NM\n\n")
+                //stringBuilder2.append("청구서 소분류명: $BILL_ITM_SCL_NM\n\n")
                 stringBuilder2.append("$formattedBillItnNM")
                 val formattedInvAmt = formatNumber(INV_AMT)
-                val paddedFormattedInvAmt = formattedInvAmt.padStart(50 - formattedInvAmt.length + formattedInvAmt.length, ' ')
+                val paddedFormattedInvAmt = formattedInvAmt.padStart(55)
                 stringBuilder2.append("\n${paddedFormattedInvAmt}원\n\n\n")
+                Log.d("SktBillDetailFragment","----------check 청구금액: $paddedFormattedInvAmt------------------")
 
             }
             val ErrorCode = consumeBytes(2)
 
             val stringBuilderTotAmt = StringBuilder()
             val title = "총 납부하실 금액 "
-            val value = "\n${formatNumber(TOT_INV_AMT.trimStart('0')).padStart(50)}원\n\n"
+            val value = "\n${formatNumber(TOT_INV_AMT.trimStart('0')).padStart(55)}원\n\n"
             val maxSpacing = 15 // Adjust this value as needed for the maximum spacing
 
             val formattedTitle = title.padEnd(title.length + maxSpacing, ' ')

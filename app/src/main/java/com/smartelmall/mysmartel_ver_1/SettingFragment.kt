@@ -143,5 +143,16 @@ class SettingFragment : Fragment() {
         //val phoneNumber = arguments?.getString("phoneNumber")
         Log.d("----------------SettingFragment","get phoneNumber: $phoneNumber-----------------------------")
 
+        // 권한 설정 전체 페이지로 이동하는 버튼 클릭 이벤트
+     /*   val btnPermit = view.findViewById<ImageButton>(R.id.btn_permit) // 버튼 ID에 따라서 변경하세요.
+
+        btnPermit.setOnClickListener {
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.fromParts("package", requireContext().packageName, null)
+            }
+            startActivity(intent)
+        }*/
+
+
     }
 }
