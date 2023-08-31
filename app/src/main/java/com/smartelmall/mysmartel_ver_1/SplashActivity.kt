@@ -37,11 +37,10 @@ class SplashActivity : AppCompatActivity() {
                 .setMessage("앱에서 제공하는 서비스를 이용하기 위해서는 알림 권한이 필요합니다. 설정하시겠습니까?")
                 .setPositiveButton("예") { _, _ ->
                     // Go to Notification Settings
-                    startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                    startActivityForResult(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
                         putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
-                    })
+                    }, 1) // request code
                     isDialogShown = true
-                    settings.edit().putBoolean(IS_FIRST_RUN, false).apply()
                 }
                 .setNegativeButton("아니오") { _, _ ->
                     settings.edit().putBoolean(IS_FIRST_RUN, false).apply()
@@ -56,12 +55,12 @@ class SplashActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        if (isDialogShown) {
-            moveToLoginActivity()
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 1) { // same request code
+            getSharedPreferences(PREFS_NAME, 0).edit().putBoolean(IS_FIRST_RUN, false).apply()
             isDialogShown = false
+            moveToLoginActivity()
         }
     }
 
