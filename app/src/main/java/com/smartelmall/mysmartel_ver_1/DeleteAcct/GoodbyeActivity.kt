@@ -1,10 +1,11 @@
-package com.smartelmall.mysmartel_ver_1
+package com.smartelmall.mysmartel_ver_1.DeleteAcct
 
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.smartelmall.mysmartel_ver_1.R
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import org.json.JSONObject

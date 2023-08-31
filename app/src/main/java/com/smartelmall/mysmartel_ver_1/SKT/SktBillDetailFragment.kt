@@ -82,7 +82,10 @@ class SktBillDetailFragment : Fragment() { // 당월 청구요금 조회
                 var currentMonth = Calendar.getInstance()
                 currentMonth.add(Calendar.MONTH, -1)
 
-                while (true) {
+                // Add a counter for limiting the number of months to look back
+                var counter = 0
+
+                while (counter < 10) { // Limit to -10 months
                     // Log the current year and month
                     Log.d("BillingDetail", "Current Year-Month: ${yearMonthFormat.format(currentMonth.time)}")
 
@@ -93,6 +96,7 @@ class SktBillDetailFragment : Fragment() { // 당월 청구요금 조회
                     val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
                     connection.setRequestProperty("charset", "euc-kr")
                     connection.requestMethod = "GET"
+
                     // Get the response in EUC-KR charset
                     val reader = BufferedReader(
                         InputStreamReader(
@@ -100,7 +104,9 @@ class SktBillDetailFragment : Fragment() { // 당월 청구요금 조회
                             Charset.forName("EUC-KR")
                         )
                     )
+
                     currentResponse = reader.readText()
+
                     Log.d("BillingDetail", "Response: $currentResponse")
 
                     // Check if the "E6" value is included in the response
@@ -109,10 +115,12 @@ class SktBillDetailFragment : Fragment() { // 당월 청구요금 조회
                         break
                     }
 
-                    // Decrement the month for the next iteration
+                    // Decrement the month for the next iteration and increment counter by one.
                     currentMonth.add(Calendar.MONTH, -1)
+
+                    counter++
                 }
-                // Display the data in the textView
+                // Display the data in textView
                 displayData(currentResponse)
 
             } catch (e: Exception) {
@@ -120,6 +128,7 @@ class SktBillDetailFragment : Fragment() { // 당월 청구요금 조회
             }
         }
     }
+
     // 문자열에 있는 이상한 문자를 제거하는 함수
     private fun removeStrangeChars(input: String): String {
         return input.replace(Regex("[^가-힣0-9\\s]+"), "")
@@ -128,6 +137,11 @@ class SktBillDetailFragment : Fragment() { // 당월 청구요금 조회
     // 조회된 데이터 처리 및 결과 출력 코드 수정
     private fun displayData(data: String) {
         GlobalScope.launch(Dispatchers.Main) {
+
+            if (data == "조회된 데이터가 없습니다.") { // 조회된 데이터가 없을때 출력한다
+                textView.text = data
+                return@launch
+            }
             val encodedData = String(data.toByteArray(Charset.forName("UTF-8")), Charset.forName("UTF-8"))
 
             // 1. Check if the string contains Korean characters and adjust the string accordingly
@@ -194,7 +208,6 @@ class SktBillDetailFragment : Fragment() { // 당월 청구요금 조회
                     "0"
                 }
             }
-
 
             for (i in 0 until billRecCnt) {
                 val BILL_ITM_LCL_NM = removeStrangeChars(consumeBytes(80).trim())

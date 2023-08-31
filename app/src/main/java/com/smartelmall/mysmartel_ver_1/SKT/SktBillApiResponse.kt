@@ -9,10 +9,10 @@ data class ParsedData(
     val 조회월: String,
     val 총청구금액: String,
     val 청구서건수: Int,
-    val 청구서정보: List<CheongGu>
+    val 청구서정보: List<Bill>
 )
 
-data class CheongGu(
+data class Bill(
     val 청구서대분류명: String,
     val 청구서소분류명: String,
     val 청구서항목명: String,

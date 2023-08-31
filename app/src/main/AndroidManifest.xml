@@ -18,13 +18,13 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".GoodbyeActivity"
+            android:name=".DeleteAcct.GoodbyeActivity"
             android:exported="false" />
         <activity
-            android:name=".CheckNumberDeleteAccountActivity"
+            android:name=".DeleteAcct.CheckNumberDeleteAccountActivity"
             android:exported="false" />
         <activity
-            android:name=".DeleteAccountActivity"
+            android:name=".DeleteAcct.DeleteAccountActivity"
             android:exported="false" />
         <activity
             android:name=".NewPW.NewPasswordActivity"

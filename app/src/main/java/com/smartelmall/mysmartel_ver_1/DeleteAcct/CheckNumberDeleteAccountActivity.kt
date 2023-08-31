@@ -1,4 +1,4 @@
-package com.smartelmall.mysmartel_ver_1
+package com.smartelmall.mysmartel_ver_1.DeleteAcct
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
+import com.smartelmall.mysmartel_ver_1.R
 
 class CheckNumberDeleteAccountActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
