@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "621030482105",
+    "project_id": "smartel-fcm",
+    "storage_bucket": "smartel-fcm.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:621030482105:android:fb8d6c488afadce89a7b68",
+        "android_client_info": {
+          "package_name": "com.smartelmall.mysmartel_ver_1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "621030482105-r7lctkf5vkibbvacto0gl5g8m32ig1ph.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.smartelmall.mysmartel_ver_1",
+            "certificate_hash": "7e373a74efeefd753e6ec8dcd86c8b6e794f634d"
+          }
+        },
+        {
+          "client_id": "621030482105-9u23g20d40u6kl8og7tb2iv51enhpjjp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxGE7P_TSwK9J2LfPDbAUH1OxLoUHGx2I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "621030482105-9u23g20d40u6kl8og7tb2iv51enhpjjp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
