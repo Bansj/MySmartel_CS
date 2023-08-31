@@ -35,10 +35,10 @@ class SettingFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_setting, container, false)
 
         sharedPrefs = requireContext().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
-        switchAutoLogin = view.findViewById(R.id.switch_autoLogin)
+       // switchAutoLogin = view.findViewById(R.id.switch_autoLogin)
 
         // Set the switch status based on the value stored in shared preferences
-        switchAutoLogin.isChecked = sharedPrefs.getBoolean("autoLogin", false)
+        //switchAutoLogin.isChecked = sharedPrefs.getBoolean("autoLogin", false)
 
         // Set click listener for btn_menu button
         view.findViewById<ImageButton>(R.id.btn_menu).setOnClickListener {
@@ -67,21 +67,16 @@ class SettingFragment : Fragment() {
                 editor.putBoolean("autoLogin", false)
                 editor.apply()
 
+                // Update the autoLoginSwitch to reflect the change in SharedPreference.
+                autoLoginSwitch.isChecked = false
+
                 // Navigate to LoginActivity after logging out.
                 startActivity(Intent(activity, LoginActivity::class.java))
                 activity?.finish()
             }
         }
-        // Handle switch changes and save the status in shared preferences
-       /* switchAutoLogin.setOnCheckedChangeListener { _, isChecked ->
-            if(isChecked){
-                sharedPrefs.edit().putBoolean("autoLogin", isChecked).apply()
-            }
-        }*/
+
         autoLoginSwitch = view.findViewById(R.id.switch_autoLogin)
-
-        //val sharedPreferences = activity?.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE) ?: return view
-
         val sharedPrefs = activity?.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
 
         if (sharedPrefs != null) {
