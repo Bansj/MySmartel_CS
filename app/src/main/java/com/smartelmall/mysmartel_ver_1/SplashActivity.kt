@@ -2,8 +2,10 @@ package com.smartelmall.mysmartel_ver_1
 
 import android.app.NotificationManager
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -31,27 +33,24 @@ class SplashActivity : AppCompatActivity() {
         if (settings.getBoolean(IS_FIRST_RUN, true)) {
             // Show alert dialog here.
             AlertDialog.Builder(this)
-                .setTitle("Notification Permission")
-                .setMessage("Do you want to enable notification?")
-                .setPositiveButton("Yes") { _, _ ->
+                .setTitle("알림 권한 설정")
+                .setMessage("앱에서 제공하는 서비스를 이용하기 위해서는 알림 권한이 필요합니다. 설정하시겠습니까?")
+                .setPositiveButton("예") { _, _ ->
                     // Go to Notification Settings
                     startActivity(Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
                         putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
                     })
                     isDialogShown = true
+                    settings.edit().putBoolean(IS_FIRST_RUN, false).apply()
                 }
-                .setNegativeButton("No") { _, _ ->
+                .setNegativeButton("아니오") { _, _ ->
+                    settings.edit().putBoolean(IS_FIRST_RUN, false).apply()
                     moveToLoginActivity()
                 }
-                .setOnDismissListener {
-                    settings.edit().putBoolean(IS_FIRST_RUN, false).apply()
-
-                    // If SplashActivity is still visible after returning from settings screen,
-                    // move to LoginActivity.
-
-                    if (!isFinishing && !isDialogShown) moveToLoginActivity()
+                .show().apply {
+                    getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(Color.parseColor("#FF6347"))  // Orange color for 'Yes' button.
+                    getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#FF6347"))  // Orange color for 'No' button.
                 }
-                .show()
         } else {
             moveToLoginActivity()
         }

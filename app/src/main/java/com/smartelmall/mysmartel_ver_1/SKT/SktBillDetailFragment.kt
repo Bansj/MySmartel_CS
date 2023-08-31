@@ -226,7 +226,7 @@ class SktBillDetailFragment : Fragment() { // 당월 청구요금 조회
                 //stringBuilder2.append("청구서 소분류명: $BILL_ITM_SCL_NM\n\n")
                 stringBuilder2.append("$formattedBillItnNM")
                 val formattedInvAmt = formatNumber(INV_AMT)
-                val paddedFormattedInvAmt = formattedInvAmt.padStart(55)
+                val paddedFormattedInvAmt = formattedInvAmt.padStart(50)
                 stringBuilder2.append("\n${paddedFormattedInvAmt}원\n\n\n")
                 Log.d("SktBillDetailFragment","----------check 청구금액: $paddedFormattedInvAmt------------------")
 
@@ -235,7 +235,7 @@ class SktBillDetailFragment : Fragment() { // 당월 청구요금 조회
 
             val stringBuilderTotAmt = StringBuilder()
             val title = "총 납부하실 금액 "
-            val value = "\n${formatNumber(TOT_INV_AMT.trimStart('0')).padStart(55)}원\n\n"
+            val value = "\n${formatNumber(TOT_INV_AMT.trimStart('0')).padStart(50)}원\n\n"
             val maxSpacing = 15 // Adjust this value as needed for the maximum spacing
 
             val formattedTitle = title.padEnd(title.length + maxSpacing, ' ')

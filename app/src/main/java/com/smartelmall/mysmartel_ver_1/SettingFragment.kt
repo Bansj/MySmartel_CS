@@ -58,11 +58,13 @@ class SettingFragment : Fragment() {
             startActivity(intent)
         }
 
+        // 로그아웃 이미지 버튼 클릭 이벤트
         view.findViewById<ImageButton>(R.id.btn_logOut).setOnClickListener {
             val editor = sharedPrefs?.edit()
 
             if (editor != null) {
                 editor.clear() // Clear all saved data
+                editor.putBoolean("autoLogin", false)
                 editor.apply()
 
                 // Navigate to LoginActivity after logging out.
@@ -71,15 +73,14 @@ class SettingFragment : Fragment() {
             }
         }
         // Handle switch changes and save the status in shared preferences
-        switchAutoLogin.setOnCheckedChangeListener { _, isChecked ->
+       /* switchAutoLogin.setOnCheckedChangeListener { _, isChecked ->
             if(isChecked){
                 sharedPrefs.edit().putBoolean("autoLogin", isChecked).apply()
             }
-        }
+        }*/
         autoLoginSwitch = view.findViewById(R.id.switch_autoLogin)
 
-        val sharedPreferences =
-            activity?.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE) ?: return view
+        //val sharedPreferences = activity?.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE) ?: return view
 
         val sharedPrefs = activity?.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
 
@@ -97,6 +98,7 @@ class SettingFragment : Fragment() {
                 }
             }
         }
+
         // 알림 권한설정 클릭 이벤트
         val btnPermit: ImageButton = view.findViewById(R.id.btn_permit)
         btnPermit.setOnClickListener {
