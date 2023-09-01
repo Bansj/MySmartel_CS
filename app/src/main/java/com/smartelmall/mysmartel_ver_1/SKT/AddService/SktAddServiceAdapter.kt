@@ -13,7 +13,7 @@ class SktAddServiceAdapter(private var items : List<SktAddServiceItem.Product>) 
     inner class ViewHolder(itemView : View) : RecyclerView.ViewHolder(itemView){
         fun bind(item : SktAddServiceItem.Product){
             itemView.findViewById<TextView>(R.id.prodName).text = item.prodNm
-            itemView.findViewById<TextView>(R.id.prodFee).text = "\n" + item.displayProdFee + "\n\n"
+            itemView.findViewById<TextView>(R.id.prodFee).text = item.displayProdFee + "\n\n"
 
             // If you want to set a specific value to displayProdFee
             // item.displayProdFee = "Your Value"

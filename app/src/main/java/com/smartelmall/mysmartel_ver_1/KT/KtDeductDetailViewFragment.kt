@@ -190,7 +190,9 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
                 // Check if strFreeMinTotal is not "무제한" and is numeric
                 if (strFreeMinTotal != "무제한") {
                     val minutesTotal = strFreeMinTotal.toIntOrNull() ?: 0
+                    val minutesRemain = strFreeMinReMain.toIntOrNull() ?: 0
                     strFreeMinTotal = "${minutesTotal / 60}분"
+                    strFreeMinReMain = "${minutesRemain / 60}분"
                 }
             }
             else if (strSvcName.contains("영상") || strSvcName.contains("통화")) {

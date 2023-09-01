@@ -155,21 +155,35 @@ class LoginActivity : AppCompatActivity() {
     private fun handleLoginResponse(response: JSONObject) {
         try {
             val loginResult = response.getString("resultCd")
+            val type = response.getString("typ")
 
-            if (loginResult == "true" || loginResult == "1818") {
-                val phoneNumber = phoneNumberEditText.text.toString()
-                Log.d("LoginActivity",
-                    "--------------------Login successful - Phone number: $phoneNumber--------------------")
-                fetchUserInfo(phoneNumber)
-            } else {
+            if (loginResult == "true") {
+                when (type) {
+                    "pwd" -> {
+                        val phoneNumber = phoneNumberEditText.text.toString()
+                        Log.d("LoginActivity",
+                            "--------------------Login successful - Phone number: $phoneNumber--------------------")
+                        fetchUserInfo(phoneNumber)
+                    }
+                    else -> showErrorDialog("로그인에 실패하였습니다.")
+                }
+            } else if (loginResult == "1818") {
+                showErrorDialog("서버점검 중입니다.")
+            } else { // loginResult is "false"
+                when (type) {
+                    "join" -> showErrorDialog("스마텔 개통 고객이 아닙니다.")
+                    "accnt" -> showErrorDialog("로그인 계정이 없습니다. 회원가입이 필요합니다.")
+                    "pwd" -> showErrorDialog("비밀번호가 일치하지 않습니다. 비밀번호를 재입력해주세요.")
+                    else -> showErrorDialog("알 수 없는 오류가 발생하였습니다.")
+                }
                 hideLoadingDialog()
-                showErrorDialog("로그인에 실패하였습니다.")
             }
         } catch (e: JSONException) {
             hideLoadingDialog()
             showErrorDialog("Failed to parse login response")
         }
     }
+
 
     private fun fetchUserInfo(phoneNumber: String) {
         val infoParams = JSONObject()
