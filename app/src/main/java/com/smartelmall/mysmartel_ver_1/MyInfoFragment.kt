@@ -32,6 +32,11 @@ import com.smartelmall.mysmartel_ver_1.LGT.LgtBillDetailFragment
 import com.smartelmall.mysmartel_ver_1.LGT.LgtDedcutApiResponse
 import com.smartelmall.mysmartel_ver_1.LGT.LgtDeductDetailViewFragment
 import com.smartelmall.mysmartel_ver_1.SKT.*
+import com.smartelmall.mysmartel_ver_1.SKT.AddService.SktAddServiceFragment
+import com.smartelmall.mysmartel_ver_1.SKT.Bill.SktBillDetailFragment
+import com.smartelmall.mysmartel_ver_1.SKT.Deduct.SktDeductApiResponse
+import com.smartelmall.mysmartel_ver_1.SKT.Deduct.SktDeductDetailViewFragment
+import com.smartelmall.mysmartel_ver_1.SKT.Deduct.SktRemainInfo
 import kotlinx.coroutines.*
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType

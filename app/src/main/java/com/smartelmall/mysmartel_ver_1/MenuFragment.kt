@@ -22,9 +22,9 @@ import com.smartelmall.mysmartel_ver_1.KT.KtBillDetailFragment
 import com.smartelmall.mysmartel_ver_1.KT.KtPaymentDetailFragment
 import com.smartelmall.mysmartel_ver_1.LGT.LgtBillDetailFragment
 import com.smartelmall.mysmartel_ver_1.LGT.LgtPaymentDetailFragment
-import com.smartelmall.mysmartel_ver_1.SKT.SktAddServiceFragment
-import com.smartelmall.mysmartel_ver_1.SKT.SktBillDetailFragment
-import com.smartelmall.mysmartel_ver_1.SKT.SktPaymentDetailFragment
+import com.smartelmall.mysmartel_ver_1.SKT.AddService.SktAddServiceFragment
+import com.smartelmall.mysmartel_ver_1.SKT.Bill.SktBillDetailFragment
+import com.smartelmall.mysmartel_ver_1.SKT.Payment.SktPaymentDetailFragment
 import com.smartelmall.mysmartel_ver_1.databinding.FragmentMenuBinding
 
 

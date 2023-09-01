@@ -1,4 +1,4 @@
-package com.smartelmall.mysmartel_ver_1.SKT
+package com.smartelmall.mysmartel_ver_1.SKT.Deduct
 
 data class SktDeductApiResponse(
     val svcAcntNum: String,

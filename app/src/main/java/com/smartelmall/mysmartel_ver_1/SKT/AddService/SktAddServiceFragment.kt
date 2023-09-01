@@ -1,4 +1,4 @@
-package com.smartelmall.mysmartel_ver_1.SKT
+package com.smartelmall.mysmartel_ver_1.SKT.AddService
 
 import android.os.Bundle
 import android.util.Log

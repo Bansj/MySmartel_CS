@@ -1,4 +1,4 @@
-package com.smartelmall.mysmartel_ver_1.SKT
+package com.smartelmall.mysmartel_ver_1.SKT.Deduct
 
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +10,8 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.smartelmall.mysmartel_ver_1.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -174,6 +176,12 @@ class SktDeductDetailViewFragment : Fragment() {
     }
     private fun updateUI(apiResponse: SktDeductApiResponse) {
 
+        // Display remainInfo details in a separate RecyclerView
+        val recyclerView = view?.findViewById<RecyclerView>(R.id.recyclerView)
+        recyclerView?.layoutManager = LinearLayoutManager(context)
+        val dataList = mutableListOf<SktDeductRecyclerResponse>()
+
+
         // Display remainInfo details in a separate TextView or a RecyclerView (depending on your layout design)
         val remainInfoTextView = view?.findViewById<TextView>(R.id.remainInfoTextView)
 
@@ -196,10 +204,22 @@ class SktDeductDetailViewFragment : Fragment() {
                     val useQtyGB = parseValueToGB(useQtyDefault)
                     val remQtyGB = parseValueToGB(remQtyDefault)
 
-                    remainInfoStr.append("\n\n$displayName\n\n\n")
+                    remainInfoStr.append("$displayName\n\n\n")
                     remainInfoStr.append("총제공량".padEnd(60) + "$totalQtyGB\n\n") // Add padding between label and value
                     remainInfoStr.append("사용량".padEnd(60) + "$useQtyGB\n\n") // Add padding between label and value
                     remainInfoStr.append("잔여량".padEnd(60) + "$remQtyGB\n\n\n\n") // Add padding between label and value
+
+                    dataList.add(
+                        SktDeductRecyclerResponse(
+                            title = "\n$displayName",
+                            totalTitle = "총제공량",
+                            useTitle = "사용량",
+                            leftTitle = "잔여량",
+                            totalValue = "$totalQtyGB",
+                            useValue = useQtyGB,
+                            leftValue = "${remQtyGB}\n\n\n"
+                        )
+                    )
                 }
                 else if (displayName.contains("음성") || displayName.contains("전화")) {
                     // Handle the case where the values are "음성" or "전화"
@@ -211,13 +231,38 @@ class SktDeductDetailViewFragment : Fragment() {
                     remainInfoStr.append("총제공량".padEnd(60) + "$totalQtyMin\n\n") // Add padding between label and value
                     remainInfoStr.append("사용량".padEnd(60) + "$useQtyMin\n\n") // Add padding between label and value
                     remainInfoStr.append("잔여량".padEnd(60) + "$remQtyMin\n\n\n\n") // Add padding between label and value
+
+                    dataList.add(
+                        SktDeductRecyclerResponse(
+                            title = "\n$displayName",
+                            totalTitle = "총제공량",
+                            useTitle = "사용량",
+                            leftTitle = "잔여량",
+                            totalValue = parseValueToMinutes(remainInfo.totalQty),
+                            useValue = parseValueToMinutes(remainInfo.useQty),
+                            leftValue = "${parseValueToMinutes(remainInfo.remQty)}\n\n\n"
+                        )
+                    )
                 }
                 else if (displayName.contains("원")){
+
                     // Default case for other freePlanName values
                     remainInfoStr.append("$displayName\n\n")
                     remainInfoStr.append("총제공량".padEnd(60) + "${remainInfo.totalQty}원\n\n")
                     remainInfoStr.append("사용량".padEnd(60) + "${remainInfo.useQty}원\n\n")
                     remainInfoStr.append("잔여량".padEnd(60) + "${remainInfo.remQty}원\n\n\n\n")
+
+                    dataList.add(
+                        SktDeductRecyclerResponse(
+                            title = "\n$displayName",
+                            totalTitle = "총제공량",
+                            useTitle = "사용량",
+                            leftTitle = "잔여량",
+                            totalValue = "${remainInfo.totalQty}원",
+                            useValue = "${remainInfo.useQty}원",
+                            leftValue = "${remainInfo.remQty}원\n\n\n"
+                        )
+                    )
                 }
                 else {
                     // Default case for other freePlanName values
@@ -225,16 +270,36 @@ class SktDeductDetailViewFragment : Fragment() {
                     remainInfoStr.append("총제공량".padEnd(60) + "${remainInfo.totalQty}\n\n")
                     remainInfoStr.append("사용량".padEnd(60) + "${remainInfo.useQty}\n\n")
                     remainInfoStr.append("잔여량".padEnd(60) + "${remainInfo.remQty}\n\n\n\n")
+
+                    dataList.add(
+                        SktDeductRecyclerResponse(
+                            title = "\n$displayName",
+                            totalTitle = "총제공량",
+                            useTitle = "사용량",
+                            leftTitle = "잔여량",
+                            totalValue = remainInfo.totalQty,
+                            useValue = remainInfo.useQty,
+                            leftValue = "${remainInfo.remQty}\n\n\n"
+                        )
+                    )
                 }
+
+                println("Logging SktDeductRecyclerResponse values:")
+                println("Title: $displayName")
+                println("Total Value: $totalQtyDefault")
+                println("Usage Value: $useQtyDefault")
+                println("Remaining Amount Value: $remQtyDefault")
             }
-            remainInfoTextView?.text = remainInfoStr.toString()
-            remainInfoTextView!!.gravity = Gravity.CENTER
+            recyclerView?.adapter=SktDeductRecyclerAdapter(dataList).also { it.notifyDataSetChanged() }
+
+            //remainInfoTextView?.text = remainInfoStr.toString()
+            //remainInfoTextView!!.gravity = Gravity.CENTER
 
         } else {
+            recyclerView?.visibility=View.GONE
             remainInfoTextView?.text = "No Remain Info found."
         }
     }
-
 
     // Helper function to convert the value to GB or handle non-numeric cases
     private fun parseValueToGB(value: String): String {

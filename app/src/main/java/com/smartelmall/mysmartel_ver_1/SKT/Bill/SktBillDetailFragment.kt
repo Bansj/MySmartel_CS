@@ -1,4 +1,4 @@
-package com.smartelmall.mysmartel_ver_1.SKT
+package com.smartelmall.mysmartel_ver_1.SKT.Bill
 
 import android.os.Bundle
 import android.util.Log
@@ -10,6 +10,8 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.smartelmall.mysmartel_ver_1.R
 import kotlinx.coroutines.*
 import java.io.BufferedReader
@@ -30,6 +32,7 @@ class SktBillDetailFragment : Fragment() { // 당월 청구요금 조회
     private lateinit var sumAmount: TextView
 
     private lateinit var txtTitle: TextView
+    private lateinit var txtTitle2: TextView
     private lateinit var txtValue: TextView
 
     private lateinit var downButton: ImageButton
@@ -58,11 +61,12 @@ class SktBillDetailFragment : Fragment() { // 당월 청구요금 조회
         super.onViewCreated(view, savedInstanceState)
 
         // Initialize the textView
-        textView = view.findViewById(R.id.textViewData)
+        //textView = view.findViewById(R.id.textViewData)
         sumAmount = view.findViewById(R.id.txt_sumAmount)
 
-        txtTitle = view.findViewById(R.id.txt_title)
-        txtValue = view.findViewById(R.id.txt_value)
+  /*      txtTitle = view.findViewById(R.id.txt_title)
+        txtTitle2 = view.findViewById(R.id.txt_title2)
+        txtValue = view.findViewById(R.id.txt_value)*/
         // Get the phoneNumber value from MyInfoFragment
         phoneNumber = arguments?.getString("phoneNumber") ?: ""
         // Set ifClCd value as "R5"
@@ -186,7 +190,7 @@ class SktBillDetailFragment : Fragment() { // 당월 청구요금 조회
 
             // 4. Iterate through the billing items and display additional values
             val stringBuilderDate = StringBuilder()
-            stringBuilderDate.append("$formattedDate\n\n\n")
+            stringBuilderDate.append("\n$formattedDate\n\n")
 
             // 4. Iterate through the billing items
             val stringBuilder2 = StringBuilder()
@@ -209,6 +213,8 @@ class SktBillDetailFragment : Fragment() { // 당월 청구요금 조회
                 }
             }
 
+            val sktBillingItems = mutableListOf<SktBillingItem>()
+
             for (i in 0 until billRecCnt) {
                 val BILL_ITM_LCL_NM = removeStrangeChars(consumeBytes(80).trim())
                 val BILL_ITM_SCL_NM = removeStrangeChars(consumeBytes(80).trim())
@@ -226,24 +232,22 @@ class SktBillDetailFragment : Fragment() { // 당월 청구요금 조회
                 val formattedBillItnNM = BILL_ITM_NM.padEnd(BILL_ITM_LCL_NM.length + minGap, ' ')
                 //val formattedInvAmt = INV_AMT.padStart()
 
-                //아래 문단은 리사이클러뷰를 이용한 반복작업 텍스트뷰가 필요함
-               /* val textView1 = view?.findViewById<TextView>(R.id.txt_title)
-                val textView3 = view?.findViewById<TextView>(R.id.txt_title2)
-                val textView2 = view?.findViewById<TextView>(R.id.txt_value)
-
-                textView1!!.text = formattedLclNm
-                textView3!!.text = formattedBillItnNM
-                textView2!!.text = INV_AMT*/
-
-                stringBuilder2.append("$formattedLclNm\n\n")
+                stringBuilder2.append("\n$formattedLclNm")
                 //stringBuilder2.append("청구서 소분류명: $BILL_ITM_SCL_NM\n\n")
-                stringBuilder2.append("$formattedBillItnNM")
+                stringBuilder2.append("\n$formattedBillItnNM")
                 val formattedInvAmt = formatNumber(INV_AMT)
-                val paddedFormattedInvAmt = formattedInvAmt.padStart(50)
-                stringBuilder2.append("\n${paddedFormattedInvAmt}원\n\n\n")
+                val paddedFormattedInvAmt = "${formattedInvAmt}".padStart(50)
+                stringBuilder2.append("\n${paddedFormattedInvAmt}원\n\n")
                 Log.d("SktBillDetailFragment","----------check 청구금액: $paddedFormattedInvAmt------------------")
 
+                sktBillingItems.add(SktBillingItem(formattedLclNm, formattedBillItnNM, paddedFormattedInvAmt))
             }
+            val recyclerView: RecyclerView = view?.findViewById(R.id.recyclerView) ?: return@launch
+            recyclerView.layoutManager = LinearLayoutManager(requireContext())
+            recyclerView.adapter = SktBillingAdapter(sktBillingItems)
+
+            Log.d("SktBillDetailFragment","----------chceck RecyclerView: $recyclerView")
+
             val ErrorCode = consumeBytes(2)
 
             val stringBuilderTotAmt = StringBuilder()
@@ -259,12 +263,21 @@ class SktBillDetailFragment : Fragment() { // 당월 청구요금 조회
 
             //txtTitle.text = stringBuilder2.toString()
             //txtValue.text = stringBuilder2.append("${INV_YM}원")
-            Log.d("BillingDetail", "청구금액: ${txtValue.text}")
+            //Log.d("BillingDetail", "청구금액: ${txtValue.text}")
 
-            textView.text = stringBuilderDate.toString() + stringBuilder2.toString() + stringBuilderTotAmt.toString()
+            //textView.text = stringBuilderDate.toString() + stringBuilder2.toString()
+
+            val txtMontLoading = requireView().findViewById<TextView>(R.id.txt_monthLoading)
+            txtMontLoading.text = stringBuilderDate
+
+            val txtSumAmtTitle = requireView().findViewById<TextView>(R.id.txt_totalAmtTitle)
+            txtSumAmtTitle.text = title
+            val txtSumAmtValue = requireView().findViewById<TextView>(R.id.txt_totalAmtValue)
+            txtSumAmtValue.text = value
+
             sumAmount.text = "총 ${formatNumber(TOT_INV_AMT.trimStart('0'))}원"
 
-            textView.gravity = Gravity.START or Gravity.END
+            //textView.gravity = Gravity.START or Gravity.END
             sumAmount.gravity = Gravity.END
 
             // Log to show the length of each parsed field
