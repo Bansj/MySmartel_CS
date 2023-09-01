@@ -10,6 +10,8 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.smartelmall.mysmartel_ver_1.R
 import kotlinx.coroutines.*
 import java.net.URL
@@ -24,6 +26,8 @@ class SktAddServiceFragment : Fragment() {
     lateinit var textView: TextView
 
     private lateinit var downButton: ImageButton
+
+    private lateinit var recyclerView: RecyclerView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,6 +51,8 @@ class SktAddServiceFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        recyclerView = view.findViewById(R.id.recyclerView)
 
         phoneNumber = arguments?.getString("phoneNumber") ?: ""
         svcNum = phoneNumber // Assuming phoneNumber is the same as svcNum based on your description
@@ -127,6 +133,9 @@ class SktAddServiceFragment : Fragment() {
             Log.d("SktAddServiceFragment", "ProdRecCnt: $prodRecCnt")
 
             // Iterate through the billing items
+
+            var productList = mutableListOf<SktAddServiceItem.Product>()
+
             val stringBuilder = StringBuilder()
             for (i in 0 until prodRecCnt) {
                 val prodId = consumeBytes(10)
@@ -141,6 +150,8 @@ class SktAddServiceFragment : Fragment() {
                 Log.d("SktAddServiceFragment", "Product Name: $prodNm")
                 Log.d("SktAddServiceFragment", "Product Fee Amount: $prodFeeAmt")
 
+                productList.add(SktAddServiceItem.Product(prodId,prodScrbDt,prodNm,displayProdFee))
+
                 Log.d("ProductLengths",
                     "        Product ID Length: ${prodId.length}\n" +
                         "                      Product Subscribe Date Length: ${prodScrbDt.length}\n" +
@@ -153,6 +164,14 @@ class SktAddServiceFragment : Fragment() {
                 stringBuilder.append("${displayProdFee.padStart(55)}\n\n\n\n")
             }
             textView.text = stringBuilder.toString()
+
+            var sktAddServiceData = SktAddServiceItem(opClCd,opTypCd,svcNum,svAcntNum,prodRecCnt.toInt(),productList)
+
+
+            recyclerView.apply {
+                layoutManager = LinearLayoutManager(requireContext())
+                adapter = SktAddServiceAdapter(sktAddServiceData.products)
+            }
 
             // Log to show the length of each parsed field
             Log.d("ParsedData",
