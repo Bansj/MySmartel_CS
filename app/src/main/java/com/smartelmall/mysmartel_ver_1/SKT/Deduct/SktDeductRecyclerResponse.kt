@@ -1,6 +1,5 @@
 package com.smartelmall.mysmartel_ver_1.SKT.Deduct
 
-import com.smartelmall.mysmartel_ver_1.LGT.RemainInfo
 
 data class SktDeductRecyclerResponse(
     val title: String,

@@ -27,10 +27,11 @@ import com.smartelmall.mysmartel_ver_1.Banner.BannerItem
 import com.smartelmall.mysmartel_ver_1.Banner.BannerViewPagerAdapter
 import com.smartelmall.mysmartel_ver_1.Banner.ZoomOutPageTransformer
 import com.smartelmall.mysmartel_ver_1.KT.*
+import com.smartelmall.mysmartel_ver_1.LGT.Deduct.LgtDedcutApiResponse
 import com.smartelmall.mysmartel_ver_1.LGT.LgtBillApiResponse
 import com.smartelmall.mysmartel_ver_1.LGT.LgtBillDetailFragment
-import com.smartelmall.mysmartel_ver_1.LGT.LgtDedcutApiResponse
-import com.smartelmall.mysmartel_ver_1.LGT.LgtDeductDetailViewFragment
+
+import com.smartelmall.mysmartel_ver_1.LGT.Deduct.LgtDeductDetailViewFragment
 import com.smartelmall.mysmartel_ver_1.SKT.*
 import com.smartelmall.mysmartel_ver_1.SKT.AddService.SktAddServiceFragment
 import com.smartelmall.mysmartel_ver_1.SKT.Bill.SktBillDetailFragment
@@ -1029,7 +1030,7 @@ class MyInfoFragment : Fragment() {
 
 
 
-    private fun LgtDeductFetchData() { // Lgt 잔여량 조회 API
+    private fun LgtDeductFetchData() { // Lgt 사용량 조회 API
 
         val baseUrl = "https://www.mysmartel.com/api/"
         val phoneNumber = viewModel.phoneNumber
@@ -1124,10 +1125,10 @@ class MyInfoFragment : Fragment() {
             //pgBarTotalData.progress = progressPercent.toInt()
         }
 
-        var totalRemainDataTotal = 0.0
-        var totalRemainData = 0.0
-        var displayCall = ""
-        var displayM = ""
+        var totalRemainDataTotal = 0.0 // 데이터 총제공량
+        var totalRemainData = 0.0 // 데이터 잔여량
+        var displayCall = "" // 통화량
+        var displayM = "" // 문자량
 
         val remainData = StringBuilder()
         val totalData = StringBuilder()
@@ -1164,25 +1165,32 @@ class MyInfoFragment : Fragment() {
             if (svcUnitCd.contains("초")) {
                 if (alloValue.contains("Z")) {
                     remainCallStr.append("총제공량 ${"무제한".padStart(40)}\n\n")
-                    val useValueInMinutes = useValue.toDouble() / 60
-                    remainCallStr.append("사용량  ${useValueInMinutes.format(0).padStart(40)}분\n\n\n\n")
+                    val useValueInMinutes = useValue.toInt() / 60
+                    remainCallStr.append("사용량  ${useValueInMinutes}분")
                     dataStringBuilder.appendLine().appendLine()
 
-                    displayCall = "✆ ${useValueInMinutes.format(0)}분 / 무제한"
+                    if (svcTypNm == "음성") {
+                        displayCall = "✆ ${useValueInMinutes}분 / 무제한"
+                        println(displayCall)
+                    }
 
                 } else {
-                    val alloValueInMinutes = alloValue.toDouble() / 60
-                    val useValueInMinutes = useValue.toDouble() / 60
+                    val alloValueInMinutes = alloValue.toInt() / 60
+                    val useValueInMinutes = useValue.toInt() / 60
                     val remainValueMin = alloValueInMinutes - useValueInMinutes
-                    remainCallStr.append("총제공량 ${alloValueInMinutes.format(0).padStart(40)}분\n\n")
-                    dataStringBuilder.append("사용량  ${useValueInMinutes.format(0).padStart(40)}분\n\n")
-                    remainCallStr.append("잔여량    ${remainValueMin.format(0).padStart(40)}분\n\n\n\n")
+                    remainCallStr.append("총제공량 ${alloValueInMinutes}분\n\n")
+                    dataStringBuilder.append("사용량  ${useValueInMinutes}분\n\n")
+                    remainCallStr.append("잔여량    ${remainValueMin}분\n\n\n\n")
                     dataStringBuilder.appendLine().appendLine()
 
-                    displayCall = "${remainValueMin} / ${alloValueInMinutes}"
+                    if (svcTypNm == "음성") {
+                        displayCall = "✆ ${remainValueMin}분 / ${alloValueInMinutes}분"
+                        println(displayCall)
+                    }
 
                 }
-            } else if (svcUnitCd.contains("건")) {
+            }
+            else if (svcUnitCd.contains("건")) {
                 if (alloValue.contains("Z")) {
                     dataStringBuilder.append("총제공량 ${"무제한"}\n\n")
                     dataStringBuilder.append("사용량  ${useValue}건\n\n\n\n")

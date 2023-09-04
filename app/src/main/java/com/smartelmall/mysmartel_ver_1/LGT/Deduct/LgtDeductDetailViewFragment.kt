@@ -1,4 +1,4 @@
-package com.smartelmall.mysmartel_ver_1.LGT
+package com.smartelmall.mysmartel_ver_1.LGT.Deduct
 
 import android.os.Bundle
 import android.os.Handler
