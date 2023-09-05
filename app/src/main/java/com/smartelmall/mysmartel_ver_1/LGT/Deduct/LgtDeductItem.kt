@@ -1,6 +1,6 @@
 package com.smartelmall.mysmartel_ver_1.LGT.Deduct
 
-data class LgtDeductRemainInfo(
+data class LgtDeductItem(
     val title: String,
     val remainTitle: String,
     val remainUse: String,

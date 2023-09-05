@@ -1,4 +1,4 @@
-package com.smartelmall.mysmartel_ver_1.KT
+package com.smartelmall.mysmartel_ver_1.KT.Deduct
 
 import android.os.Bundle
 import android.text.Spannable
@@ -12,6 +12,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.smartelmall.mysmartel_ver_1.R
 import okhttp3.*
@@ -29,6 +31,9 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
     private lateinit var totUseTimeCntTotTextView: TextView
     private var initialY: Float = 0f
 
+    private val itemList = mutableListOf<KtDeductItem>() // Your data should be populated in this list
+
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -36,11 +41,16 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_kt_deduct_detail_view, container, false)
 
+        val recyclerView: RecyclerView = view.findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        val adapter = KtDeductAdapter(itemList)
+        recyclerView.adapter = adapter
+
         totaluseTimeTextView = view.findViewById(R.id.tvTotaluseTime)
-        voiceCallDetailTextView = view.findViewById(R.id.tvVoiceCallDetail)
-        voiceCallDetailTotTextView = view.findViewById(R.id.tvVoiceCallDetailTot)
-        totUseTimeCntTextView = view.findViewById(R.id.tvTotUseTimeCnt)
-        totUseTimeCntTotTextView = view.findViewById(R.id.tvTotUseTimeCntTot)
+//        voiceCallDetailTextView = view.findViewById(R.id.tvVoiceCallDetail)
+//        voiceCallDetailTotTextView = view.findViewById(R.id.tvVoiceCallDetailTot)
+//        totUseTimeCntTextView = view.findViewById(R.id.tvTotUseTimeCnt)
+//        totUseTimeCntTotTextView = view.findViewById(R.id.tvTotUseTimeCntTot)
 
         view.setOnTouchListener(this)
 
@@ -48,8 +58,8 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
         moveButton.setOnClickListener {
             animateFragmentOut(view)
         }
-
         fetchDeductApiData()
+
         return view
     }
 
@@ -142,7 +152,6 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
             }
 
         })
-
     }
     private fun createRequestBody(phoneNumber: String): String {
         val requestBody = HashMap<String, List<HashMap<String, String>>>()
@@ -165,7 +174,9 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
     }
 
     private fun setDataToTextViews(totaluseTimeList: List<KtDeductApiResponse.BodyData.TotaluseTimeDtoData>) {
+
         val totaluseTimeStringBuilder = StringBuilder()
+
         totaluseTimeList.forEach { totaluseTime ->
             val strSvcName = totaluseTime.strSvcName
             var strFreeMinTotal = formatValue(totaluseTime.strFreeMinTotal)
@@ -184,7 +195,8 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
             }
             else if (strSvcName.contains("음성")) {
                 val minutesUse = strFreeMinUse.toIntOrNull() ?: 0
-                strFreeMinReMain = "" // Hide strFreeMinReMain
+                val minutesRemain = strFreeMinReMain.toIntOrNull() ?: 0
+                strFreeMinReMain = "${minutesRemain / 60}분" // Hide strFreeMinReMain
                 strFreeMinUse = "${minutesUse / 60}분"
 
                 // Check if strFreeMinTotal is not "무제한" and is numeric
@@ -193,6 +205,11 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
                     val minutesRemain = strFreeMinReMain.toIntOrNull() ?: 0
                     strFreeMinTotal = "${minutesTotal / 60}분"
                     strFreeMinReMain = "${minutesRemain / 60}분"
+                }
+                else if (strFreeMinTotal == "무제한") {
+                    val minutesUse = strFreeMinUse.toIntOrNull() ?: 0
+                    strFreeMinReMain = "무제한"
+                    strFreeMinUse = "${minutesUse / 60}분"
                 }
             }
             else if (strSvcName.contains("영상") || strSvcName.contains("통화")) {
@@ -231,6 +248,8 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
                 totaluseTimeStringBuilder.append(String.format("%-40s %3s%n\n", "사용량", strFreeMinUse))
             }
             totaluseTimeStringBuilder.append("\n\n\n")
+
+
         }
         totaluseTimeTextView.text = totaluseTimeStringBuilder.toString()
     }

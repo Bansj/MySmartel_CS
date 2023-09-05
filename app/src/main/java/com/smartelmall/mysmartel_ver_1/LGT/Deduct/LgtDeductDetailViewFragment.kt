@@ -12,6 +12,8 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.smartelmall.mysmartel_ver_1.R
 import com.smartelmall.mysmartel_ver_1.databinding.FragmentLgtDeductDetailViewBinding
@@ -34,6 +36,8 @@ class LgtDeductDetailViewFragment : Fragment() {
 
     private val handler = Handler(Looper.getMainLooper())
 
+    private lateinit var recyclerView: RecyclerView
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -47,11 +51,11 @@ class LgtDeductDetailViewFragment : Fragment() {
         downButton.setOnClickListener {
             animateFragmentOut(binding.root)
         }
-
         LgtDeductfetchData()
 
         return binding.root
     }
+
     private fun animateFragmentOut(view: View) { // 슬라이드 다운 애니메이션 효과
         val transaction: FragmentTransaction = parentFragmentManager.beginTransaction()
         transaction.setCustomAnimations(R.anim.slide_in_up, R.anim.slide_out_down)
@@ -61,7 +65,8 @@ class LgtDeductDetailViewFragment : Fragment() {
 
     private fun LgtDeductfetchData() {
         val baseUrl = "https://www.mysmartel.com/api/"
-        val apiRequestUrl = "${baseUrl}lguDeductibleAmt.php?serviceNum=$phoneNumber&custNm=$custName"
+        val apiRequestUrl =
+            "${baseUrl}lguDeductibleAmt.php?serviceNum=$phoneNumber&custNm=$custName"
 
         // Create a TrustManager that trusts all certificates
         val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
@@ -137,6 +142,7 @@ class LgtDeductDetailViewFragment : Fragment() {
             val useValue = remainInfo.useValue
             val prodTypeCd = remainInfo.prodTypeCd
 
+
             val modifiedSvcNm = svcNm.replace("[SMT]", "")
 
             // Modify svcTypNm if it contains "패킷데이터" or "음성+영상"
@@ -197,6 +203,7 @@ class LgtDeductDetailViewFragment : Fragment() {
                 dataStringBuilder.appendLine().appendLine()
             }
         }
+
         // Set the data string to the dataTextView and center-align the text
         dataTextView.text = dataStringBuilder.toString()
         dataTextView.gravity = Gravity.CENTER

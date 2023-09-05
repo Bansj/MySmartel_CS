@@ -27,6 +27,8 @@ import com.smartelmall.mysmartel_ver_1.Banner.BannerItem
 import com.smartelmall.mysmartel_ver_1.Banner.BannerViewPagerAdapter
 import com.smartelmall.mysmartel_ver_1.Banner.ZoomOutPageTransformer
 import com.smartelmall.mysmartel_ver_1.KT.*
+import com.smartelmall.mysmartel_ver_1.KT.Deduct.KtDeductApiResponse
+import com.smartelmall.mysmartel_ver_1.KT.Deduct.KtDeductDetailViewFragment
 import com.smartelmall.mysmartel_ver_1.LGT.Deduct.LgtDedcutApiResponse
 import com.smartelmall.mysmartel_ver_1.LGT.LgtBillApiResponse
 import com.smartelmall.mysmartel_ver_1.LGT.LgtBillDetailFragment

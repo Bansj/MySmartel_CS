@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.smartelmall.mysmartel_ver_1.R
 
-class LgtDeductAdapter(private val dataList: List<LgtDeductRemainInfo>) :
+/*class LgtDeductAdapter(private val dataList: List<LgtDeductRemainInfo>) :
     RecyclerView.Adapter<LgtDeductAdapter.ViewHolder>() {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -34,5 +34,5 @@ class LgtDeductAdapter(private val dataList: List<LgtDeductRemainInfo>) :
     override fun getItemCount(): Int {
         return dataList.size
     }
-}
+}*/
 

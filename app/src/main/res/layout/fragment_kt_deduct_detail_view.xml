@@ -77,53 +77,10 @@
                         android:textColor="@color/black"
                         android:layout_gravity="center"/>
 
-                    <TextView
-                        android:id="@+id/tvVoiceCallDetail"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="VoiceCallDetail"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_weight="1"
-                        android:textColor="@color/black"
-                        android:layout_gravity="center"
-                        android:visibility="gone"/>
-
-                    <TextView
-                        android:id="@+id/tvVoiceCallDetailTot"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="VoiceCallDetailTot"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_weight="1"
-                        android:textColor="@color/black"
-                        android:layout_gravity="center"
-                        android:visibility="gone"/>
-
-                    <TextView
-                        android:id="@+id/tvTotUseTimeCnt"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="TotuseTimeCnt"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_weight="1"
-                        android:textColor="@color/black"
-                        android:layout_gravity="center"
-                        android:visibility="gone"/>
-
-                    <TextView
-                        android:id="@+id/tvTotUseTimeCntTot"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="TotUseTimeCntTot"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:layout_weight="1"
-                        android:textColor="@color/black"
-                        android:layout_gravity="center"
-                        android:visibility="gone"/>
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
                 </LinearLayout>
 
             </ScrollView>
@@ -131,4 +88,5 @@
         </LinearLayout>
 
     </LinearLayout>
+
 </FrameLayout>

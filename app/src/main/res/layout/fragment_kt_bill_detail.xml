@@ -39,7 +39,7 @@
                 android:id="@+id/txt_sumAmount"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
-                android:text="총 xxxxx원"
+                android:text="청구 전 입니다"
                 android:textColor="@color/black"
                 android:textStyle="bold"
                 android:textSize="18dp"
