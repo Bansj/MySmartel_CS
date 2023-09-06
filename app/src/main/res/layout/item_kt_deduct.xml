@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="8dp">
+    android:layout_height="wrap_content"
+    android:id="@+id/item_layout"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
-        android:id="@+id/txt_title"
+        android:id="@+id/svcNameTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -28,7 +27,7 @@
         android:textColor="@color/black"
         android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_title" />
+        app:layout_constraintTop_toBottomOf="@+id/svcNameTextView" />
 
     <TextView
         android:id="@+id/txt_remainUse"
@@ -56,7 +55,7 @@
         app:layout_constraintTop_toBottomOf="@+id/txt_remainUse" />
 
     <TextView
-        android:id="@+id/txt_totalValue"
+        android:id="@+id/totalTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="totalValue"
@@ -65,22 +64,10 @@
         android:layout_marginTop="25dp"
         android:layout_marginEnd="15dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_title" />
+        app:layout_constraintTop_toBottomOf="@+id/svcNameTextView" />
 
     <TextView
-        android:id="@+id/txt_useValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="totalValue"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="15dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_totalValue" />
-
-    <TextView
-        android:id="@+id/txt_leftValue"
+        android:id="@+id/usageTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="useValue"
@@ -88,8 +75,21 @@
         android:textSize="18sp"
         android:layout_marginTop="15dp"
         android:layout_marginEnd="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/totalTextView" />
+
+    <TextView
+        android:id="@+id/remainTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="remainValue"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="15dp"
         android:layout_marginBottom="20dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_useValue" />
+        app:layout_constraintTop_toBottomOf="@+id/usageTextView" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

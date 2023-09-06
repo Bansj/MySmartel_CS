@@ -31,20 +31,15 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
     private lateinit var totUseTimeCntTotTextView: TextView
     private var initialY: Float = 0f
 
-    private val itemList = mutableListOf<KtDeductItem>() // Your data should be populated in this list
-
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_kt_deduct_detail_view, container, false)
-
-        val recyclerView: RecyclerView = view.findViewById(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(context)
-        val adapter = KtDeductAdapter(itemList)
-        recyclerView.adapter = adapter
 
         totaluseTimeTextView = view.findViewById(R.id.tvTotaluseTime)
 //        voiceCallDetailTextView = view.findViewById(R.id.tvVoiceCallDetail)
@@ -98,9 +93,7 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
         view.animate().translationY(0f).setDuration(300).start()
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-    }
+
 
     private fun fetchDeductApiData() {
         val phoneNumber = arguments?.getString("phoneNumber") ?: ""
@@ -176,8 +169,9 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
     private fun setDataToTextViews(totaluseTimeList: List<KtDeductApiResponse.BodyData.TotaluseTimeDtoData>) {
 
         val totaluseTimeStringBuilder = StringBuilder()
+        val deductItem = totaluseTimeList.map { totaluseTime ->
+        //totaluseTimeList.forEach() { totaluseTime ->
 
-        totaluseTimeList.forEach { totaluseTime ->
             val strSvcName = totaluseTime.strSvcName
             var strFreeMinTotal = formatValue(totaluseTime.strFreeMinTotal)
             var strFreeMinReMain = formatValue(totaluseTime.strFreeMinReMain)
@@ -249,9 +243,14 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
             }
             totaluseTimeStringBuilder.append("\n\n\n")
 
+            DeductItem(strSvcName, strFreeMinTotal, strFreeMinReMain, strFreeMinUse)
 
         }
-        totaluseTimeTextView.text = totaluseTimeStringBuilder.toString()
+        val recyclerView: RecyclerView = requireView().findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.adapter = DeductAdapter(deductItem)
+
+        //totaluseTimeTextView.text = totaluseTimeStringBuilder.toString()
     }
 
     private fun formatValue(value: String): String {
