@@ -63,7 +63,8 @@
                     android:gravity="center"
                     android:textSize="18sp"
                     android:textColor="@android:color/black"
-                    android:padding="16dp" />
+                    android:padding="16dp"
+                    android:visibility="gone"/>
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recyclerView"

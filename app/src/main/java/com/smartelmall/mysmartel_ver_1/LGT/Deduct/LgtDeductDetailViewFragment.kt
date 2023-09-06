@@ -12,6 +12,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
@@ -37,6 +38,7 @@ class LgtDeductDetailViewFragment : Fragment() {
     private val handler = Handler(Looper.getMainLooper())
 
     private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter:LgtDeductAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -132,6 +134,7 @@ class LgtDeductDetailViewFragment : Fragment() {
         // Create a StringBuilder to build the data string
         val dataStringBuilder = StringBuilder()
 
+        val LgtDeductItemList=ArrayList<LgtDeductItem>()
 
         // Iterate over the RemainInfo list and append the values to the data string
         for (remainInfo in remainInfoList) {
@@ -140,8 +143,7 @@ class LgtDeductDetailViewFragment : Fragment() {
             val svcUnitCd = remainInfo.svcUnitCd
             val alloValue = remainInfo.alloValue
             val useValue = remainInfo.useValue
-            val prodTypeCd = remainInfo.prodTypeCd
-
+            //val prodTypeCd = remainInfo.prodTypeCd
 
             val modifiedSvcNm = svcNm.replace("[SMT]", "")
 
@@ -168,7 +170,21 @@ class LgtDeductDetailViewFragment : Fragment() {
                     val useValueInMinutes = useValue.toDouble() / 60
                     dataStringBuilder.append("사용량  ${useValueInMinutes.format(0).padStart(40)}분\n\n\n\n")
                     dataStringBuilder.appendLine().appendLine()
-                } else {
+
+                    LgtDeductItemList.add(
+                        LgtDeductItem(
+                            modifiedSvcNm+" $modifiedSvcTypNm",
+                            "총제공량",
+                            "사용량",
+                            "잔여량",
+                            "무제한",
+                            "${useValueInMinutes.format(0)}분",
+                            "\n\n"
+                        )
+                    )
+                    Log.d("LgtDuctDetailViewFramgent","----------------check recyclerView: $LgtDeductItemList\n\n\n--------------------")
+                }
+                else {
                     val alloValueInMinutes = alloValue.toDouble() / 60
                     val useValueInMinutes = useValue.toDouble() / 60
                     val remainValueMin = alloValueInMinutes - useValueInMinutes
@@ -176,20 +192,65 @@ class LgtDeductDetailViewFragment : Fragment() {
                     dataStringBuilder.append("사용량  ${useValueInMinutes.format(0).padStart(40)}분\n\n")
                     dataStringBuilder.append("잔여량    ${remainValueMin.format(0).padStart(40)}분\n\n\n\n")
                     dataStringBuilder.appendLine().appendLine()
+
+                    LgtDeductItemList.add(
+                        LgtDeductItem(
+                            modifiedSvcNm+" $modifiedSvcTypNm",
+                            "총제공량",
+                            "사용량",
+                            "잔여량",
+                            "${alloValueInMinutes.format(0)}분",
+                            "${useValueInMinutes.format(0)}분",
+                            "${remainValueMin.format(0)}분\n\n"
+                        )
+                    )
+                    Log.d("LgtDuctDetailViewFramgent","----------------check recyclerView: $LgtDeductItemList\n" +
+                            "\n" +
+                            "\n--------------------")
                 }
-            } else if (svcUnitCd.contains("건")) {
+            }
+            else if (svcUnitCd.contains("건")) {
                 if (alloValue.contains("Z")) {
                     dataStringBuilder.append("총제공량 ${"무제한".padStart(40)}\n\n")
                     dataStringBuilder.append("사용량  ${useValue.padStart(40)}건\n\n\n\n")
                     dataStringBuilder.appendLine().appendLine()
-                } else {
+
+                    LgtDeductItemList.add(
+                        LgtDeductItem(
+                            modifiedSvcNm+" $modifiedSvcTypNm",
+                            "총제공량",
+                            "사용량",
+                            "잔여량",
+                            "무제한",
+                            "${useValue}건",
+                            "\n\n"
+                        )
+                    )
+                    Log.d("LgtDuctDetailViewFramgent","----------------check recyclerView: $LgtDeductItemList\n\n\n--------------------")
+
+                }
+                else {
                     dataStringBuilder.append("총제공량 ${alloValue.padStart(40)}건\n\n")
                     dataStringBuilder.append("사용량  ${useValue.padStart(40)}건\n\n")
                     val remainValue = alloValue.toInt() - useValue.toInt()
                     dataStringBuilder.append("잔여량:    ${remainValue.toString().padStart(40)}건\n\n\n\n")
                     dataStringBuilder.appendLine().appendLine()
+
+                    LgtDeductItemList.add(
+                        LgtDeductItem(
+                            modifiedSvcNm+" $modifiedSvcTypNm",
+                            "총제공량",
+                            "사용량",
+                            "잔여량",
+                            "${alloValue}건",
+                            "${useValue}건",
+                            "${remainValue}건\n\n"
+                        )
+                    )
+                    Log.d("LgtDuctDetailViewFramgent","----------------check recyclerView: $LgtDeductItemList\n\n\n--------------------")
                 }
-            } else if (svcTypNm.contains("패킷")) {
+            }
+            else if (svcTypNm.contains("패킷")) {
                 val alloValueInGB = alloValue.toDouble() / 1024 / 1024
                 val useValueInGB = useValue.toDouble() / 1024 / 1024
                 val remainValueInGB = alloValueInGB - useValueInGB
@@ -197,16 +258,48 @@ class LgtDeductDetailViewFragment : Fragment() {
                 dataStringBuilder.append("사용량  ${useValueInGB.format(1).padStart(40)}GB\n\n")
                 dataStringBuilder.append("잔여량    ${remainValueInGB.format(1).padStart(40)}GB\n\n\n\n")
                 dataStringBuilder.appendLine().appendLine()
-            } else {
+
+                LgtDeductItemList.add(
+                    LgtDeductItem(
+                        modifiedSvcNm+" $modifiedSvcTypNm",
+                        "총제공량",
+                        "사용량",
+                        "잔여량",
+                        "${alloValueInGB.format(1)}GB",
+                        "${useValueInGB.format(1)}GB",
+                        "${remainValueInGB.format(1)}GB\n\n"
+                    )
+                )
+                Log.d("LgtDuctDetailViewFramgent","----------------check recyclerView: $LgtDeductItemList\n\n\n--------------------")
+            }
+            else {
                 dataStringBuilder.append("총제공량: $alloValue\n\n")
                 dataStringBuilder.append("사용량:  $useValue\n\n\n\n")
                 dataStringBuilder.appendLine().appendLine()
-            }
-        }
 
-        // Set the data string to the dataTextView and center-align the text
-        dataTextView.text = dataStringBuilder.toString()
-        dataTextView.gravity = Gravity.CENTER
+                LgtDeductItemList.add(
+                    LgtDeductItem(
+                        modifiedSvcNm+" $modifiedSvcTypNm",
+                        "총제공량",
+                        "사용량",
+                        "잔여량",
+                        "$alloValue",
+                        "$useValue",
+                        "\n\n"
+                    )
+                )
+                Log.d("LgtDuctDetailViewFramgent","----------------check recyclerView: $LgtDeductItemList\n\n\n--------------------")
+            }
+
+        }
+        val adapter=LgtDeductAdapter(LgtDeductItemList)
+
+        val recyclerView = requireView().findViewById<RecyclerView>(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView.adapter=adapter
+
+        Log.d("LgtDuctDetailViewFramgent","==================================check recyclerView: $LgtDeductItemList\n\n\n=============================")
+
     }
 
     // Extension function to format a Double value with the specified number of decimal places

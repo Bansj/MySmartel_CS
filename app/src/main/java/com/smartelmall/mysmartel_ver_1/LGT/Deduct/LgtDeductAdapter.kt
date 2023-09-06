@@ -1,6 +1,6 @@
 package com.smartelmall.mysmartel_ver_1.LGT.Deduct
 
-import android.view.Gravity
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,37 +8,40 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.smartelmall.mysmartel_ver_1.R
 
-class LgtDeductViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-    private val txtTitle = view.findViewById<TextView>(R.id.txt_title)
-    private val txtRemainTitle = view.findViewById<TextView>(R.id.txt_remainTitle)
-    private val txtRemainUse = view.findViewById<TextView>(R.id.txt_remainUse)
-    private val txtRemainLeft = view.findViewById<TextView>(R.id.txt_remainLeft)
+class LgtDeductAdapter(private var items: List<LgtDeductItem>) : RecyclerView.Adapter<LgtDeductViewHolder>() {
 
-    private val txtTotalValue = view.findViewById<TextView>(R.id.txt_totalValue)
-    private val txtUseValue = view.findViewById<TextView>(R.id.txt_useValue)
-    private val txtLeftValue = view.findViewById<TextView>(R.id.txt_leftValue)
-
-
-    fun bind(item: LgtDeductItem) {
-        // Set the text for each TextView from the item data
-        txtTitle.text = item.title
-        txtRemainTitle.text = item.remainTitle
-        txtRemainUse.text = item.remainUse
-        txtRemainLeft.text= item.remainLeft
-
-    }
-}
-
-class LgtDeductAdapter(private var items : List<LgtDeductItem>) : RecyclerView.Adapter<LgtDeductViewHolder>() {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType:Int):LgtDeductViewHolder{
-        return LgtDeductViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.lgt_deduct_item,parent,false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LgtDeductViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.lgt_deduct_item, parent, false)
+        return LgtDeductViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder:LgtDeductViewHolder, position:Int){
+    override fun onBindViewHolder(holder: LgtDeductViewHolder, position: Int) {
         holder.bind(items[position])
     }
 
-    override fun getItemCount()=items.size
+    override fun getItemCount(): Int = items.size
 
 }
+
+class LgtDeductViewHolder(view : View) : RecyclerView.ViewHolder(view){
+
+    private var txtTitle : TextView = view.findViewById(R.id.txt_title)
+    private var txtTotalTitle : TextView = view.findViewById(R.id.txt_totalTitle)
+    private var txtUseTitle : TextView = view.findViewById(R.id.txt_useTitle)
+    private var txtRemainTitle : TextView = view.findViewById(R.id.txt_remainTitle)
+    private var txtTotalValue : TextView = view.findViewById(R.id.txt_totalValue)
+    private var txtUseValue : TextView=view.findViewById(R.id.txt_useValue)
+    private var txtRemainValue : TextView=view.findViewById(R.id.txt_remainValue)
+
+
+    fun bind(item:LgtDeductItem){
+        txtTitle.text=item.title
+        txtTotalTitle.text=item.totalTitle
+        txtUseTitle.text=item.useTitle
+        txtTotalValue.text=item.totalValue
+        txtUseValue.text=item.useValue
+        txtRemainTitle.text= "${item.remainTitle}\n\n\n"
+        txtRemainValue.text = item.remainValue
+    }
+}
+

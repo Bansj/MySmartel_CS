@@ -19,7 +19,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/txt_totalTitle"
+        android:id="@+id/txt_remainTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="총제공량"
@@ -31,7 +31,7 @@
         app:layout_constraintTop_toBottomOf="@+id/txt_title" />
 
     <TextView
-        android:id="@+id/txt_useTitle"
+        android:id="@+id/txt_remainUse"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="사용량"
@@ -40,10 +40,10 @@
         android:layout_marginTop="15dp"
         android:layout_marginStart="15dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_totalTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/txt_remainTitle" />
 
     <TextView
-        android:id="@+id/txt_remainTitle"
+        android:id="@+id/txt_remainLeft"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="잔여량"
@@ -53,7 +53,7 @@
         android:layout_marginStart="15dp"
         android:layout_marginBottom="20dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txt_useTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/txt_remainUse" />
 
     <TextView
         android:id="@+id/txt_totalValue"
@@ -71,7 +71,7 @@
         android:id="@+id/txt_useValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="useValue"
+        android:text="totalValue"
         android:textColor="@color/black"
         android:textSize="18sp"
         android:layout_marginTop="15dp"
@@ -80,10 +80,10 @@
         app:layout_constraintTop_toBottomOf="@+id/txt_totalValue" />
 
     <TextView
-        android:id="@+id/txt_remainValue"
+        android:id="@+id/txt_leftValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="remainValue"
+        android:text="useValue"
         android:textColor="@color/black"
         android:textSize="18sp"
         android:layout_marginTop="15dp"

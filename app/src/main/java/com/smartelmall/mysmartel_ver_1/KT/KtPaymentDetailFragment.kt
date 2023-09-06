@@ -18,6 +18,9 @@ import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -124,17 +127,25 @@ class KtPaymentDetailFragment : Fragment() {
                 val titleWidth = 12 // Fixed width for the title section
                 val valueWidth = 12 // Arbitrary width for the value section
 
-                val formattedThisMonth = "청구요금 ${paymentDto.thisMonth}원".splitValueAndAlign(titleWidth, valueWidth)
-                stringBuilder.append(formattedThisMonth)
-                stringBuilder.append("\n")
+                val formattedThisMonthAmount= formatToKoreanWon(paymentDto.thisMonth.toLong())
+                val formattedPastDueAmtAmount= formatToKoreanWon(paymentDto.pastDueAmt.toLong())
 
-                val formattedPastDueAmt = "미납요금 ${paymentDto.pastDueAmt}원".splitValueAndAlign(titleWidth, valueWidth)
+                val formattedThisMonhth ="청구요금 $formattedThisMonthAmount".splitValueAndAlign(titleWidth,valueWidth )
+                stringBuilder.append(formattedThisMonhth)
+                stringBuilder.append("\n\n")
+
+                val formattedPastDueAmt ="미납요금 $formattedPastDueAmtAmount".splitValueAndAlign(titleWidth,valueWidth )
                 stringBuilder.append(formattedPastDueAmt)
-                stringBuilder.append("\n\n\n")
+                stringBuilder.append("\n\n\n\n")
             }
             return stringBuilder.toString()
         }
         return "No payment data available"
+    }
+
+    fun formatToKoreanWon(amount: Long): String {
+        val formatter = NumberFormat.getNumberInstance(Locale.KOREA)
+        return formatter.format(amount) + "원"
     }
 
     private fun getScreenWidth(context: Context): Int {
