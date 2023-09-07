@@ -5,6 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+<!--    배너 이미지용 아이템 레이아웃-->
+
     <ImageView
         android:id="@+id/bannerImage"
         android:layout_width="match_parent"

@@ -37,9 +37,6 @@ class LgtDeductDetailViewFragment : Fragment() {
 
     private val handler = Handler(Looper.getMainLooper())
 
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter:LgtDeductAdapter
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

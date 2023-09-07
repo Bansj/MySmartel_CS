@@ -783,7 +783,6 @@ class MyInfoFragment : Fragment() {
                 strFreeMinTotal = "${minutesTotal / 60}분"
                 strFreeMinReMain = "${minutesRemain / 60}분"
                 strFreeMinUse = "${minutesUse / 60}분"
-
             }
             else if (strSvcName == "음성" || strSvcName == "음성/영상") {
                 val minutesUse = strFreeMinUse.toIntOrNull() ?: 0
