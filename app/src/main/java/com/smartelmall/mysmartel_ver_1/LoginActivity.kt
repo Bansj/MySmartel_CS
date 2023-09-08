@@ -127,13 +127,15 @@ class LoginActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    private var testPhoneNumber: String? = null // 테스트 계정번호 생성
     private fun loginUser() {
         val phoneNumber = phoneNumberEditText.text.toString()
         val password = passwordEditText.text.toString()
 
-        if (phoneNumber == "2323" && password == "2323") {
+        if (phoneNumber == "123" && password == "123") { // 테스트 계정생성
             handleTestLogin()
-            fetchUserInfo("01033504523")
+            testPhoneNumber = "01059376401" // 반승주
+            fetchUserInfo(testPhoneNumber!!)
             return
         }
 
@@ -169,12 +171,12 @@ class LoginActivity : AppCompatActivity() {
 
     private fun handleTestLogin() {
         val response = JSONObject().apply {
-            put("resultCd", "true")
-            put("typ", "pwd")
-//            put("telecom", "LGT")
-//            put("serviceAcct", "500279120526")
-//            put("custNm", "김지은")
-//            put("phoneNumber", "01033504523")
+            put("resultCd", "true") // 로그인 로직 강제 통과
+            put("typ", "pwd")       // 로그인 로직 강제 통과
+            put("telecom", "LGT")
+            put("serviceAcct", "500279120526")
+            put("custNm", "김지은")
+            put("phoneNumber", "01033504523")
         }
         //handleLoginResponse(response)
         handleInfoResponse(response)
@@ -307,7 +309,12 @@ class LoginActivity : AppCompatActivity() {
     private fun handleInfoResponse(response: JSONObject) {
         hideLoadingDialog()
         try {
-            val phoneNumber = phoneNumberEditText.text.toString()
+            var phoneNumber = phoneNumberEditText.text.toString()
+
+            if (phoneNumber == "123") {
+                // If entered phone number is "320", replace it with the last fetched phone number
+                phoneNumber = testPhoneNumber ?: ""
+            }
             val telecom = response.getString("telecom")
             val custName = response.getString("custNm")
             val serviceAcct = response.getString("serviceAcct")
