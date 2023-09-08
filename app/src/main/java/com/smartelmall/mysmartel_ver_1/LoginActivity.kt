@@ -127,14 +127,16 @@ class LoginActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private var testPhoneNumber: String? = null // 테스트 계정번호 생성
+    // 테스트 계정번호 생성
+    private var testPhoneNumber: String? =
+        //"01084817615" // lg
+    "01026693491" // lg
     private fun loginUser() {
         val phoneNumber = phoneNumberEditText.text.toString()
         val password = passwordEditText.text.toString()
 
         if (phoneNumber == "123" && password == "123") { // 테스트 계정생성
             handleTestLogin()
-            testPhoneNumber = "01059376401" // 반승주
             fetchUserInfo(testPhoneNumber!!)
             return
         }

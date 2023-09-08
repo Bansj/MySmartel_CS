@@ -248,26 +248,35 @@ class LgtDeductDetailViewFragment : Fragment() {
                 }
             }
             else if (svcTypNm.contains("패킷")) {
-                val alloValueInGB = alloValue.toDouble() / 1024 / 1024
-                val useValueInGB = useValue.toDouble() / 1024 / 1024
-                val remainValueInGB = alloValueInGB - useValueInGB
-                dataStringBuilder.append("총제공량 ${alloValueInGB.format(1).padStart(40)}GB\n\n")
-                dataStringBuilder.append("사용량  ${useValueInGB.format(1).padStart(40)}GB\n\n")
-                dataStringBuilder.append("잔여량    ${remainValueInGB.format(1).padStart(40)}GB\n\n\n\n")
-                dataStringBuilder.appendLine().appendLine()
-
-                LgtDeductItemList.add(
-                    LgtDeductItem(
-                        modifiedSvcNm+" $modifiedSvcTypNm",
-                        "총제공량",
-                        "사용량",
-                        "잔여량",
-                        "${alloValueInGB.format(1)}GB",
-                        "${useValueInGB.format(1)}GB",
-                        "${remainValueInGB.format(1)}GB\n\n"
+                if (!alloValue.contains("Z") && !useValue.contains("Z")) {
+                    val alloValueInGB = alloValue.toDouble() / 1024 / 1024
+                    val useValueInGB = useValue.toDouble() / 1024 / 1024
+                    val remainValueInGB = alloValueInGB - useValueInGB
+                    dataStringBuilder.append("총제공량 ${alloValueInGB.format(1).padStart(40)}GB\n\n")
+                    dataStringBuilder.append("사용량  ${useValueInGB.format(1).padStart(40)}GB\n\n")
+                    dataStringBuilder.append(
+                        "잔여량    ${
+                            remainValueInGB.format(1).padStart(40)
+                        }GB\n\n\n\n"
                     )
-                )
-                Log.d("LgtDuctDetailViewFramgent","----------------check recyclerView: $LgtDeductItemList\n\n\n--------------------")
+                    dataStringBuilder.appendLine().appendLine()
+
+                    LgtDeductItemList.add(
+                        LgtDeductItem(
+                            modifiedSvcNm + " $modifiedSvcTypNm",
+                            "총제공량",
+                            "사용량",
+                            "잔여량",
+                            "${alloValueInGB.format(1)}GB",
+                            "${useValueInGB.format(1)}GB",
+                            "${remainValueInGB.format(1)}GB\n\n"
+                        )
+                    )
+                    Log.d(
+                        "LgtDuctDetailViewFramgent",
+                        "----------------check recyclerView: $LgtDeductItemList\n\n\n--------------------"
+                    )
+                }
             }
             else {
                 dataStringBuilder.append("총제공량: $alloValue\n\n")

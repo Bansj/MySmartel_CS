@@ -1189,6 +1189,10 @@ class MyInfoFragment : Fragment() {
                         displayCall = "✆ ${remainValueMin}분 / ${alloValueInMinutes}분"
                         println(displayCall)
                     }
+                    else {
+                        displayCall = "✆ ${remainValueMin}분 / ${alloValueInMinutes}분"
+                        println(displayCall)
+                    }
 
                 }
             }
@@ -1208,22 +1212,25 @@ class MyInfoFragment : Fragment() {
                     displayM = "✉︎ ${remainValue}건 / ${alloValue}건"
                 }
             } else if (svcTypNm.contains("패킷")) {
-                val alloValueInGB = alloValue.toDouble() / 1024 / 1024
-                val useValueInGB = useValue.toDouble() / 1024 / 1024
-                val remainValueInGB = alloValueInGB - useValueInGB
 
-                dataStringBuilder.append("$alloValueInGB\n") // 총제공량
-                dataStringBuilder.append("사용량  ${useValueInGB.format(1).padStart(40)}GB\n")
-                dataStringBuilder.append("$remainValueInGB") // 잔여량
+                if (!alloValue.contains("Z") && !useValue.contains("Z")){
+                    val alloValueInGB = alloValue.toDouble() / 1024 / 1024
+                    val useValueInGB = useValue.toDouble() / 1024 / 1024
+                    val remainValueInGB = alloValueInGB - useValueInGB
 
-                totalRemainData += remainValueInGB.toDouble()
-                totalRemainDataTotal += alloValueInGB.toDouble()
+                    dataStringBuilder.append("$alloValueInGB\n")
+                    dataStringBuilder.append("사용량 ${useValueInGB.format(1)}GB\n")
+                    dataStringBuilder.append("$remainValueInGB")
 
-                updateProgressBar(totalRemainDataTotal, totalRemainData)
+                    totalRemainData += remainValueInGB
+                    totalRemainDataTotal += alloValueInGB
+
+                    updateProgressBar(totalRemainDataTotal, totalRemainData)
+                }
 
             } else {
-                dataStringBuilder.append("총제공량: $alloValue\n\n")
-                dataStringBuilder.append("사용량:  $useValue\n\n\n\n")
+                dataStringBuilder.append("총제공량: $alloValue\n")
+                dataStringBuilder.append("사용량: $useValue\n\n")
             }
         }
 
