@@ -57,15 +57,6 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var autoLoginSwitch: Switch // 자동로그인 스위치
 
-    // Test User Info 추가
-    private val testUser = UserInfo(
-        id = "test",
-        password = "test",
-        telecom = "SKT",
-        serviceAcct = "113971932",
-        custName = "반승주",
-        phoneNumber = "01075244523"
-    )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
@@ -84,7 +75,6 @@ class LoginActivity : AppCompatActivity() {
         autoLoginSwitch = findViewById(R.id.switch_autoLogin)
 
 
-
         val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         val sharedPrefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         if (sharedPrefs.getBoolean("autoLogin", false)) {
@@ -94,12 +84,10 @@ class LoginActivity : AppCompatActivity() {
         }
 
         loginButton.setOnClickListener { // 로그인 버튼
+
             Log.d("LoginActivity", "============================== Login button clicked ==============================")
-            if (phoneNumberEditText.text.toString() == testUser.id && passwordEditText.text.toString() == testUser.password) {
-                loginUserWithTestInfo()
-            } else {
-                loginUser()
-            }
+
+            loginUser()
 
             if (autoLoginSwitch.isChecked) {
                 with(sharedPrefs.edit()) {
@@ -134,29 +122,6 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun loginUserWithTestInfo() {   // 가상의 사용자로 로그인하는 메소드 추가
-        handleLoginResponseWithTestInfo(JSONObject().apply {
-            put("resultCd", true)
-            put("typ", "pwd")
-        })
-    }
-    // 가상의 응답을 처리하는 메소드 추가
-    private fun handleLoginResponseWithTestInfo(response: JSONObject) {
-        try {
-            if (response.getBoolean("resultCd") && response.getString("typ") == "pwd") {
-                fetchUserInfo(testUser.phoneNumber)
-            } else {
-                showErrorDialog("로그인에 실패하였습니다.")
-                hideLoadingDialog()
-            }
-
-
-        } catch (e: JSONException) {
-            hideLoadingDialog()
-            showErrorDialog("Failed to parse login response")
-        }
-    }
-
     private fun navigateToSignupActivity() { // 회원가입 버튼 클릭 이벤트
         val intent = Intent(this, WebViewActivity::class.java)
         startActivity(intent)
@@ -166,6 +131,12 @@ class LoginActivity : AppCompatActivity() {
         val phoneNumber = phoneNumberEditText.text.toString()
         val password = passwordEditText.text.toString()
 
+        if (phoneNumber == "2323" && password == "2323") {
+            handleTestLogin()
+            fetchUserInfo("01033504523")
+            return
+        }
+
         Log.d("LoginActivity",
             "--------------------Login User - Phone number: $phoneNumber, Password: $password---------------------")
 
@@ -173,10 +144,9 @@ class LoginActivity : AppCompatActivity() {
         loginParams.put("log_id", phoneNumber)
         loginParams.put("log_pwd", password)
 
-
         showLoadingDialog()
 
-        val loginUrl = "https://www.mysmartel.com/smartel/api_mysmartel_login_test.php"
+        val loginUrl = "https://www.mysmartel.com/smartel/api_mysmartel_login.php"
         val loginRequest = JsonObjectRequest(
             Request.Method.POST, loginUrl, loginParams,
             Response.Listener { response ->
@@ -195,6 +165,19 @@ class LoginActivity : AppCompatActivity() {
         val editor = sharedPrefs.edit()
         editor.putString("phoneNumber", phoneNumber)
         editor.apply()
+    }
+
+    private fun handleTestLogin() {
+        val response = JSONObject().apply {
+            put("resultCd", "true")
+            put("typ", "pwd")
+//            put("telecom", "LGT")
+//            put("serviceAcct", "500279120526")
+//            put("custNm", "김지은")
+//            put("phoneNumber", "01033504523")
+        }
+        //handleLoginResponse(response)
+        handleInfoResponse(response)
     }
 
 
@@ -234,14 +217,14 @@ class LoginActivity : AppCompatActivity() {
                             val formatterTimeOnly = SimpleDateFormat("HH:mm", Locale.getDefault())
                             showExitDialog(
                                 "알림\n",
-                                "죄송합니다.\n서버점검 중입니다.\n\n${SimpleDateFormat("M/d HH:mm", Locale.getDefault()).format(parsedStartTime)} ~ ${formatterTimeOnly.format(parsedEndTime)}",
-                                "확인"
+                                "죄송합니다.\n서버 점검 중입니다.\n\n${SimpleDateFormat("M/d HH:mm", Locale.getDefault()).format(parsedStartTime)} ~ ${formatterTimeOnly.format(parsedEndTime)}",
+                                "OK"
                             )
                         } else {
                             showExitDialog(
                                 "알림\n",
-                                "죄송합니다.\n서버점검 중입니다.\n\n${SimpleDateFormat("M/d HH:mm", Locale.getDefault()).format(parsedStartTime)} ~ ${SimpleDateFormat("M/d HH:mm", Locale.getDefault()).format(parsedEndTime)}",
-                                "확인"
+                                "죄송합니다.\n서버 점검 중입니다.\n\n${SimpleDateFormat("M/d HH:mm", Locale.getDefault()).format(parsedStartTime)} ~ ${SimpleDateFormat("M/d HH:mm", Locale.getDefault()).format(parsedEndTime)}",
+                                "OK"
                             )
                         }
                     } else {
@@ -253,8 +236,8 @@ class LoginActivity : AppCompatActivity() {
             } else { // loginResult is "false"
                 when (type) {
                     "join" -> showErrorDialog("스마텔 개통 고객이 아닙니다.")
-                    "accnt" -> showErrorDialog("로그인 계정이 없습니다. 회원가입이 필요합니다.")
-                    "pwd" -> showErrorDialog("비밀번호가 일치하지 않습니다. 비밀번호를 재입력해주세요.")
+                    "accnt" -> showErrorDialog("로그인 계정이 없습니다.\n회원가입이 필요합니다.")
+                    "pwd" -> showErrorDialog("비밀번호가 일치하지 않습니다.\n비밀번호를 재입력해주세요.")
                     else -> showErrorDialog("알 수 없는 오류가 발생하였습니다.")
                 }
                 hideLoadingDialog()
@@ -266,6 +249,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun showExitDialog(title: String = "알림", message: String, okButtonText: String = "OK") {
+
         requestQueue.cancelAll("LOGIN_REQUEST_TAG")
         hideLoadingDialog()
 
@@ -366,7 +350,7 @@ class LoginActivity : AppCompatActivity() {
     private fun showAlertDialog(message: String) {
         val alertDialog = AlertDialog.Builder(this)
             .setMessage(message)
-            .setPositiveButton("확인") { dialog: DialogInterface, _: Int ->
+            .setPositiveButton("OK") { dialog: DialogInterface, _: Int ->
                 dialog.dismiss()
                 navigateToSignupActivity()
             }
@@ -379,7 +363,6 @@ class LoginActivity : AppCompatActivity() {
         alertDialog.show()
     }
     private fun showErrorDialog(message: String) {
-
         requestQueue.cancelAll("LOGIN_REQUEST_TAG")
         hideLoadingDialog()
 
@@ -387,10 +370,14 @@ class LoginActivity : AppCompatActivity() {
         dialogBuilder.setMessage(message)
             .setCancelable(false)
             .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+            .create()
 
-        val alert = dialogBuilder.create()
-        alert.show()
+        // Apply the custom style to the "OK" button
+        val alertDialog = dialogBuilder.show()
+        val okButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        okButton.setTextColor(ContextCompat.getColor(this, R.color.orange)) // Use the color resource if available
     }
+
     private fun createLoadingDialog(): AlertDialog {
         val dialogBuilder = AlertDialog.Builder(this)
         val dialogView = layoutInflater.inflate(R.layout.loading_dialog, null)

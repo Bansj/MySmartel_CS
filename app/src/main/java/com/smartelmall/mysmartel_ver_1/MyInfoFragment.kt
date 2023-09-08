@@ -230,7 +230,7 @@ class MyInfoFragment : Fragment() {
         Log.d("MyInfoFragment", "from get viewModel -----> serviceAcct: $serviceAcct")
 
         // 전화번호 형시으로 커스텀 함수
-        val formattedPhoneNumber = if (phoneNumber != null) {
+        val formattedPhoneNumber = if (phoneNumber != null && phoneNumber.length == 11) {
             String.format(
                 "%s-%s-%s",
                 phoneNumber.substring(0, 3),
@@ -238,8 +238,9 @@ class MyInfoFragment : Fragment() {
                 phoneNumber.substring(7)
             )
         } else {
-            "Unknown"
+            phoneNumber ?: "Unknown"
         }
+
         // Set the data in the views
         txtcustName.text = "  ${custName}님, 안녕하세요. "
         txtPhoneNumber.text = " ✆ $formattedPhoneNumber [$Telecom]"

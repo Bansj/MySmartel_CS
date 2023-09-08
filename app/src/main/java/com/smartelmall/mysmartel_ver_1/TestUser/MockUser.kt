@@ -7,4 +7,4 @@ data class MockUser(
     val phoneNumber: String
 )
 
-val mockUser = MockUser("SKT", "113971932", "반승주", "01075244523")
+val mockUser = MockUser("LGT", "500279120526", "김지은", "01033504523")

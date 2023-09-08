@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="200dp"
     android:orientation="vertical"
+    android:background="#33ffffff"
     android:id="@+id/dialogLayout">
 
     <TextView
@@ -20,12 +21,6 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_editor_absoluteX="16dp" />
 
-    <!--    <TextView-->
-<!--        android:id="@+id/dialogOK"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:textAlignment="center" />-->
-
     <TextView
         android:id="@+id/dialogMessage"
         android:layout_width="match_parent"
@@ -39,10 +34,10 @@
         android:layout_width="100dp"
         android:layout_height="30dp"
         android:layout_gravity="center"
-        android:background="#FF5722"
+        android:background="@android:color/transparent"
         android:gravity="center"
         android:text="OK"
-        android:textColor="#FFFFFF"
+        android:textColor="#FF5722"
         android:textSize="18sp"
         android:layout_marginBottom="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
