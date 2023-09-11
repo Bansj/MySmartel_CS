@@ -1162,28 +1162,25 @@ class MyInfoFragment : Fragment() {
             // Append the values to the data string with proper formatting
             dataStringBuilder.append("$modifiedSvcNm\t")
             dataStringBuilder.append(" $modifiedSvcTypNm\n\n")
-            dataStringBuilder.appendLine().appendLine()
 
             if (svcUnitCd.contains("초")) {
                 if (alloValue.contains("Z")) {
                     remainCallStr.append("총제공량 ${"무제한".padStart(40)}\n\n")
                     val useValueInMinutes = useValue.toInt() / 60
                     remainCallStr.append("사용량  ${useValueInMinutes}분")
-                    dataStringBuilder.appendLine().appendLine()
 
                     if (svcTypNm == "음성") {
                         displayCall = "✆ ${useValueInMinutes}분 / 무제한"
                         println(displayCall)
                     }
-
-                } else {
+                }
+                else {
                     val alloValueInMinutes = alloValue.toInt() / 60
                     val useValueInMinutes = useValue.toInt() / 60
                     val remainValueMin = alloValueInMinutes - useValueInMinutes
                     remainCallStr.append("총제공량 ${alloValueInMinutes}분\n\n")
                     dataStringBuilder.append("사용량  ${useValueInMinutes}분\n\n")
                     remainCallStr.append("잔여량    ${remainValueMin}분\n\n\n\n")
-                    dataStringBuilder.appendLine().appendLine()
 
                     if (svcTypNm == "음성") {
                         displayCall = "✆ ${remainValueMin}분 / ${alloValueInMinutes}분"
@@ -1193,7 +1190,6 @@ class MyInfoFragment : Fragment() {
                         displayCall = "✆ ${remainValueMin}분 / ${alloValueInMinutes}분"
                         println(displayCall)
                     }
-
                 }
             }
             else if (svcUnitCd.contains("건")) {

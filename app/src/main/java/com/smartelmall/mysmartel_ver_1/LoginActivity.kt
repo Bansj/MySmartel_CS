@@ -10,6 +10,7 @@ import android.graphics.drawable.ColorDrawable
 import android.net.ParseException
 import android.net.Uri
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Gravity
 import android.view.View
@@ -127,15 +128,15 @@ class LoginActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    // 테스트 계정번호 생성
-    private var testPhoneNumber: String? =
+
+    private var testPhoneNumber: String? = // 테스트계정 번호 생성
         //"01084817615" // lg
-    "01026693491" // lg
+        "01083748151"// lg
     private fun loginUser() {
         val phoneNumber = phoneNumberEditText.text.toString()
         val password = passwordEditText.text.toString()
 
-        if (phoneNumber == "123" && password == "123") { // 테스트 계정생성
+        if (phoneNumber == "123" && password == "123") { // 테스트 계정
             handleTestLogin()
             fetchUserInfo(testPhoneNumber!!)
             return
@@ -179,11 +180,11 @@ class LoginActivity : AppCompatActivity() {
             put("serviceAcct", "500279120526")
             put("custNm", "김지은")
             put("phoneNumber", "01033504523")
+            //put("kind", "후불")
         }
         //handleLoginResponse(response)
         handleInfoResponse(response)
     }
-
 
     private fun handleLoginResponse(response: JSONObject) {
         try {
@@ -320,6 +321,7 @@ class LoginActivity : AppCompatActivity() {
             val telecom = response.getString("telecom")
             val custName = response.getString("custNm")
             val serviceAcct = response.getString("serviceAcct")
+            val kind = response.getString("kind")
 
             // Save user info in SharedPreferences if auto login switch is on
             val sharedPrefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
@@ -329,22 +331,32 @@ class LoginActivity : AppCompatActivity() {
                     putString("password", passwordEditText.text.toString())
                     putString("telecom", telecom)
                     putString("custName", custName)
+                    putString("kind", kind)
                     putString("serviceAcct", serviceAcct)
                     apply()
                 }
             }
             Log.d("\nLoginActivity - getString",
-                "-----------------User Info - Telecom: $telecom, CustName: $custName, ServiceAccount: $serviceAcct, PhoneNumber: $phoneNumber-----------------------")
+                "-----------------User Info - Telecom: $telecom, CustName: $custName, ServiceAccount: $serviceAcct, PhoneNumber: $phoneNumber, Kind: $kind-----------------------")
 
-            val intent = Intent(this, MainActivity::class.java)
-            intent.putExtra("custName", custName)
-            intent.putExtra("PhoneNumber", phoneNumber)
-            intent.putExtra("Telecom", telecom)
-            intent.putExtra("serviceAcct", serviceAcct)
-            startActivity(intent)
-            Log.d("\nLoginActivity - putExtra",
-                "-----------------User Info - Telecom: $telecom, CustName: $custName, ServiceAccount: $serviceAcct, PhoneNumber: $phoneNumber-----------------------")
-
+            if (kind == "선불") { // Check if "kind" is "선불"
+                showPrepaidDialog(
+                    title = "알림",
+                    message = "선불폰 전용앱을 이용해주세요.",
+                    okButtonText = "설치하기"
+                )
+            }
+            else {
+                // Proceed to MainActivity if "kind" is not "선불"
+                val intent = Intent(this, MainActivity::class.java)
+                intent.putExtra("custName", custName)
+                intent.putExtra("PhoneNumber", phoneNumber)
+                intent.putExtra("Telecom", telecom)
+                intent.putExtra("serviceAcct", serviceAcct)
+                startActivity(intent)
+                Log.d("\nLoginActivity - putExtra",
+                    "-----------------User Info - Telecom: $telecom, CustName: $custName, ServiceAccount: $serviceAcct, PhoneNumber: $phoneNumber-----------------------")
+            }
         } catch (e: JSONException) {
             showErrorDialog("Failed to parse user info response")
         }
@@ -386,6 +398,54 @@ class LoginActivity : AppCompatActivity() {
         val okButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
         okButton.setTextColor(ContextCompat.getColor(this, R.color.orange)) // Use the color resource if available
     }
+    // 선불폰 고객 거르기 함수
+    private fun showPrepaidDialog(title: String = "알림", message: String, okButtonText: String = "OK") {
+
+        requestQueue.cancelAll("LOGIN_REQUEST_TAG")
+        hideLoadingDialog()
+
+        val dialog = Dialog(this)
+
+        // Set the custom layout
+        dialog.setContentView(R.layout.dialog_prepaid_exit_layout)
+
+        // Find the views in the custom layout
+        val titleTextView = dialog.findViewById<TextView>(R.id.dialogTitle)
+        val messageTextView = dialog.findViewById<TextView>(R.id.dialogMessage)
+        val okButton = dialog.findViewById<Button>(R.id.okButton)
+
+        // Set the text of the TextViews and Button
+        titleTextView.text = title
+        messageTextView.text = message
+        okButton.text = okButtonText
+
+        // Set an OnClickListener for the OK button
+        okButton.setOnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=kr.co.Smartel.prepaid_smartel0525&hl=ko"))
+            startActivity(intent)
+            finishAffinity() // Closes all activities and exits the app
+            dialog.dismiss()
+        }
+
+        // Calculate dialog width and height based on screen size
+        val displayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+        val screenWidth = displayMetrics.widthPixels
+        val screenHeight = displayMetrics.heightPixels
+
+        val dialogWidth = (screenWidth * 2 ) / 3
+        val dialogHeight = (dialogWidth * 2) / 3
+
+        // Set the dialog's size
+        val window = dialog.window
+        if (window != null) {
+            window.setBackgroundDrawableResource(R.drawable.box_whitesmoke)
+            window.setLayout(dialogWidth, dialogHeight)
+        }
+
+        dialog.show()
+    }
+
 
     private fun createLoadingDialog(): AlertDialog {
         val dialogBuilder = AlertDialog.Builder(this)
