@@ -277,9 +277,9 @@ class SktDeductDetailViewFragment : Fragment() {
                             totalTitle = "총제공량",
                             useTitle = "사용량",
                             leftTitle = "잔여량",
-                            totalValue = remainInfo.totalQty,
-                            useValue = remainInfo.useQty,
-                            leftValue = "${remainInfo.remQty}\n\n\n"
+                            totalValue = "${remainInfo.totalQty}건",
+                            useValue = "${remainInfo.useQty}건",
+                            leftValue = "${remainInfo.remQty}건\n\n\n"
                         )
                     )
                 }

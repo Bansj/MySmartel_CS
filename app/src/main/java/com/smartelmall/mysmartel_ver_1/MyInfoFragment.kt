@@ -1163,35 +1163,26 @@ class MyInfoFragment : Fragment() {
             dataStringBuilder.append("$modifiedSvcNm\t")
             dataStringBuilder.append(" $modifiedSvcTypNm\n\n")
 
+
             if (svcUnitCd.contains("초")) {
                 if (alloValue.contains("Z")) {
-                    remainCallStr.append("총제공량 ${"무제한".padStart(40)}\n\n")
                     val useValueInMinutes = useValue.toInt() / 60
-                    remainCallStr.append("사용량  ${useValueInMinutes}분")
 
                     if (svcTypNm == "음성") {
                         displayCall = "✆ ${useValueInMinutes}분 / 무제한"
-                        println(displayCall)
                     }
-                }
-                else {
+                } else {
                     val alloValueInMinutes = alloValue.toInt() / 60
                     val useValueInMinutes = useValue.toInt() / 60
                     val remainValueMin = alloValueInMinutes - useValueInMinutes
-                    remainCallStr.append("총제공량 ${alloValueInMinutes}분\n\n")
-                    dataStringBuilder.append("사용량  ${useValueInMinutes}분\n\n")
-                    remainCallStr.append("잔여량    ${remainValueMin}분\n\n\n\n")
 
-                    if (svcTypNm == "음성") {
+                    if (svcTypNm == "부가통화") { // 부가통화만 조회되었을 경우에만 값을 설정하도록 변경
                         displayCall = "✆ ${remainValueMin}분 / ${alloValueInMinutes}분"
-                        println(displayCall)
-                    }
-                    else {
-                        displayCall = "✆ ${remainValueMin}분 / ${alloValueInMinutes}분"
-                        println(displayCall)
                     }
                 }
             }
+
+
             else if (svcUnitCd.contains("건")) {
                 if (alloValue.contains("Z")) {
                     dataStringBuilder.append("총제공량 ${"무제한"}\n\n")
@@ -1236,13 +1227,13 @@ class MyInfoFragment : Fragment() {
 
         totalData.append("${totalRemainDataTotal.format(1)}GB")
         txtRefreshDataTotal?.text = totalData.toString()
-        Log.d("-----------------총제공량 ", "총합: $totalData -----------")
+        Log.d("-----------------데이터량 ", "총합: $totalData -----------")
 
         txtRefreshCall?.text = displayCall
-        Log.d("-----------------잔여량 ", "총합: $displayCall -----------")
+        Log.d("-----------------통화량 ", "총합: $displayCall -----------")
 
         txtRefreshM?.text = displayM
-        Log.d("-----------------잔여량 ", "총합: $displayM -----------")
+        Log.d("-----------------문자량 ", "총합: $displayM -----------")
     }
 
     // Extension function to format a Double value with the specified number of decimal places
@@ -1559,8 +1550,8 @@ class MyInfoFragment : Fragment() {
 
 
 
-   // SKT 잔여량 조회 API
-    private fun SktFetchDeductData(serviceAcct: String?, telecom: String?) {
+
+    private fun SktFetchDeductData(serviceAcct: String?, telecom: String?) {// SKT 잔여량 조회 API
 
        val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")?.also { viewModel.phoneNumber = it }?.also { viewModel.phoneNumber = it }
         GlobalScope.launch(Dispatchers.IO) {
@@ -1721,24 +1712,37 @@ class MyInfoFragment : Fragment() {
                 val remQtyDefault = if (remainInfo.remQty.isEmpty()) "0" else remainInfo.remQty
 
                 // Check if freePlanName contains "데이터" or "Data"
+                var totalDataQtyGB = 0.0 // 총제공량 총합 (GB)
+                var totalRemQtyDataGB = 0.0 // 잔여량 총합 (GB)
+
                 if ((displayName.contains("데이터") || displayName.contains("Data")) && !displayName.contains("테더링")) {
                     // Handle the case where the values are not valid numbers (e.g., "무제한")
                     val totalQtyGB = parseValueToGB(totalQtyDefault)
                     val useQtyGB = parseValueToGB(useQtyDefault)
                     val remQtyGB = parseValueToGB(remQtyDefault)
 
-                    remainInfoStr.append("\n\n$displayName\n\n\n")
-                    remainInfoStr.append("총제공량".padEnd(1) + "%.1fGB".format(totalQtyGB) + "\n\n")
-                    remainInfoStr.append("사용량".padEnd(1) + "%.1fGB".format(useQtyGB) + "\n\n")
-                    remainInfoStr.append("잔여량".padEnd(1) + "%.1fGB".format(remQtyGB) + "\n\n\n\n")
+                    remainInfoStr.append("\n$displayName\n")
+                    remainInfoStr.append("총제공량".padEnd(1) + "%.1f GB".format(totalQtyGB) + "\n")
+                    remainInfoStr.append("사용량".padEnd(1) + "%.1f GB".format(useQtyGB) + "\n")
+                    remainInfoStr.append("잔여량".padEnd(1) + "%.1f GB".format(remQtyGB) + "\n\n")
 
                     // Add remQty to totalRemQtyData
                     totalDataQty += totalQtyGB.toDouble() // 총제공량 총합
                     totalRemQtyData += remQtyGB.toDouble() // 잔여량 총합
 
-                    updateProgressBar(totalDataQty, totalRemQtyData)
-                    Log.d("-------------progressBar","${updateProgressBar(totalDataQty, totalRemQtyData)}-----------")
+                    if (totalDataQty <= 1){
+                        var totalDataQutyMB = 1024 * totalDataQty
+                        var totalRemainDataMB = 1024 * totalRemQtyData
+                        updateProgressBar(totalDataQutyMB, totalRemainDataMB)
+                        Log.d("-------------progressBar","${updateProgressBar(totalDataQutyMB, totalRemainDataMB)}-----------")
+                    } else {
+                        updateProgressBar(totalDataQty,totalRemQtyData) // 전체, 비교량
+                        Log.d("-------------progressBar","${updateProgressBar(totalDataQty, totalRemQtyData)}-----------")
+                    }
                 }
+
+
+
                 else if (displayName.contains("음성") || displayName.contains("전화")) {
                     // Handle the case where the values are "음성" or "전화"
                     val totalQtyMin = parseValueToMinutes(remainInfo.totalQty)
@@ -1774,15 +1778,27 @@ class MyInfoFragment : Fragment() {
                     remainInfoStr.append("사용량".padEnd(1) + "${remainInfo.useQty}\n\n")
                     remainInfoStr.append("${remainInfo.remQty}\n\n\n\n") // 잔여량
 
-                    displayM = "✉︎ ${remainInfo.remQty} / ${remainInfo.totalQty}"
+                    displayM = "✉︎ ${remainInfo.remQty}건 / ${remainInfo.totalQty}건"
                 }
             }
             remainInfoTextView?.text = remainInfoStr.toString()
             remainInfoTextView!!.gravity = Gravity.CENTER
 
             // Set the value of totalRemQtyData to txtRefreshData
-            txtRefreshData?.text = "%.1fGB".format(totalRemQtyData) // 잔여량 총합
-            txtRefreshDataTotal?.text = "%.1fGB".format(totalDataQty) // 총제공량 총합
+            if (totalRemQtyData <= 1) {
+                val totalRemQtyDataMB = 1024 * totalRemQtyData
+                txtRefreshData?.text = "%.1fMB".format(totalRemQtyDataMB) // 잔여량 총합 MB 단위로 표시
+            } else {
+                txtRefreshData?.text = "%.1fGB".format(totalRemQtyData) // 잔여량 총합 GB 단위로 표시
+            }
+
+            if (totalDataQty <= 1) {
+                val totalDataQtyMB = 1024 * totalDataQty
+                txtRefreshDataTotal?.text = "%.1fMB".format(totalDataQtyMB) // 총제공량 총합 MB 단위로 표시
+            } else {
+                txtRefreshDataTotal?.text = "%.1fGB".format(totalDataQty) // 총제공량 총합 GB 단위로 표시
+            }
+
 
             txtRefreshCall?.text = displayCall
             Log.d("txt통화량", "$remainCallstr")

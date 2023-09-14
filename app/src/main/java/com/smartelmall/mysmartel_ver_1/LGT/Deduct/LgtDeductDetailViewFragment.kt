@@ -248,18 +248,13 @@ class LgtDeductDetailViewFragment : Fragment() {
                 }
             }
             else if (svcTypNm.contains("패킷")) {
-                if (!alloValue.contains("Z") && !useValue.contains("Z")) {
+                if (!alloValue.contains("Z")) {
                     val alloValueInGB = alloValue.toDouble() / 1024 / 1024
                     val useValueInGB = useValue.toDouble() / 1024 / 1024
                     val remainValueInGB = alloValueInGB - useValueInGB
                     dataStringBuilder.append("총제공량 ${alloValueInGB.format(1).padStart(40)}GB\n\n")
                     dataStringBuilder.append("사용량  ${useValueInGB.format(1).padStart(40)}GB\n\n")
-                    dataStringBuilder.append(
-                        "잔여량    ${
-                            remainValueInGB.format(1).padStart(40)
-                        }GB\n\n\n\n"
-                    )
-                    dataStringBuilder.appendLine().appendLine()
+                    dataStringBuilder.append("잔여량    ${remainValueInGB.format(1).padStart(40)}GB\n\n\n\n")
 
                     LgtDeductItemList.add(
                         LgtDeductItem(
@@ -272,16 +267,13 @@ class LgtDeductDetailViewFragment : Fragment() {
                             "${remainValueInGB.format(1)}GB\n\n"
                         )
                     )
-                    Log.d(
-                        "LgtDuctDetailViewFramgent",
-                        "----------------check recyclerView: $LgtDeductItemList\n\n\n--------------------"
-                    )
+                    Log.d("LgtDuctDetailViewFramgent", "----------------check recyclerView: $LgtDeductItemList\n\n\n--------------------")
+                    Log.d("LgtDuctDetailViewFramgent", "----------------check modi: $modifiedSvcNm\n\n\n--------------------")
                 }
             }
             else {
                 dataStringBuilder.append("총제공량: $alloValue\n\n")
                 dataStringBuilder.append("사용량:  $useValue\n\n\n\n")
-                dataStringBuilder.appendLine().appendLine()
 
                 LgtDeductItemList.add(
                     LgtDeductItem(

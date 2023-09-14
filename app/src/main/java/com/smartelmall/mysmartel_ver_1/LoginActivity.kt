@@ -62,7 +62,6 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        autoLoginSwitch = findViewById(R.id.switch_autoLogin)
 
         phoneNumberEditText = findViewById(R.id.edit_id)
         passwordEditText = findViewById(R.id.edit_password)
@@ -130,8 +129,8 @@ class LoginActivity : AppCompatActivity() {
 
 
     private var testPhoneNumber: String? = // 테스트계정 번호 생성
-        //"01084817615" // lg
-        "01083748151"// lg
+        // 아래에는 테스트 로그인할 번호 기입
+        "01021571133"// lg
     private fun loginUser() {
         val phoneNumber = phoneNumberEditText.text.toString()
         val password = passwordEditText.text.toString()
