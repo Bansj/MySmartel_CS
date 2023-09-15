@@ -1715,11 +1715,11 @@ class MyInfoFragment : Fragment() {
                 var totalDataQtyGB = 0.0 // 총제공량 총합 (GB)
                 var totalRemQtyDataGB = 0.0 // 잔여량 총합 (GB)
 
-                if ((displayName.contains("데이터") || displayName.contains("Data")) && !displayName.contains("테더링")) {
+                if ((displayName.contains("데이터") || displayName.contains("Data") && !displayName.contains("음성")) && !displayName.contains("테더링") ) {
                     // Handle the case where the values are not valid numbers (e.g., "무제한")
-                    val totalQtyGB = parseValueToGB(totalQtyDefault)
-                    val useQtyGB = parseValueToGB(useQtyDefault)
-                    val remQtyGB = parseValueToGB(remQtyDefault)
+                    val totalQtyGB = parseValueToSize(totalQtyDefault)
+                    val useQtyGB = parseValueToSize(useQtyDefault)
+                    val remQtyGB = parseValueToSize(remQtyDefault)
 
                     remainInfoStr.append("\n$displayName\n")
                     remainInfoStr.append("총제공량".padEnd(1) + "%.1f GB".format(totalQtyGB) + "\n")
@@ -1731,10 +1731,10 @@ class MyInfoFragment : Fragment() {
                     totalRemQtyData += remQtyGB.toDouble() // 잔여량 총합
 
                     if (totalDataQty <= 1){
-                        var totalDataQutyMB = 1024 * totalDataQty
+                        var totalDataQtyMB = 1024 * totalDataQty
                         var totalRemainDataMB = 1024 * totalRemQtyData
-                        updateProgressBar(totalDataQutyMB, totalRemainDataMB)
-                        Log.d("-------------progressBar","${updateProgressBar(totalDataQutyMB, totalRemainDataMB)}-----------")
+                        updateProgressBar(totalDataQtyMB, totalRemainDataMB)
+                        Log.d("-------------progressBar","${updateProgressBar(totalDataQtyMB, totalRemainDataMB)}-----------")
                     } else {
                         updateProgressBar(totalDataQty,totalRemQtyData) // 전체, 비교량
                         Log.d("-------------progressBar","${updateProgressBar(totalDataQty, totalRemQtyData)}-----------")
@@ -1743,16 +1743,11 @@ class MyInfoFragment : Fragment() {
 
 
 
-                else if (displayName.contains("음성") || displayName.contains("전화")) {
+                else if (displayName.contains("음성") || displayName.contains("전화") && !displayName.contains("데이터")) {
                     // Handle the case where the values are "음성" or "전화"
-                    val totalQtyMin = parseValueToMinutes(remainInfo.totalQty)
-                    val useQtyMin = parseValueToMinutes(remainInfo.useQty)
-                    val remQtyMin = parseValueToMinutes(remainInfo.remQty)
-
-                    remainInfoStr.append("$displayName\n\n")
-                    remainCallstr.append("$totalQtyMin") // 통화 총제공량
-                    remainInfoStr.append("사용량".padEnd(1) + "$useQtyMin\n\n") // Add padding between label and value
-                    remainCallstr.append("$remQtyMin") // 통화 잔여량 표출
+                    val totalQtyMin = parseValueToMinutes(remainInfo.totalQty) // 총제공량
+                    val useQtyMin = parseValueToMinutes(remainInfo.useQty) // 사용량
+                    val remQtyMin = parseValueToMinutes(remainInfo.remQty) // 잔여량
 
                     if (displayName.contains("부가")) {
                         displayCall = "✆ 무제한 / 무제한"
@@ -1810,17 +1805,23 @@ class MyInfoFragment : Fragment() {
         }
     }
 
-    private fun parseValueToGB(value: String): Double {   // KB를 GB로 변환하는 함수
+    private fun parseValueToSize(value: String): String {
         return try {
-            if (!value.contains("무제한")) {
-                val number = value.replace(",", "").toDouble() / (1024 * 1024) // 기존 코드에서 단위 변환을 유지합니다.
-                number
+            if (!value.contains("무제한") && value.replace(",", "").toDoubleOrNull() != null) {
+                val number = value.replace(",", "").toDouble() / (1024 * 1024)
+                if (number < 1) {
+                    // If less than 1GB, display as MB.
+                    val numberInMB = number * 1024
+                    "%.1fMB".format(numberInMB)
+                } else {
+                    "%.1fGB".format(number)
+                }
             } else {
-                0.0 // 무제한인 경우 0.0 또는 적절한 값을 설정합니다.
+                value
             }
         } catch (e: NumberFormatException) {
             // Handle non-numeric cases, e.g., "unlimited"
-            0.0
+            value
         }
     }
 

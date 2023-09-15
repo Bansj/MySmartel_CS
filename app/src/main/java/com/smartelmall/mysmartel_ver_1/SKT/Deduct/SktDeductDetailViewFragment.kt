@@ -198,11 +198,11 @@ class SktDeductDetailViewFragment : Fragment() {
                 val remQtyDefault = if (remainInfo.remQty.isEmpty()) "0" else remainInfo.remQty
 
                 // Check if freePlanName contains "데이터" or "Data"
-                if (displayName.contains("데이터") || displayName.contains("Data")) {
+                if (displayName.contains("데이터") || displayName.contains("Data") && !displayName.contains("음성")) {
                     // Handle the case where the values are not valid numbers (e.g., "무제한")
-                    val totalQtyGB = parseValueToGB(totalQtyDefault)
-                    val useQtyGB = parseValueToGB(useQtyDefault)
-                    val remQtyGB = parseValueToGB(remQtyDefault)
+                    val totalQtyGB = parseValueToSize(totalQtyDefault)
+                    val useQtyGB = parseValueToSize(useQtyDefault)
+                    val remQtyGB = parseValueToSize(remQtyDefault)
 
                     remainInfoStr.append("$displayName\n\n\n")
                     remainInfoStr.append("총제공량".padEnd(60) + "$totalQtyGB\n\n") // Add padding between label and value
@@ -302,11 +302,17 @@ class SktDeductDetailViewFragment : Fragment() {
     }
 
     // Helper function to convert the value to GB or handle non-numeric cases
-    private fun parseValueToGB(value: String): String {
+    private fun parseValueToSize(value: String): String {
         return try {
             if (!value.contains("무제한") && value.replace(",", "").toDoubleOrNull() != null) {
                 val number = value.replace(",", "").toDouble() / (1024 * 1024)
-                "%.1fGB".format(number)
+                if (number < 1) {
+                    // If less than 1GB, display as MB.
+                    val numberInMB = number * 1024
+                    "%.1fMB".format(numberInMB)
+                } else {
+                    "%.1fGB".format(number)
+                }
             } else {
                 value
             }
