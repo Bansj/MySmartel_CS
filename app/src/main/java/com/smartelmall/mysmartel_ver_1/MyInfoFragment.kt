@@ -1715,47 +1715,51 @@ class MyInfoFragment : Fragment() {
                 var totalDataQtyGB = 0.0 // 총제공량 총합 (GB)
                 var totalRemQtyDataGB = 0.0 // 잔여량 총합 (GB)
 
-                if ((displayName.contains("데이터") || displayName.contains("Data") && !displayName.contains("음성")) && !displayName.contains("테더링") ) {
-                    // Handle the case where the values are not valid numbers (e.g., "무제한")
-                    val totalQtyGB = parseValueToSize(totalQtyDefault)
-                    val useQtyGB = parseValueToSize(useQtyDefault)
-                    val remQtyGB = parseValueToSize(remQtyDefault)
+                if ((displayName.contains("공제") || displayName.contains("데이터") || displayName.contains("Data") && !displayName.contains("음성통화")) && !displayName.contains("테더링") ) {
+                    if (!displayName.contains("음성")) {
+                        // Handle the case where the values are not valid numbers (e.g., "무제한")
+                        val totalQtyGB = parseValueToGB(totalQtyDefault)
+                        val useQtyGB = parseValueToGB(useQtyDefault)
+                        val remQtyGB = parseValueToGB(remQtyDefault)
 
-                    remainInfoStr.append("\n$displayName\n")
-                    remainInfoStr.append("총제공량".padEnd(1) + "%.1f GB".format(totalQtyGB) + "\n")
-                    remainInfoStr.append("사용량".padEnd(1) + "%.1f GB".format(useQtyGB) + "\n")
-                    remainInfoStr.append("잔여량".padEnd(1) + "%.1f GB".format(remQtyGB) + "\n\n")
+                        // Add remQty to totalRemQtyData
+                        totalDataQty += totalQtyGB.toDouble() // 총제공량 총합
+                        totalRemQtyData += remQtyGB.toDouble() // 잔여량 총합
 
-                    // Add remQty to totalRemQtyData
-                    totalDataQty += totalQtyGB.toDouble() // 총제공량 총합
-                    totalRemQtyData += remQtyGB.toDouble() // 잔여량 총합
-
-                    if (totalDataQty <= 1){
-                        var totalDataQtyMB = 1024 * totalDataQty
-                        var totalRemainDataMB = 1024 * totalRemQtyData
-                        updateProgressBar(totalDataQtyMB, totalRemainDataMB)
-                        Log.d("-------------progressBar","${updateProgressBar(totalDataQtyMB, totalRemainDataMB)}-----------")
-                    } else {
-                        updateProgressBar(totalDataQty,totalRemQtyData) // 전체, 비교량
-                        Log.d("-------------progressBar","${updateProgressBar(totalDataQty, totalRemQtyData)}-----------")
+                        if (totalDataQty <= 1) {
+                            var totalDataQtyMB = 1024 * totalDataQty
+                            var totalRemainDataMB = 1024 * totalRemQtyData
+                            updateProgressBar(totalDataQtyMB, totalRemainDataMB)
+                            Log.d(
+                                "-------------progressBar",
+                                "${updateProgressBar(totalDataQtyMB, totalRemainDataMB)}-----------"
+                            )
+                        } else {
+                            updateProgressBar(totalDataQty, totalRemQtyData) // 전체, 비교량
+                            Log.d(
+                                "-------------progressBar",
+                                "${updateProgressBar(totalDataQty, totalRemQtyData)}-----------"
+                            )
+                        }
                     }
                 }
 
 
 
-                else if (displayName.contains("음성") || displayName.contains("전화") && !displayName.contains("데이터")) {
-                    // Handle the case where the values are "음성" or "전화"
-                    val totalQtyMin = parseValueToMinutes(remainInfo.totalQty) // 총제공량
-                    val useQtyMin = parseValueToMinutes(remainInfo.useQty) // 사용량
-                    val remQtyMin = parseValueToMinutes(remainInfo.remQty) // 잔여량
+                else if (displayName.contains("음성") || displayName.contains("전화")  ) {
+                   if (!displayName.contains("데이터")) { // Handle the case where the values are "음성" or "전화"
 
-                    if (displayName.contains("부가")) {
-                        displayCall = "✆ 무제한 / 무제한"
-                    } else {
-                        displayCall = "✆ $remQtyMin / $totalQtyMin"
-                    }
-                    Log.d("displayCall","$displayCall")
+                       val totalQtyMin = parseValueToMinutes(remainInfo.totalQty) // 총제공량
+                       val useQtyMin = parseValueToMinutes(remainInfo.useQty) // 사용량
+                       val remQtyMin = parseValueToMinutes(remainInfo.remQty) // 잔여량
 
+                       if (displayName.contains("부가")) {
+                           displayCall = "✆ 무제한 / 무제한"
+                       } else {
+                           displayCall = "✆ $remQtyMin / $totalQtyMin"
+                       }
+                       Log.d("displayCall", "$displayCall")
+                   }
                 }
                 else if(displayName.contains("원")) {
                     // Default case for other freePlanName values
@@ -1766,12 +1770,21 @@ class MyInfoFragment : Fragment() {
 
                     displayM = " ✉︎ ${remainInfo.remQty}원 / ${remainInfo.totalQty}원"
                 }
+                else if(displayName.contains("SMS")) {
+                    // Default case for other freePlanName values
+                    remainInfoStr.append("$displayName\n\n")
+                    remainInfoStr.append("${remainInfo.totalQty}") // 총제공량
+                    remainInfoStr.append("사용량".padEnd(1) + "${remainInfo.useQty}\n\n")
+                    remainInfoStr.append("${remainInfo.remQty}") // 잔여량
+
+                    displayM = " ✉︎ ${remainInfo.remQty}건 / ${remainInfo.totalQty}건"
+                }
                 else {
                     // Default case for other freePlanName values
                     remainInfoStr.append("$displayName\n\n")
-                    remainInfoStr.append("${remainInfo.totalQty}\n\n") // 총제공량
+                    remainInfoStr.append("${remainInfo.totalQty}") // 총제공량
                     remainInfoStr.append("사용량".padEnd(1) + "${remainInfo.useQty}\n\n")
-                    remainInfoStr.append("${remainInfo.remQty}\n\n\n\n") // 잔여량
+                    remainInfoStr.append("${remainInfo.remQty}") // 잔여량
 
                     displayM = "✉︎ ${remainInfo.remQty}건 / ${remainInfo.totalQty}건"
                 }
@@ -1805,23 +1818,17 @@ class MyInfoFragment : Fragment() {
         }
     }
 
-    private fun parseValueToSize(value: String): String {
+    private fun parseValueToGB(value: String): Double {   // KB를 GB로 변환하는 함수
         return try {
-            if (!value.contains("무제한") && value.replace(",", "").toDoubleOrNull() != null) {
-                val number = value.replace(",", "").toDouble() / (1024 * 1024)
-                if (number < 1) {
-                    // If less than 1GB, display as MB.
-                    val numberInMB = number * 1024
-                    "%.1fMB".format(numberInMB)
-                } else {
-                    "%.1fGB".format(number)
-                }
+            if (!value.contains("무제한")) {
+                val number = value.replace(",", "").toDouble() / (1024 * 1024) // 기존 코드에서 단위 변환을 유지합니다.
+                number
             } else {
-                value
+                0.0 // 무제한인 경우 0.0 또는 적절한 값을 설정합니다.
             }
         } catch (e: NumberFormatException) {
             // Handle non-numeric cases, e.g., "unlimited"
-            value
+            0.0
         }
     }
 
