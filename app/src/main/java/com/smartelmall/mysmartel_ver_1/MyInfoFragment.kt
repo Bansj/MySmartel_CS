@@ -1715,7 +1715,7 @@ class MyInfoFragment : Fragment() {
                 var totalDataQtyGB = 0.0 // 총제공량 총합 (GB)
                 var totalRemQtyDataGB = 0.0 // 잔여량 총합 (GB)
 
-                if ((displayName.contains("공제") || displayName.contains("데이터") || displayName.contains("Data") && !displayName.contains("음성통화")) && !displayName.contains("테더링") ) {
+                if (( displayName.contains("데이터") || displayName.contains("Data") && !displayName.contains("음성통화")) && !displayName.contains("테더링") ) {
                     if (!displayName.contains("음성")) {
                         // Handle the case where the values are not valid numbers (e.g., "무제한")
                         val totalQtyGB = parseValueToGB(totalQtyDefault)
@@ -1762,29 +1762,14 @@ class MyInfoFragment : Fragment() {
                    }
                 }
                 else if(displayName.contains("원")) {
-                    // Default case for other freePlanName values
-                    remainInfoStr.append("$displayName\n\n")
-                    remainInfoStr.append("${remainInfo.totalQty}원\n\n") // 총제공량
-                    remainInfoStr.append("사용량".padEnd(1) + "${remainInfo.useQty}\n\n")
-                    remainInfoStr.append("${remainInfo.remQty}원\n\n\n\n") // 잔여량
 
                     displayM = " ✉︎ ${remainInfo.remQty}원 / ${remainInfo.totalQty}원"
                 }
                 else if(displayName.contains("SMS")) {
-                    // Default case for other freePlanName values
-                    remainInfoStr.append("$displayName\n\n")
-                    remainInfoStr.append("${remainInfo.totalQty}") // 총제공량
-                    remainInfoStr.append("사용량".padEnd(1) + "${remainInfo.useQty}\n\n")
-                    remainInfoStr.append("${remainInfo.remQty}") // 잔여량
 
                     displayM = " ✉︎ ${remainInfo.remQty}건 / ${remainInfo.totalQty}건"
                 }
                 else {
-                    // Default case for other freePlanName values
-                    remainInfoStr.append("$displayName\n\n")
-                    remainInfoStr.append("${remainInfo.totalQty}") // 총제공량
-                    remainInfoStr.append("사용량".padEnd(1) + "${remainInfo.useQty}\n\n")
-                    remainInfoStr.append("${remainInfo.remQty}") // 잔여량
 
                     displayM = "✉︎ ${remainInfo.remQty}건 / ${remainInfo.totalQty}건"
                 }
