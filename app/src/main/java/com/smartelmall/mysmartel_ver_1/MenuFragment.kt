@@ -195,6 +195,7 @@ class MenuFragment : Fragment() {
                     val sktBillDetailFragment = SktBillDetailFragment()
                     val bundle = Bundle()
                     bundle.putString("serviceAcct", serviceAcct)
+                    bundle.putString("phoneNumber", phoneNumber)
                     sktBillDetailFragment.arguments = bundle
 
                     // Log the values for SKT

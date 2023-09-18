@@ -339,7 +339,7 @@ class MyInfoFragment : Fragment() {
             }
         }
 
-        // 버튼을 클릭시 아래에서 위로 올라오는 청구요금 상세보기 페이지 클릭이벤트
+        // 버튼을 클릭시 아래에서 위로 올라오는 당월 청구요금 상세보기 페이지 클릭이벤트
         val btnBillDetailFragment = view?.findViewById<Button>(R.id.btn_billDetailDeduct)
         btnBillDetailFragment?.setOnClickListener {
             val telecom = viewModel.Telecom ?: arguments?.getString("Telecom")
@@ -504,6 +504,9 @@ class MyInfoFragment : Fragment() {
 
         // Add click listener for btn_refresh button
         btnRefresh.setOnClickListener {
+            val animator = ObjectAnimator.ofFloat(btnRefresh, View.ROTATION, 0f, 360f)
+            animator.duration = 1000 // 설정한 시간 동안 애니메이션 진행 (1초)
+            animator.start()
 
             Log.d(
                 "MyInfoFragment",
