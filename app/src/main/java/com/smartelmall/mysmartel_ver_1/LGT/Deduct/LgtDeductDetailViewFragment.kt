@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +11,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
-import androidx.navigation.fragment.findNavController
+import androidx.privacysandbox.tools.core.model.Types.unit
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
@@ -159,14 +158,12 @@ class LgtDeductDetailViewFragment : Fragment() {
             // Append the values to the data string with proper formatting
             dataStringBuilder.append("$modifiedSvcNm\t")
             dataStringBuilder.append(" $modifiedSvcTypNm\n\n")
-            dataStringBuilder.appendLine().appendLine()
 
             if (svcUnitCd.contains("초")) {
                 if (alloValue.contains("Z")) {
                     dataStringBuilder.append("총제공량 ${"무제한".padStart(40)}\n\n")
-                    val useValueInMinutes = useValue.toDouble() / 60
-                    dataStringBuilder.append("사용량  ${useValueInMinutes.format(0).padStart(40)}분\n\n\n\n")
-                    dataStringBuilder.appendLine().appendLine()
+                    val useValueInMinutes = useValue.toInt() / 60
+                    //dataStringBuilder.append("사용량  ${useValueInMinutes.format(0).padStart(40)}분\n\n\n\n")
 
                     LgtDeductItemList.add(
                         LgtDeductItem(
@@ -175,19 +172,17 @@ class LgtDeductDetailViewFragment : Fragment() {
                             "사용량",
                             "잔여량",
                             "무제한",
-                            "${useValueInMinutes.format(0)}분",
+                            "${useValueInMinutes}분",
                             "\n\n"
                         )
                     )
                     Log.d("LgtDuctDetailViewFramgent","----------------check recyclerView: $LgtDeductItemList\n\n\n--------------------")
                 }
                 else {
-                    val alloValueInMinutes = alloValue.toDouble() / 60
-                    val useValueInMinutes = useValue.toDouble() / 60
+                    val alloValueInMinutes = alloValue.toInt() / 60
+                    val useValueInMinutes = useValue.toInt() / 60
                     val remainValueMin = alloValueInMinutes - useValueInMinutes
-                    dataStringBuilder.append("총제공량 ${alloValueInMinutes.format(0).padStart(40)}분\n\n")
-                    dataStringBuilder.append("사용량  ${useValueInMinutes.format(0).padStart(40)}분\n\n")
-                    dataStringBuilder.append("잔여량    ${remainValueMin.format(0).padStart(40)}분\n\n\n\n")
+
                     dataStringBuilder.appendLine().appendLine()
 
                     LgtDeductItemList.add(
@@ -196,9 +191,9 @@ class LgtDeductDetailViewFragment : Fragment() {
                             "총제공량",
                             "사용량",
                             "잔여량",
-                            "${alloValueInMinutes.format(0)}분",
-                            "${useValueInMinutes.format(0)}분",
-                            "${remainValueMin.format(0)}분\n\n"
+                            "${alloValueInMinutes}분",
+                            "${useValueInMinutes}분",
+                            "${remainValueMin}분\n\n"
                         )
                     )
                     Log.d("LgtDuctDetailViewFramgent","----------------check recyclerView: $LgtDeductItemList\n" +
@@ -252,9 +247,24 @@ class LgtDeductDetailViewFragment : Fragment() {
                     val alloValueInGB = alloValue.toDouble() / 1024 / 1024
                     val useValueInGB = useValue.toDouble() / 1024 / 1024
                     val remainValueInGB = alloValueInGB - useValueInGB
-                    dataStringBuilder.append("총제공량 ${alloValueInGB.format(1).padStart(40)}GB\n\n")
-                    dataStringBuilder.append("사용량  ${useValueInGB.format(1).padStart(40)}GB\n\n")
-                    dataStringBuilder.append("잔여량    ${remainValueInGB.format(1).padStart(40)}GB\n\n\n\n")
+
+                    val totalValueFormatted = if (alloValueInGB >= 1.0) {
+                        String.format("%.1fGB", alloValueInGB)
+                    } else {
+                        String.format("%.0fMB", alloValueInGB * 1024)
+                    }
+
+                    val useValueFormatted = if (useValueInGB >= 1.0) {
+                        String.format("%.1fGB", useValueInGB)
+                    } else {
+                        String.format("%.0fMB", useValueInGB * 1024)
+                    }
+
+                    val remainValueFormatted = if (remainValueInGB >= 1.0) {
+                        String.format("%.1fGB", remainValueInGB)
+                    } else {
+                        String.format("%.0fMB", remainValueInGB * 1024)
+                    }
 
                     LgtDeductItemList.add(
                         LgtDeductItem(
@@ -262,11 +272,12 @@ class LgtDeductDetailViewFragment : Fragment() {
                             "총제공량",
                             "사용량",
                             "잔여량",
-                            "${alloValueInGB.format(1)}GB",
-                            "${useValueInGB.format(1)}GB",
-                            "${remainValueInGB.format(1)}GB\n\n"
+                            totalValueFormatted,
+                            useValueFormatted,
+                            remainValueFormatted + "\n\n"
                         )
                     )
+
                     Log.d("LgtDuctDetailViewFramgent", "----------------check recyclerView: $LgtDeductItemList\n\n\n--------------------")
                     Log.d("LgtDuctDetailViewFramgent", "----------------check modi: $modifiedSvcNm\n\n\n--------------------")
                 }
@@ -301,9 +312,15 @@ class LgtDeductDetailViewFragment : Fragment() {
     }
 
     // Extension function to format a Double value with the specified number of decimal places
-    private fun Double.format(decimalPlaces: Int): String {
-        return String.format("%.${decimalPlaces}f", this)
+    private fun Double.format(): String {
+        return if (this < 1) {
+            val valueInMB = this * 1024
+            String.format("%.1fMB", valueInMB)
+        } else {
+            String.format("%.1fGB $unit", this)
+        }
     }
+
 }
 
 

@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
+import androidx.privacysandbox.tools.core.model.Types
 import androidx.viewpager2.widget.ViewPager2
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -135,7 +136,10 @@ class MyInfoFragment : Fragment() {
                 if (response.isSuccessful) {
                     val resultListJson = response.body?.string()
                     val gson = Gson()
-                    val bannerItemList = gson.fromJson<List<BannerItem>>(resultListJson, object : TypeToken<List<BannerItem>>(){}.type)
+                    val bannerItemList = gson.fromJson<List<BannerItem>>(
+                        resultListJson,
+                        object : TypeToken<List<BannerItem>>() {}.type
+                    )
 
                     activity?.runOnUiThread {
                         setupViewPager(bannerItemList)
@@ -210,10 +214,14 @@ class MyInfoFragment : Fragment() {
         sharedPrefs = MyInfoSharedPreferences(requireContext())
 
         // Retrieve the data from the ViewModel or arguments
-        val custName = viewModel.custName ?: arguments?.getString("custName")?.also { viewModel.custName = it }
-        val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")?.also { viewModel.phoneNumber = it }?.also { viewModel.phoneNumber = it }
-        val Telecom = viewModel.Telecom ?: arguments?.getString("Telecom")?.also { viewModel.Telecom = it }
-        val serviceAcct = viewModel.serviceAcct ?: arguments?.getString("serviceAcct")?.also { viewModel.serviceAcct = it }?.also { viewModel.serviceAcct = it }
+        val custName =
+            viewModel.custName ?: arguments?.getString("custName")?.also { viewModel.custName = it }
+        val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")
+            ?.also { viewModel.phoneNumber = it }?.also { viewModel.phoneNumber = it }
+        val Telecom =
+            viewModel.Telecom ?: arguments?.getString("Telecom")?.also { viewModel.Telecom = it }
+        val serviceAcct = viewModel.serviceAcct ?: arguments?.getString("serviceAcct")
+            ?.also { viewModel.serviceAcct = it }?.also { viewModel.serviceAcct = it }
 
         // Get a reference to the layout_additionalServices view
         val layoutAdditionalServices = view.findViewById<View>(R.id.layout_additionalServices)
@@ -497,10 +505,16 @@ class MyInfoFragment : Fragment() {
         // Add click listener for btn_refresh button
         btnRefresh.setOnClickListener {
 
-            Log.d("MyInfoFragment","---------------get Reload serviceAcct: $serviceAcct--------------")
-            Log.d("MyInfoFragment","---------------get Reload telecom: $Telecom--------------")
-            Log.d("MyInfoFragment","---------------get Reload phoneNumber: $phoneNumber--------------")
-            Log.d("MyInfoFragment","---------------get Reload custName: $custName--------------")
+            Log.d(
+                "MyInfoFragment",
+                "---------------get Reload serviceAcct: $serviceAcct--------------"
+            )
+            Log.d("MyInfoFragment", "---------------get Reload telecom: $Telecom--------------")
+            Log.d(
+                "MyInfoFragment",
+                "---------------get Reload phoneNumber: $phoneNumber--------------"
+            )
+            Log.d("MyInfoFragment", "---------------get Reload custName: $custName--------------")
 
             when (Telecom) {
                 "SKT" -> {
@@ -526,17 +540,10 @@ class MyInfoFragment : Fragment() {
     }
 
 
-
-
-
-
-
-
-
-
     private fun KtFetchBillData() {  // KT 당월 청구요금 API 조회
 
-        val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")?.also { viewModel.phoneNumber = it }?.also { viewModel.phoneNumber = it }?:""
+        val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")
+            ?.also { viewModel.phoneNumber = it }?.also { viewModel.phoneNumber = it } ?: ""
         val apiUrl = "https://kt-self.smartelmobile.com/common/api/selfcare/selfcareAPIServer.aspx"
 
         val requestBody = createBillRequestBody(phoneNumber)
@@ -568,6 +575,7 @@ class MyInfoFragment : Fragment() {
             }
         })
     }
+
     private fun createBillRequestBody(phoneNumber: String): RequestBody {  //Requerst body만들어 발신하기
         val requestBody = HashMap<String, List<HashMap<String, String>>>()
         val headerData = HashMap<String, String>()
@@ -627,29 +635,27 @@ class MyInfoFragment : Fragment() {
             Log.d("-----------MyInfoFragment----- 청구금액 합계", "$sumAmount")
         }
 
-        Log.d(TAG, "Data set to TextViews: \n bodyData=$bodyData\n, \n detListDtoText=$detListDtoText \n")
+        Log.d(
+            TAG,
+            "Data set to TextViews: \n bodyData=$bodyData\n, \n detListDtoText=$detListDtoText \n"
+        )
     }
+
     private fun getCurrentYearMonth(): String {
         val currentDate = Calendar.getInstance().time
         val yearMonthFormat = SimpleDateFormat("yyyyMM", Locale.getDefault())
         return yearMonthFormat.format(currentDate)
     }
+
     companion object {
         private const val TAG = "KtBillDetailFragment"
         private val MEDIA_TYPE_JSON = "application/json; charset=utf-8".toMediaType()
     }
 
 
-
-
-
-
-
-
-
-
     private fun KtFetchDeductApiData() {  // KT 잔여량 API 조회
-        val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")?.also { viewModel.phoneNumber = it }?.also { viewModel.phoneNumber = it }?:""
+        val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")
+            ?.also { viewModel.phoneNumber = it }?.also { viewModel.phoneNumber = it } ?: ""
         val apiUrl = "https://kt-self.smartelmobile.com/common/api/selfcare/selfcareAPIServer.aspx"
 
         val requestBody = RequestBody.create(
@@ -673,11 +679,16 @@ class MyInfoFragment : Fragment() {
 
                 val apiResponse = Gson().fromJson(responseData, KtDeductApiResponse::class.java)
 
-                val totaluseTimeList = mutableListOf<KtDeductApiResponse.BodyData.TotaluseTimeDtoData>()
-                val voiceCallDetailList = mutableListOf<KtDeductApiResponse.BodyData.VoiceCallDetailDtoData>()
-                val voiceCallDetailTotList = mutableListOf<KtDeductApiResponse.BodyData.VoiceCallDetailTotDtoData>()
-                val totUseTimeCntList = mutableListOf<KtDeductApiResponse.BodyData.TotUseTimeCntDtoData>()
-                val totUseTimeCntTotList = mutableListOf<KtDeductApiResponse.BodyData.TotUseTimeCntTotDtoData>()
+                val totaluseTimeList =
+                    mutableListOf<KtDeductApiResponse.BodyData.TotaluseTimeDtoData>()
+                val voiceCallDetailList =
+                    mutableListOf<KtDeductApiResponse.BodyData.VoiceCallDetailDtoData>()
+                val voiceCallDetailTotList =
+                    mutableListOf<KtDeductApiResponse.BodyData.VoiceCallDetailTotDtoData>()
+                val totUseTimeCntList =
+                    mutableListOf<KtDeductApiResponse.BodyData.TotUseTimeCntDtoData>()
+                val totUseTimeCntTotList =
+                    mutableListOf<KtDeductApiResponse.BodyData.TotUseTimeCntTotDtoData>()
 
                 apiResponse.body?.forEach { bodyData ->
                     bodyData.totaluseTimeDto?.let { totaluseTimeList.addAll(it) }
@@ -729,9 +740,14 @@ class MyInfoFragment : Fragment() {
         pgBarTotalData = view?.findViewById(R.id.pgBar_leftData)!!
 
         // 프로그레스바 커스텀
-        fun updateProgressBar(total: Double, remain: Double, durationInMillis:Long = 1000) {
+        fun updateProgressBar(total: Double, remain: Double, durationInMillis: Long = 1000) {
             val progressPercent = (remain / total) * 100
-            val animation = ObjectAnimator.ofInt(pgBarTotalData,"progress",pgBarTotalData.progress,progressPercent.toInt())
+            val animation = ObjectAnimator.ofInt(
+                pgBarTotalData,
+                "progress",
+                pgBarTotalData.progress,
+                progressPercent.toInt()
+            )
 
             // 애니메이션 지속시간 설정
             animation.duration = durationInMillis
@@ -766,29 +782,29 @@ class MyInfoFragment : Fragment() {
                     totalStrFreeMinTotal += floatTotalValue!! * 0.5 / (1024 * 1024)
                     totalStrFreeMinRemain += floatValue!! * 0.5 / (1024 * 1024)
 
-                    Log.d("-----------MyInfoFragment----------총제공량", "$totalStrFreeMinTotal---------")
+                    Log.d(
+                        "-----------MyInfoFragment----------총제공량",
+                        "$totalStrFreeMinTotal---------"
+                    )
 
-                updateProgressBar(totalStrFreeMinTotal, totalStrFreeMinRemain)
+                    updateProgressBar(totalStrFreeMinTotal, totalStrFreeMinRemain)
                 }
             } else if (strSvcName.contains("속도제어")) {
                 val floatValue = strFreeMinReMain.toFloatOrNull()
-                if (floatValue != null) {
-                    totalStrFreeMinRemain += floatValue
-                }
-            }
-
-            else if (strSvcName =="영상/부가") {
+//                if (floatValue != null) {
+//                    totalStrFreeMinRemain += floatValue
+//                }
+            } else if (strSvcName == "영상/부가") {
                 val minutesTotal = strFreeMinTotal.toIntOrNull() ?: 0
                 val minutesRemain = strFreeMinReMain.toIntOrNull() ?: 0
                 val minutesUse = strFreeMinUse.toIntOrNull() ?: 0
                 strFreeMinTotal = "${minutesTotal / 60}분"
                 strFreeMinReMain = "${minutesRemain / 60}분"
                 strFreeMinUse = "${minutesUse / 60}분"
-            }
-            else if (strSvcName == "음성" || strSvcName == "음성/영상") {
+            } else if (strSvcName == "음성" || strSvcName == "음성/영상") {
                 val minutesUse = strFreeMinUse.toIntOrNull() ?: 0
                 val minutesRemain = strFreeMinReMain.toIntOrNull() ?: 0
-                strFreeMinReMain = "${minutesRemain /60}분" // Hide strFreeMinReMain
+                strFreeMinReMain = "${minutesRemain / 60}분" // Hide strFreeMinReMain
                 strFreeMinUse = "${minutesUse / 60}분"
 
                 // Check if strFreeMinTotal is not "무제한" and is numeric
@@ -803,8 +819,7 @@ class MyInfoFragment : Fragment() {
                     "✆︎ $strFreeMinReMain / $strFreeMinTotal"
                 }
 
-            }
-            else if (strSvcName.contains("부가")) {
+            } else if (strSvcName.contains("부가")) {
                 val minutesTotal = strFreeMinTotal.toIntOrNull() ?: 0
                 val minutesRemain = strFreeMinReMain.toIntOrNull() ?: 0
                 val minutesUse = strFreeMinUse.toIntOrNull() ?: 0
@@ -813,8 +828,7 @@ class MyInfoFragment : Fragment() {
                 strFreeMinUse = "${minutesUse / 60}분"
 
                 //displayCall = "✆ $strFreeMinReMain / $strFreeMinTotal"
-            }
-            else if (strSvcName.contains("SMS")) {
+            } else if (strSvcName.contains("SMS")) {
                 val intValue = strFreeMinReMain.toIntOrNull() ?: 0
                 if (intValue > 99999) {
                     strFreeMinReMain = "무제한"
@@ -843,16 +857,17 @@ class MyInfoFragment : Fragment() {
             }
         }
 
-        txtRefreshData?.text = String.format("%.2f GB", totalStrFreeMinRemain)
+        txtRefreshData?.text = formatDataValue(totalStrFreeMinRemain, 1.0)
         Log.d("------------------MyInfoFragment  Check Data", "$totalStrFreeMinRemain")
 
-        txtRefreshTotalData?.text = String.format("%.2f GB", totalStrFreeMinTotal)
+        txtRefreshTotalData?.text = formatDataValue(totalStrFreeMinTotal, 1.0)
         Log.d("------------------MyInfoFragment  Check Data", "$totalStrFreeMinTotal")
 
         txtRefreshCall?.text = displayCall
-        Log.d("---------------------Check Call","$displayCall--------------")
+        Log.d("---------------------Check Call", "$displayCall--------------")
 
         txtRefreshM?.text = displayM
+        Log.d("---------------------Check Call", "$displayM--------------")
     }
 
     private fun formatValue(value: String): String {
@@ -863,23 +878,15 @@ class MyInfoFragment : Fragment() {
             value
         }
     }
-    private fun formatDataValue(value: String, multiplier: Double): String {
-        val floatValue = value.toFloatOrNull()
-        return if (floatValue != null) {
-            val formattedValue = String.format("%.2f GB", floatValue * multiplier)
-            formattedValue
+
+    private fun formatDataValue(value: Double, multiplier: Double): String {
+        val convertedValue = value * multiplier
+        return if (convertedValue < 1) {
+            String.format("%.1fMB", convertedValue * 1024)
         } else {
-            value
+            String.format("%.1fGB", convertedValue)
         }
     }
-
-
-
-
-
-
-
-
 
 
     // LGT 당월 청구요금 API조회
@@ -910,7 +917,10 @@ class MyInfoFragment : Fragment() {
                 try {
                     val apiResponse = Gson().fromJson(responseData, LgtBillApiResponse::class.java)
                     if (apiResponse.billInfo.isNullOrEmpty()) {
-                        Log.e("LgtBillDetailFragment", "Bill Info is null or empty in API response.")
+                        Log.e(
+                            "LgtBillDetailFragment",
+                            "Bill Info is null or empty in API response."
+                        )
                         return
                     }
 
@@ -978,6 +988,7 @@ class MyInfoFragment : Fragment() {
             .hostnameVerifier(hostnameVerifier)
             .build()
     }
+
     private fun updateUI(apiResponse: LgtBillApiResponse) {
         if (apiResponse.billInfo.isNullOrEmpty()) {
             Log.e("LgtBillDetailFragment", "Bill Info is null or empty in API response.")
@@ -992,20 +1003,40 @@ class MyInfoFragment : Fragment() {
         numberFormat.applyPattern("#,###")
 
         for (billInfo in billInfoList) {
-            sb.append(String.format("\n%-60s\n\n", billInfo.blItemNm)) // Left align blItemNm column with 20 characters
+            sb.append(
+                String.format(
+                    "\n%-60s\n\n",
+                    billInfo.blItemNm
+                )
+            ) // Left align blItemNm column with 20 characters
 
             if (billInfo.blItemNm.contains("총 납부하실 금액", ignoreCase = true)) {
                 val formattedAmount = numberFormat.format(billInfo.billAmt.toLong())
                 totalAmount = "${formattedAmount}원"
-                sb.append(String.format("%60s", totalAmount)) // Right align totalAmount value with padding
+                sb.append(
+                    String.format(
+                        "%60s",
+                        totalAmount
+                    )
+                ) // Right align totalAmount value with padding
             } else {
                 val formattedBillAmt = numberFormat.format(billInfo.billAmt.toLong())
 
                 // Create a SpannableString with bold style for billAmt
                 val spannableString = SpannableString("${formattedBillAmt}원")
-                spannableString.setSpan(StyleSpan(Typeface.BOLD), 0, spannableString.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                spannableString.setSpan(
+                    StyleSpan(Typeface.BOLD),
+                    0,
+                    spannableString.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
 
-                sb.append(String.format("%64s", spannableString)) // Right align billAmt value with padding
+                sb.append(
+                    String.format(
+                        "%64s",
+                        spannableString
+                    )
+                ) // Right align billAmt value with padding
             }
             sb.append("\n\n\n")
         }
@@ -1026,18 +1057,13 @@ class MyInfoFragment : Fragment() {
     }
 
 
-
-
-
-
-
-
     private fun LgtDeductFetchData() { // Lgt 사용량 조회 API
 
         val baseUrl = "https://www.mysmartel.com/api/"
         val phoneNumber = viewModel.phoneNumber
         val custName = viewModel.custName
-        val apiRequestUrl = "${baseUrl}lguDeductibleAmt.php?serviceNum=$phoneNumber&custNm=$custName"
+        val apiRequestUrl =
+            "${baseUrl}lguDeductibleAmt.php?serviceNum=$phoneNumber&custNm=$custName"
 
         // Create a TrustManager that trusts all certificates
         val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
@@ -1111,9 +1137,14 @@ class MyInfoFragment : Fragment() {
         val dataStringBuilder = StringBuilder()
 
         // 프로그레스바 커스텀
-        fun updateProgressBar(total: Double, remain: Double, durationInMillis:Long = 1000) {
+        fun updateProgressBar(total: Double, remain: Double, durationInMillis: Long = 1000) {
             val progressPercent = (remain / total) * 100
-            val animation = ObjectAnimator.ofInt(pgBarTotalData,"progress",pgBarTotalData.progress,progressPercent.toInt())
+            val animation = ObjectAnimator.ofInt(
+                pgBarTotalData,
+                "progress",
+                pgBarTotalData.progress,
+                progressPercent.toInt()
+            )
 
             // 애니메이션 지속시간 설정
             animation.duration = durationInMillis
@@ -1135,6 +1166,9 @@ class MyInfoFragment : Fragment() {
         val remainData = StringBuilder()
         val totalData = StringBuilder()
         val remainCallStr = StringBuilder()
+
+        var displayCallVoice: String? = null // 음성
+        var displayCallVoiceVideo: String? = null // 음성+영상 = 부가통화
 
         // Iterate over the RemainInfo list and append the values to the data string
         for (remainInfo in remainInfoList) {
@@ -1163,27 +1197,30 @@ class MyInfoFragment : Fragment() {
             dataStringBuilder.append("$modifiedSvcNm\t")
             dataStringBuilder.append(" $modifiedSvcTypNm\n\n")
 
+            Log.d("DEBUG", "svcUnitCd: $svcUnitCd")
+            Log.d("DEBUG", "alloValue: $alloValue")
+            Log.d("DEBUG", "svcTypNm: $svcTypNm")
+
 
             if (svcUnitCd.contains("초")) {
                 if (alloValue.contains("Z")) {
                     val useValueInMinutes = useValue.toInt() / 60
 
                     if (svcTypNm == "음성") {
-                        displayCall = "✆ ${useValueInMinutes}분 / 무제한"
+                        displayCallVoice = "✆ ${useValueInMinutes}분 / 무제한"
                     }
                 } else {
                     val alloValueInMinutes = alloValue.toInt() / 60
                     val useValueInMinutes = useValue.toInt() / 60
                     val remainValueMin = alloValueInMinutes - useValueInMinutes
 
-                    if (svcTypNm == "부가통화") { // 부가통화만 조회되었을 경우에만 값을 설정하도록 변경
-                        displayCall = "✆ ${remainValueMin}분 / ${alloValueInMinutes}분"
+                    if (svcTypNm == "음성") {
+                        displayCallVoice = "✆ ${remainValueMin}분 / ${alloValueInMinutes}분"
+                    } else if (svcTypNm == "음성+영상") {
+                        displayCallVoiceVideo = "✆ ${remainValueMin}분 / ${alloValueInMinutes}분"
                     }
                 }
-            }
-
-
-            else if (svcUnitCd.contains("건")) {
+            } else if (svcUnitCd.contains("건")) {
                 if (alloValue.contains("Z")) {
                     dataStringBuilder.append("총제공량 ${"무제한"}\n\n")
                     dataStringBuilder.append("사용량  ${useValue}건\n\n\n\n")
@@ -1200,14 +1237,11 @@ class MyInfoFragment : Fragment() {
                 }
             } else if (svcTypNm.contains("패킷")) {
 
-                if (!alloValue.contains("Z") && !useValue.contains("Z")){
+                if (!alloValue.contains("Z") && !useValue.contains("Z")) {
                     val alloValueInGB = alloValue.toDouble() / 1024 / 1024
                     val useValueInGB = useValue.toDouble() / 1024 / 1024
                     val remainValueInGB = alloValueInGB - useValueInGB
 
-                    dataStringBuilder.append("$alloValueInGB\n")
-                    dataStringBuilder.append("사용량 ${useValueInGB.format(1)}GB\n")
-                    dataStringBuilder.append("$remainValueInGB")
 
                     totalRemainData += remainValueInGB
                     totalRemainDataTotal += alloValueInGB
@@ -1221,25 +1255,38 @@ class MyInfoFragment : Fragment() {
             }
         }
 
-        remainData.append("${totalRemainData.format(1)}GB")
+        remainData.append("${totalRemainData.format()}")
         txtRefreshData?.text = remainData.toString()
         Log.d("-----------------잔여량 ", "총합: $remainData -----------")
 
-        totalData.append("${totalRemainDataTotal.format(1)}GB")
+        totalData.append("${totalRemainDataTotal.format()}")
         txtRefreshDataTotal?.text = totalData.toString()
         Log.d("-----------------데이터량 ", "총합: $totalData -----------")
 
-        txtRefreshCall?.text = displayCall
-        Log.d("-----------------통화량 ", "총합: $displayCall -----------")
+        val finalDisplayCall =
+            if (displayCallVoice != null)
+                displayCallVoice
+            else
+                displayCallVoiceVideo ?: ""
+
+        txtRefreshCall?.text = finalDisplayCall ?: ""
+        Log.d("-----------------통화량 ", "$finalDisplayCall -----------")
 
         txtRefreshM?.text = displayM
         Log.d("-----------------문자량 ", "총합: $displayM -----------")
     }
-
-    // Extension function to format a Double value with the specified number of decimal places
     private fun Double.format(decimalPlaces: Int): String {
         return String.format("%.${decimalPlaces}f", this)
     }
+    // Extension function to format a Double value with the specified number of decimal places
+    private fun Double.format(): String {
+        return if (this < 1) {
+            "${(this * 1024).format(0)}MB"
+        } else {
+            "${this.format(1)}GB"
+        }
+    }
+
 
 
 

@@ -180,9 +180,15 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
             if (strSvcName.contains("데이터")) {
                 val multiplier = 0.5 / (1024 * 1024)
                 strFreeMinUse = formatDataValue(strFreeMinUse, multiplier)
-                strFreeMinReMain = formatDataValue(strFreeMinReMain, multiplier)
+
+                if (strFreeMinTotal == "무제한") {
+                    strFreeMinReMain = "무제한"
+                } else {
+                    strFreeMinReMain = formatDataValue(strFreeMinReMain, multiplier)
+                }
                 strFreeMinTotal = formatDataValue(strFreeMinTotal, multiplier)
             }
+
             else if (strSvcName.contains("속도제어")) {
                 val multiplier = 1.0
                 strFreeMinUse = formatDataValue(strFreeMinUse, multiplier)
@@ -225,23 +231,6 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
                 strFreeMinUse = "${strFreeMinUse}건"
             }
 
-            totaluseTimeStringBuilder.append("\n")
-            val spannableSvcName = SpannableString("${totaluseTime.strSvcName}\n")
-            spannableSvcName.setSpan(AbsoluteSizeSpan(32, true), 0, spannableSvcName.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            totaluseTimeStringBuilder.append(spannableSvcName)
-            totaluseTimeStringBuilder.append("\n")
-
-            totaluseTimeStringBuilder.append(String.format("%-40s %3s%n\n", "총제공량", strFreeMinTotal))
-            if (strSvcName.contains("음성") && strFreeMinReMain == "0") {
-                // Do not include "잔여량" if strFreeMinReMain is 0
-                totaluseTimeStringBuilder.append(String.format("%-40s %3s%n\n", "", strFreeMinReMain))
-            } else {
-                if (strFreeMinReMain != "0") {
-                    totaluseTimeStringBuilder.append(String.format("%-41.5s %3s%n\n", "잔여량", strFreeMinReMain))
-                }
-                totaluseTimeStringBuilder.append(String.format("%-40s %3s%n\n", "사용량", strFreeMinUse))
-            }
-            totaluseTimeStringBuilder.append("\n\n\n")
 
             DeductItem(strSvcName, strFreeMinTotal, strFreeMinReMain, strFreeMinUse)
 
@@ -250,7 +239,6 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = DeductAdapter(deductItem)
 
-        //totaluseTimeTextView.text = totaluseTimeStringBuilder.toString()
     }
 
     private fun formatValue(value: String): String {
@@ -264,8 +252,12 @@ class KtDeductDetailViewFragment : Fragment(), View.OnTouchListener {
     private fun formatDataValue(value: String, multiplier: Double): String {
         val floatValue = value.toFloatOrNull()
         return if (floatValue != null) {
-            val formattedValue = String.format("%.2f GB", floatValue * multiplier)
-            formattedValue
+            val convertedValue = floatValue * multiplier
+            if (convertedValue < 1) {
+                String.format("%.1fMB", convertedValue * 1024)
+            } else {
+                String.format("%.1fGB", convertedValue)
+            }
         } else {
             value
         }
