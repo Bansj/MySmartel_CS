@@ -1238,15 +1238,17 @@ class MyInfoFragment : Fragment() {
             } else if (svcTypNm.contains("패킷")) {
 
                 if (!alloValue.contains("Z") && !useValue.contains("Z")) {
-                    val alloValueInGB = alloValue.toDouble() / 1024 / 1024
-                    val useValueInGB = useValue.toDouble() / 1024 / 1024
-                    val remainValueInGB = alloValueInGB - useValueInGB
+                    if (!svcNm.contains("비디오")) {
+                        val alloValueInGB = alloValue.toDouble() / 1024 / 1024
+                        val useValueInGB = useValue.toDouble() / 1024 / 1024
+                        val remainValueInGB = alloValueInGB - useValueInGB
 
 
-                    totalRemainData += remainValueInGB
-                    totalRemainDataTotal += alloValueInGB
+                        totalRemainData += remainValueInGB
+                        totalRemainDataTotal += alloValueInGB
 
-                    updateProgressBar(totalRemainDataTotal, totalRemainData)
+                        updateProgressBar(totalRemainDataTotal, totalRemainData)
+                    }
                 }
 
             } else {

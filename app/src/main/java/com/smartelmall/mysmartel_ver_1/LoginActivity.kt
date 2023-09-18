@@ -3,18 +3,12 @@ package com.smartelmall.mysmartel_ver_1
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.net.ParseException
 import android.net.Uri
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
-import android.view.Gravity
-import android.view.View
-import android.view.WindowManager
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
@@ -30,7 +24,6 @@ import com.android.volley.Response
 import com.android.volley.toolbox.HurlStack
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import com.smartelmall.mysmartel_ver_1.TestUser.UserInfo
 import org.json.JSONException
 import org.json.JSONObject
 import java.net.HttpURLConnection
@@ -107,15 +100,15 @@ class LoginActivity : AppCompatActivity() {
         }
         signUpButton = findViewById(R.id.btn_signUp)
         signUpButton.setOnClickListener {
-            val message = "회원가입 완료후에 로그인하기 버튼을 클릭하여 주십시오. "
-            showAlertDialog(message)
+           // val message = "회원가입 페이지로 이동합니다.\n완료후에 스마텔 어플로 돌아와\n로그인 해주세요."
+            showAlertDialog()
         }
 
         // 추후 업데이트 후에 웹뷰 방식으로 비밀번호 찾기 기능 구현
         val webView = findViewById<WebView>(R.id.webviewFindPW)
         webView.webViewClient = WebViewClient()
 
-        findPW.setOnClickListener {
+        findPW.setOnClickListener {// 비밀번호 찾기 클릭이벤트
             val url = "https://www.mysmartel.com/page/user_pw.php"
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
             startActivity(intent)
@@ -123,14 +116,16 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun navigateToSignupActivity() { // 회원가입 버튼 클릭 이벤트
-        val intent = Intent(this, WebViewActivity::class.java)
+        //val intent = Intent(this, WebViewActivity::class.java)
+        val url = "https://www.mysmartel.com/page/user_login.php"
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
         startActivity(intent)
     }
 
 
     private var testPhoneNumber: String? = // 테스트계정 번호 생성
         // 아래에는 테스트 로그인할 번호 기입
-        "01084052638"
+        "01059370011"
             .replace("-", "") // SKT, LG, KT
     private fun loginUser() {
         val phoneNumber = phoneNumberEditText.text.toString()
@@ -368,21 +363,47 @@ class LoginActivity : AppCompatActivity() {
     private fun hideLoadingDialog() {
         loadingDialog.dismiss()
     }
-    private fun showAlertDialog(message: String) {
-        val alertDialog = AlertDialog.Builder(this)
-            .setMessage(message)
-            .setPositiveButton("OK") { dialog: DialogInterface, _: Int ->
-                dialog.dismiss()
-                navigateToSignupActivity()
-            }
-            .create()
+    private fun showAlertDialog(title: String = "알림", okButtonText: String = "OK") {
+        val dialog = Dialog(this)
 
-        // AlertDialog 확인버튼 글자색 변경 코드
-        alertDialog.setOnShowListener {
-            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(resources.getColor(R.color.orange))
+        // Set the custom layout
+        dialog.setContentView(R.layout.dialog_prepaid_exit_layout)
+
+        // Find the views in the custom layout
+        val titleTextView = dialog.findViewById<TextView>(R.id.dialogTitle)
+        val messageTextView = dialog.findViewById<TextView>(R.id.dialogMessage)
+        val okButton = dialog.findViewById<Button>(R.id.okButton)
+
+        // Set the text of the TextViews and Button
+        titleTextView.text = "알림"
+        messageTextView.text = "회원가입 페이지로 이동합니다.\n완료후에 스마텔 어플로 돌아와\n로그인 해주세요."
+        okButton.text = okButtonText
+
+        // Set an OnClickListener for the OK button
+        okButton.setOnClickListener {
+            dialog.dismiss()
+            navigateToSignupActivity()
         }
-        alertDialog.show()
+
+        // Calculate dialog width and height based on screen size
+        val displayMetrics = DisplayMetrics()
+        windowManager.defaultDisplay.getMetrics(displayMetrics)
+        val screenWidth = displayMetrics.widthPixels
+        val screenHeight = displayMetrics.heightPixels
+
+        val dialogWidth = (screenWidth * 2 ) / 3
+        val dialogHeight = (dialogWidth * 2) / 3
+
+        // Set the dialog's size
+        val window = dialog.window
+        if (window != null) {
+            window.setBackgroundDrawableResource(R.drawable.box_whitesmoke)
+            window.setLayout(dialogWidth, dialogHeight)
+        }
+
+        dialog.show()
     }
+
     private fun showErrorDialog(message: String) {
         requestQueue.cancelAll("LOGIN_REQUEST_TAG")
         hideLoadingDialog()

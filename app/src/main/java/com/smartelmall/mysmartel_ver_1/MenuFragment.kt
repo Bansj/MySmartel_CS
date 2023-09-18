@@ -188,7 +188,7 @@ class MenuFragment : Fragment() {
         }
 
 
-        // 청구요금 조회 슬라이드 업 클릭 이벤트
+        // 당월 청구요금 조회 슬라이드 업 클릭 이벤트
         binding.txtBillDetail.setOnClickListener {
             val fragment: Fragment? = when (telecom) {
                 "SKT" -> {
