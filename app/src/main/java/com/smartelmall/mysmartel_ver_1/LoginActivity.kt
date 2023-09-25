@@ -131,11 +131,11 @@ class LoginActivity : AppCompatActivity() {
         val phoneNumber = phoneNumberEditText.text.toString()
         val password = passwordEditText.text.toString()
 
-        if (phoneNumber == "123" && password == "123") { // 테스트 계정
+       /* if (phoneNumber == "123" && password == "123") { // 테스트 계정
             handleTestLogin()
             fetchUserInfo(testPhoneNumber!!)
             return
-        }
+        }*/
 
         Log.d("LoginActivity",
             "--------------------Login User - Phone number: $phoneNumber, Password: $password---------------------")
@@ -167,7 +167,7 @@ class LoginActivity : AppCompatActivity() {
         editor.apply()
     }
 
-    private fun handleTestLogin() {
+    private fun handleTestLogin() { // 로그인 로직 강제 통과 아이템
         val response = JSONObject().apply {
             put("resultCd", "true") // 로그인 로직 강제 통과
             put("typ", "pwd")       // 로그인 로직 강제 통과
@@ -400,7 +400,6 @@ class LoginActivity : AppCompatActivity() {
             window.setBackgroundDrawableResource(R.drawable.box_whitesmoke)
             window.setLayout(dialogWidth, dialogHeight)
         }
-
         dialog.show()
     }
 

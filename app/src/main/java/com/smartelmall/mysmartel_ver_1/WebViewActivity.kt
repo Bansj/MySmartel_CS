@@ -17,22 +17,22 @@ class WebViewActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_webview)
 
-        webView = findViewById(R.id.webView)
+/*        webView = findViewById(R.id.webView)
         webView.settings.javaScriptEnabled = true
-        webView.webViewClient = MyWebViewClient()
+        //webView.webViewClient = MyWebViewClient()
         webView.loadUrl("https://www.mysmartel.com/page/user_login.php")
 
         toLoginButton = findViewById(R.id.btn_toLogin)
         toLoginButton.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
-        }
+        }*/
     }
 
-    private inner class MyWebViewClient : WebViewClient() { // 어플 안에서 웹뷰로 열리게 해주는 기능
+ /*   private inner class MyWebViewClient : WebViewClient() { // 어플 안에서 웹뷰로 열리게 해주는 기능
         override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: SslError?) {
             handler?.proceed() // Ignore SSL certificate errors
         }
-    }
+    }*/
 }
 

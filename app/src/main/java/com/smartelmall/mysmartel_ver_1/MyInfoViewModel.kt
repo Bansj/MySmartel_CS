@@ -7,4 +7,6 @@ class MyInfoViewModel: ViewModel() {
     var phoneNumber: String? = null
     var Telecom: String? = null
     var serviceAcct: String? = null
+
+
 }

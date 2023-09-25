@@ -20,7 +20,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
-import androidx.privacysandbox.tools.core.model.Types
 import androidx.viewpager2.widget.ViewPager2
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -30,9 +29,9 @@ import com.smartelmall.mysmartel_ver_1.Banner.ZoomOutPageTransformer
 import com.smartelmall.mysmartel_ver_1.KT.*
 import com.smartelmall.mysmartel_ver_1.KT.Deduct.KtDeductApiResponse
 import com.smartelmall.mysmartel_ver_1.KT.Deduct.KtDeductDetailViewFragment
+import com.smartelmall.mysmartel_ver_1.LGT.Bill.LgtBillApiResponse
 import com.smartelmall.mysmartel_ver_1.LGT.Deduct.LgtDedcutApiResponse
-import com.smartelmall.mysmartel_ver_1.LGT.LgtBillApiResponse
-import com.smartelmall.mysmartel_ver_1.LGT.LgtBillDetailFragment
+import com.smartelmall.mysmartel_ver_1.LGT.Bill.LgtBillDetailFragment
 
 import com.smartelmall.mysmartel_ver_1.LGT.Deduct.LgtDeductDetailViewFragment
 import com.smartelmall.mysmartel_ver_1.SKT.*
@@ -121,7 +120,7 @@ class MyInfoFragment : Fragment() {
         return view
     }
 
-    private fun fetchBannerList() { // 배너 api
+    private fun fetchBannerList() { // 광고 배너 api
         val request = Request.Builder()
             .url("https://api.smartel.kr/banner")
             .build()
@@ -178,7 +177,7 @@ class MyInfoFragment : Fragment() {
         outState.putString("serviceAcct", viewModel.serviceAcct)
     }
 
-    fun formatPhoneNumber(rawPhoneNumber: String?): String {
+    fun formatPhoneNumber(rawPhoneNumber: String?): String { // 숫자 -> 폰번호 형식
         if (rawPhoneNumber == null) {
             return "Unknown"
         }
@@ -502,7 +501,7 @@ class MyInfoFragment : Fragment() {
         txt_refreshData = view.findViewById(R.id.txt_refreshData)
         btnRefresh = view.findViewById(R.id.btn_refresh)
 
-        // Add click listener for btn_refresh button
+        // 새로 고침 버튼 클릭이벤트
         btnRefresh.setOnClickListener {
             val animator = ObjectAnimator.ofFloat(btnRefresh, View.ROTATION, 0f, 360f)
             animator.duration = 1000 // 설정한 시간 동안 애니메이션 진행 (1초)

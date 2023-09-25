@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,6 +18,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        Thread.setDefaultUncaughtExceptionHandler { _, e ->
+            FirebaseCrashlytics.getInstance().recordException(e)
+        }
 
         val phoneNumber = intent.getStringExtra("PhoneNumber")
         val custName = intent.getStringExtra("custName")
@@ -37,13 +42,6 @@ class MainActivity : AppCompatActivity() {
 
         // Retrieve the phoneNumber from SharedPreferences
         val sharedPrefs = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-    /*    val phoneNumber = sharedPrefs.getString("phoneNumber", "")
-
-        // Retrieve the data from the intent extras
-        val custName = intent.getStringExtra("custName")
-        //val phoneNumber = intent.getStringExtra("phoneNumber")
-        val Telecom = intent.getStringExtra("Telecom")
-        val serviceAcct = intent.getStringExtra("serviceAcct")*/
 
         // Log the data before creating the fragment
         Log.d(TAG, "---------------getStringExtra -> custName: $custName, phoneNumber: $phoneNumber, Telecom: $Telecom, serviceAcct: $serviceAcct---------------")

@@ -4,4 +4,7 @@
     <string name="open">Open</string>
     <string name="close">Close</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="appwidget_text">스마텔</string>
+    <string name="add_widget">Add widget</string>
+    <string name="app_widget_description">This is an app widget description</string>
 </resources>
