@@ -125,17 +125,17 @@ class LoginActivity : AppCompatActivity() {
 
     private var testPhoneNumber: String? = // 테스트계정 번호 생성
         // 아래에는 테스트 로그인할 번호 기입
-        "01059370011"
+        "010-2969-5567"//"01059370011"
             .replace("-", "") // SKT, LG, KT
     private fun loginUser() {
         val phoneNumber = phoneNumberEditText.text.toString()
         val password = passwordEditText.text.toString()
 
-       /* if (phoneNumber == "123" && password == "123") { // 테스트 계정
+        if (phoneNumber == "123" && password == "123") { // 테스트 계정
             handleTestLogin()
             fetchUserInfo(testPhoneNumber!!)
             return
-        }*/
+        }
 
         Log.d("LoginActivity",
             "--------------------Login User - Phone number: $phoneNumber, Password: $password---------------------")

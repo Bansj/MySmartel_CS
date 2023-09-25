@@ -1,4 +1,4 @@
-package com.smartelmall.mysmartel_ver_1.KT
+package com.smartelmall.mysmartel_ver_1.KT.Payment
 
 import android.content.Context
 import android.os.Bundle
@@ -18,8 +18,6 @@ import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.IOException
-import java.text.DecimalFormat
-import java.text.DecimalFormatSymbols
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*

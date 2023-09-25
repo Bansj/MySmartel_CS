@@ -18,10 +18,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
-import com.smartelmall.mysmartel_ver_1.KT.KtBillDetailFragment
-import com.smartelmall.mysmartel_ver_1.KT.KtPaymentDetailFragment
+import com.smartelmall.mysmartel_ver_1.KT.Bill.KtBillDetailFragment
+import com.smartelmall.mysmartel_ver_1.KT.Payment.KtPaymentDetailFragment
 import com.smartelmall.mysmartel_ver_1.LGT.Bill.LgtBillDetailFragment
-import com.smartelmall.mysmartel_ver_1.LGT.LgtPaymentDetailFragment
+import com.smartelmall.mysmartel_ver_1.LGT.Payment.LgtPaymentDetailFragment
 import com.smartelmall.mysmartel_ver_1.SKT.AddService.SktAddServiceFragment
 import com.smartelmall.mysmartel_ver_1.SKT.Bill.SktBillDetailFragment
 import com.smartelmall.mysmartel_ver_1.SKT.Payment.SktPaymentDetailFragment

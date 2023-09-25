@@ -1,4 +1,4 @@
-package com.smartelmall.mysmartel_ver_1.LGT
+package com.smartelmall.mysmartel_ver_1.LGT.Payment
 
 import android.graphics.Color
 import android.os.Bundle

@@ -1,4 +1,4 @@
-package com.smartelmall.mysmartel_ver_1.KT
+package com.smartelmall.mysmartel_ver_1.KT.Payment
 
 data class KtPaymentApiRequest(
     val header: List<Header>,

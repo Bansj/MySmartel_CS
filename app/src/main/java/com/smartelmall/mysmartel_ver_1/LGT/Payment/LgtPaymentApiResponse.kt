@@ -1,4 +1,4 @@
-package com.smartelmall.mysmartel_ver_1.LGT
+package com.smartelmall.mysmartel_ver_1.LGT.Payment
 
 data class LgtPaymentApiResponse(
     val BillInfo: List<LgtBillInfo>,

@@ -1,4 +1,4 @@
-package com.smartelmall.mysmartel_ver_1.KT
+package com.smartelmall.mysmartel_ver_1.KT.Bill
 
 import android.content.res.Resources
 import android.os.Bundle
@@ -11,6 +11,8 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.smartelmall.mysmartel_ver_1.R
 import okhttp3.*
@@ -60,7 +62,7 @@ class KtBillDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         fetchBillData()
         txt_sumAmount = view.findViewById(R.id.txt_sumAmount)
-        txt_sumAmount2 = view.findViewById(R.id.txt_sumAmount2)
+       // txt_sumAmount2 = view.findViewById(R.id.txt_sumAmount2)
     }
 
     private fun fetchBillData() {
@@ -136,21 +138,25 @@ class KtBillDetailFragment : Fragment() {
 
         val numberFormat = NumberFormat.getNumberInstance(Locale.getDefault())
 
+        val ktItemList = mutableListOf<KtBillItem>()
+
         bodyData.detListDto.forEach { detListDtoData ->
             val description = detListDtoData.splitDescription
             val amount = numberFormat.format(detListDtoData.actvAmt.toLong())
 
-            detListDtoText.append("\n\n")
-            detListDtoText.append(description)
-            detListDtoText.append("\n\n")
-            detListDtoText.append(String.format("\n%66s", "${amount}원\n"))
+            ktItemList.add(KtBillItem(description,"${amount}원\n\n"))
 
             if (description.contains("납부하실 금액", ignoreCase = true)) {
                 sumAmountList.add("총 ${amount}원")
             }
-        }
 
-        textViewDetListDto.text = "\n$detListDtoText"
+        }
+        val recyclerView = requireView().findViewById<RecyclerView>(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(activity)
+        val adapter = KtBillAdapter(ktItemList)
+        recyclerView.adapter = adapter
+
+       // textViewDetListDto.text = "\n$detListDtoText"
 
         /// Set the sumAmountList values to txt_sumAmount
         if (sumAmountList.isNotEmpty()) {

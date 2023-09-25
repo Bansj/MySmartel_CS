@@ -1,4 +1,4 @@
-package com.smartelmall.mysmartel_ver_1.KT
+package com.smartelmall.mysmartel_ver_1.KT.Bill
 data class KtBillApiResponse(
     val header: List<Header>,
     val body: List<Body>
