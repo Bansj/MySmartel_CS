@@ -7,12 +7,16 @@ import android.content.Intent
 import android.net.ParseException
 import android.net.Uri
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.DisplayMetrics
 import android.util.Log
+import android.view.View
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.Switch
 import android.widget.TextView
@@ -55,7 +59,6 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-
         phoneNumberEditText = findViewById(R.id.edit_id)
         passwordEditText = findViewById(R.id.edit_password)
         loginButton = findViewById(R.id.btn_login)
@@ -66,6 +69,34 @@ class LoginActivity : AppCompatActivity() {
         requestQueue = Volley.newRequestQueue(this, ignoreSslErrorHurlStack())
 
         autoLoginSwitch = findViewById(R.id.switch_autoLogin)
+
+        val btnClearID = findViewById<ImageButton>(R.id.btn_clearID)
+        val btnClearPW = findViewById<ImageButton>(R.id.btn_clearPW)
+
+        btnClearID.setOnClickListener {
+            phoneNumberEditText.text.clear()
+        }
+        btnClearPW.setOnClickListener {
+            passwordEditText.text.clear()
+        }
+        phoneNumberEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                btnClearID.visibility = if (s.toString().isEmpty()) View.GONE else View.VISIBLE
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start:Int, count:Int, after:Int) {}
+
+            override fun onTextChanged(s :CharSequence?, start :Int,before :Int,count :Int) {}
+        })
+        passwordEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                btnClearPW.visibility = if (s.toString().isEmpty()) View.GONE else View.VISIBLE
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start:Int, count:Int, after:Int) {}
+
+            override fun onTextChanged(s :CharSequence?, start :Int,before :Int,count :Int) {}
+        })
 
 
         val sharedPreferences = getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
@@ -105,8 +136,8 @@ class LoginActivity : AppCompatActivity() {
         }
 
         // 추후 업데이트 후에 웹뷰 방식으로 비밀번호 찾기 기능 구현
-        val webView = findViewById<WebView>(R.id.webviewFindPW)
-        webView.webViewClient = WebViewClient()
+/*        val webView = findViewById<WebView>(R.id.webviewFindPW)
+        webView.webViewClient = WebViewClient()*/
 
         findPW.setOnClickListener {// 비밀번호 찾기 클릭이벤트
             val url = "https://www.mysmartel.com/page/user_pw.php"
