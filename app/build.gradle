@@ -15,8 +15,8 @@ android {
         applicationId "com.smartelmall.mysmartel_ver_1"
         minSdk 27
         targetSdk 33
-        versionCode 9
-        versionName "1.0.0"
+        versionCode 10
+        versionName "1.0.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

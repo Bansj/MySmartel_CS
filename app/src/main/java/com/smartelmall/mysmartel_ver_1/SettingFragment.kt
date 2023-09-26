@@ -160,8 +160,7 @@ class SettingFragment : Fragment() {
         // TextView에 현재 버전 설정
         txtAppVersion.text = "$currentVersion"
 
-
-        val firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
+        val firebaseRemoteConfig = FirebaseRemoteConfig.getInstance() // remote config
 
         // 기본값 설정
         val configSettings = FirebaseRemoteConfigSettings.Builder()
@@ -189,7 +188,7 @@ class SettingFragment : Fragment() {
                 }
             }
 
-        btnAppUpdate.setOnClickListener {
+        btnAppUpdate.setOnClickListener {//업데이트하기 버튼을 클릭하면 스토어로 이동하는 클릭이벤트
             try {
                 startActivity(
                     Intent(

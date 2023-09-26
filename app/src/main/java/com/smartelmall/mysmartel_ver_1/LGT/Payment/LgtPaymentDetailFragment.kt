@@ -2,9 +2,6 @@ package com.smartelmall.mysmartel_ver_1.LGT.Payment
 
 import android.graphics.Color
 import android.os.Bundle
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -13,14 +10,16 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.smartelmall.mysmartel_ver_1.R
 import okhttp3.*
 import java.io.IOException
 import java.security.cert.X509Certificate
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.net.ssl.SSLContext
@@ -121,57 +120,37 @@ class LgtPaymentDetailFragment : Fragment() {
             return
         }
 
+        val recyclerView = requireView().findViewById<RecyclerView>(R.id.recyclerView)
+
+        recyclerView.layoutManager = LinearLayoutManager(activity)
+
         val billInfoList = apiResponse.BillInfo
 
-        val sb = StringBuilder()
+        // LgtPayment 객체로 변환하여 저장할 리스트
+        val lgtPaymentList = ArrayList<LgtPayment>()
+
         for (billInfo in billInfoList) {
             val paymentMethod = billInfo.Method
             val paymentDate = billInfo.PayDate
             val paymentAmount = billInfo.PayAmt
+            // PayAmt 값을 안전하게 Double로 변환 후 Int로 변환. 만약 변환이 불가능한 경우 0으로 설정.
+            val paymentAmountInt = billInfo.PayAmt.replace(",", "").toDoubleOrNull()?.toInt() ?: 0
             val paymentName = billInfo.PayName
 
-            sb.append("Payment Method: $paymentMethod\n")
-            sb.append("Payment Date: $paymentDate\n")
-            sb.append("Payment Amount: $paymentAmount\n")
-            sb.append("Payment Name: $paymentName\n\n")
+            // NumberFormat 인스턴스 생성 (Locale.KOREA 설정)
+            val numberFormat = NumberFormat.getNumberInstance(Locale.KOREA)
 
-            val dateFormat = SimpleDateFormat("yyyyMMdd", Locale.getDefault())
-            val parsedDate = dateFormat.parse(paymentDate)
-            val formattedDate = SimpleDateFormat("yyyy년 MM월 dd일", Locale.getDefault()).format(parsedDate ?: Date())
+            // paymentAmountInt 값을 천 단위로 구분하여 문자열로 변환
+            val paymentAmountStr = numberFormat.format(paymentAmountInt)
 
-            val paymentDateTextView = TextView(requireContext()).apply {
-                text = "\n$formattedDate\n\n"
-                gravity = Gravity.CENTER
-                setTextColor(Color.BLACK)
-                textSize = 20f
-            }
-
-            val paymentAmountTextView = TextView(requireContext()).apply {
-                val fullText = "청구요금".padEnd(40) + "${paymentAmount}원\n"
-                val grayTextColor = ContextCompat.getColor(requireContext(), R.color.grey)
-                val blackTextColor = Color.BLACK
-
-                val spannableString = SpannableString(fullText)
-                spannableString.setSpan(ForegroundColorSpan(grayTextColor), 0, 5, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                spannableString.setSpan(ForegroundColorSpan(blackTextColor), 5, fullText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-
-                text = spannableString
-                gravity = Gravity.CENTER
-                textSize = 18f
-            }
-
-            val paymentMethodTextView = TextView(requireContext()).apply {
-                text = "납부방법".padEnd(30) + paymentMethod + "\n\n"
-                gravity = Gravity.CENTER
-                textSize = 18f
-            }
-            // Add the TextViews to the layout container
-            containerLayout.addView(paymentDateTextView)
-            containerLayout.addView(paymentAmountTextView)
-            containerLayout.addView(paymentMethodTextView)
+            // LgtPayment 객체 생성 후 리스트에 추가
+            lgtPaymentList.add(LgtPayment(paymentMethod, paymentDate, paymentAmount, paymentName))
         }
-        // Log the complete response
-        sb.append("Complete Response: $responseString")
+
+        // Adapter 생성 후 RecyclerView에 설정
+        val adapter=LgtPaymentAdapter(lgtPaymentList)
+        recyclerView.adapter=adapter
+
     }
 }
 
