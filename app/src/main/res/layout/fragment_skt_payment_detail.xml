@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="25dp"
+    android:paddingTop="25dp"
+    android:paddingHorizontal="25dp"
     android:id="@+id/fragment_ktPaymentDetail">
 
     <LinearLayout
@@ -59,14 +60,11 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/textView"
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="16sp"
-                    android:padding="16dp"
-                    android:textColor="@android:color/black"
-                    android:layout_centerInParent="true" />
+                    android:layout_height="wrap_content"/>
 
             </LinearLayout>
 

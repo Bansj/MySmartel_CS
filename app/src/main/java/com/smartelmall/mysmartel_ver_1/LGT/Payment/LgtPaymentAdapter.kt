@@ -17,7 +17,6 @@ class LgtPaymentViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     val txtTitle2: TextView = view.findViewById(R.id.txt_title2)
     val txtValue1: TextView = view.findViewById(R.id.txt_value)
     val txtValue2: TextView = view.findViewById(R.id.txt_value2)
-
 }
 
 // Adapter 정의

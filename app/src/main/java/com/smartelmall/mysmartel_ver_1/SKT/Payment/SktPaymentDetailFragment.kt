@@ -11,6 +11,8 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.smartelmall.mysmartel_ver_1.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -51,7 +53,7 @@ class SktPaymentDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         Log.d("SktPaymentDetailFragment", "onViewCreated called")
 
-        textView = view.findViewById(R.id.textView)
+       // textView = view.findViewById(R.id.textView)
         phoneNumber = arguments?.getString("phoneNumber") ?: ""
 
         if (phoneNumber.isNotEmpty()) {
@@ -101,14 +103,15 @@ class SktPaymentDetailFragment : Fragment() {
         val svAcntNum = consumeBytes(11)
         val FEE_REC_CNT = consumeBytes(5).trim().toInt()
 
-        fun formatCurrency(value: String): String {
+        fun formatCurrency(value: String): String { // 원화로 변경하는 코드
             if (value.isEmpty()) {
                 return "0"
             }
             return value.toBigInteger().toString().reversed().chunked(3).joinToString(",").reversed()
         }
 
-        val stringBuilder = StringBuilder()
+        var paymentsList= mutableListOf<SktPayment>()
+
         for (i in 0 until FEE_REC_CNT) {
             val INV_YM = consumeBytes(6).trimStart('0')
             val year = INV_YM.substring(0,4)
@@ -117,32 +120,18 @@ class SktPaymentDetailFragment : Fragment() {
             val INV_AMT = consumeBytes(22).trimStart('0')
             val COL_BAMT = consumeBytes(22).trimStart('0')
 
-            val title = "청구금액"
-            val title2 = "미납금액"
-            val value = "${formatCurrency(INV_AMT)}원"
-            val value2 = "${formatCurrency(COL_BAMT)}원"
+            val value = "${formatCurrency(INV_AMT)}" // 원화로 변경하는 코드
+            val value2 = "${formatCurrency(COL_BAMT)}" // 원화로 변경하는 코드
 
-            val customTitle = title.padEnd(40)
-            val customTitle2 = title2.padEnd(40)
-
-         /*   stringBuilder.append("$formattedDate\n\n")
-            stringBuilder.append("청구금액: ${INV_AMT}원\n")
-            stringBuilder.append("미납잔액: ${COL_BAMT}원\n\n\n")*/
-
-            stringBuilder.append("$formattedDate\n\n")
-            stringBuilder.append("$customTitle")
-            stringBuilder.append("$value\n\n")
-            stringBuilder.append("$customTitle2")
-            stringBuilder.append("$value2\n\n\n\n\n")
+            paymentsList.add(SktPayment(formattedDate, value, value2))
         }
 
+        val recyclerView = requireView().findViewById<RecyclerView>(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(activity)
+        val adapter = SktPaymentAdapter(paymentsList)
+        recyclerView.adapter = adapter
+
         val errorCd = consumeBytes(2)
-
-        val formattedResult = "\n$stringBuilder\n"
-
-        textView.text = formattedResult
-
-        textView.gravity = Gravity.CENTER
 
         // 각 항목의 길이를 로그에 기록합니다.
         Log.d("displayData", "Lengths: opClCd: ${opClCd.length}, opTypCd: ${opTypCd.length}, svcNum: ${svcNum.length}, svAcntNum: ${svAcntNum.length}, FEE_REC_CNT: $FEE_REC_CNT, errorCd: ${errorCd.length}")
