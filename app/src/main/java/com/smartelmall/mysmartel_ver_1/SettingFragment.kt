@@ -3,6 +3,7 @@ package com.smartelmall.mysmartel_ver_1
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -15,6 +16,9 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import com.smartelmall.mysmartel_ver_1.NewPW.IdentificationSelfActivity
 import android.provider.Settings
+import android.widget.TextView
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import com.smartelmall.mysmartel_ver_1.DeleteAcct.DeleteAccountActivity
 
 class SettingFragment : Fragment() {
@@ -36,9 +40,6 @@ class SettingFragment : Fragment() {
 
         sharedPrefs = requireContext().getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE)
        // switchAutoLogin = view.findViewById(R.id.switch_autoLogin)
-
-        // Set the switch status based on the value stored in shared preferences
-        //switchAutoLogin.isChecked = sharedPrefs.getBoolean("autoLogin", false)
 
         // Set click listener for btn_menu button
         view.findViewById<ImageButton>(R.id.btn_menu).setOnClickListener {
@@ -149,6 +150,66 @@ class SettingFragment : Fragment() {
             }
             startActivity(intent)
         }*/
+        val txtAppVersion = view.findViewById<TextView>(R.id.txt_appVersion)
+        val txtStoreVersion = view.findViewById<TextView>(R.id.txt_storeVersion)
+        val btnAppUpdate = view.findViewById<TextView>(R.id.btn_appUpdate)
+
+        val pInfo = requireActivity().packageManager.getPackageInfo(requireActivity().packageName, 0)
+        val currentVersion = pInfo.versionName
+
+        // TextView에 현재 버전 설정
+        txtAppVersion.text = "$currentVersion"
+
+
+        val firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
+
+        // 기본값 설정
+        val configSettings = FirebaseRemoteConfigSettings.Builder()
+            .setMinimumFetchIntervalInSeconds(3600)
+            .build()
+        firebaseRemoteConfig.setConfigSettingsAsync(configSettings)
+
+        // Fetch and activate the config
+        firebaseRemoteConfig.fetchAndActivate()
+            .addOnCompleteListener(requireActivity()) { task ->
+                if (task.isSuccessful) {
+                    val updated = task.result
+
+                    // 최신버전 정보 받아오기
+                    val storeVersion = firebaseRemoteConfig.getString("storeVersion")
+
+                    // TextView에 플레이스토어 최신버전 설정
+                    txtStoreVersion.text = "$storeVersion"
+
+                    // 버전 비교 후 업데이트 버튼 보여주기/숨기기 결정하기
+                    btnAppUpdate.visibility =
+                        if (currentVersion != storeVersion) View.VISIBLE else View.GONE
+                } else {
+                    // Fetch failed 처리 필요
+                }
+            }
+
+        btnAppUpdate.setOnClickListener {
+            try {
+                startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("market://details?id=com.smartelmall.mysmartel_ver_1")
+                    )
+                )
+            } catch (anfe: android.content.ActivityNotFoundException) {
+                startActivity(
+                    Intent(
+                        Intent.ACTION_VIEW,
+                        Uri.parse("https://play.google.com/store/apps/details?id=com.smartelmall.mysmartel_ver_1")
+                    )
+                )
+            }
+        }
+
+
+
+
 
 
     }

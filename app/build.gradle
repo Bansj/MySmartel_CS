@@ -16,7 +16,7 @@ android {
         minSdk 27
         targetSdk 33
         versionCode 9
-        versionName "1.0"
+        versionName "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -49,6 +49,7 @@ dependencies {
     implementation 'androidx.test.ext:junit-ktx:1.1.5'
     implementation 'com.google.firebase:firebase-crashlytics-ktx:18.2.9'
     implementation 'com.google.firebase:firebase-perf-ktx:20.4.1'
+    implementation 'com.google.firebase:firebase-config-ktx:21.4.1'
     testImplementation 'io.mockk:mockk:1.12.0'
     testImplementation 'androidx.arch.core:core-testing:2.1.0'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2'
