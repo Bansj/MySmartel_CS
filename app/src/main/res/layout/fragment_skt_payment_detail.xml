@@ -5,9 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:paddingTop="25dp"
-    android:paddingHorizontal="25dp"
-    android:id="@+id/fragment_ktPaymentDetail">
+    android:padding="15dp"
+    android:id="@+id/fragment_sktPaymentDetail">
 
     <LinearLayout
         android:layout_width="match_parent"

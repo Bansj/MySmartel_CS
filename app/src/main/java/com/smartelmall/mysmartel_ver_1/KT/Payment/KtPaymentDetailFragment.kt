@@ -12,6 +12,8 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.smartelmall.mysmartel_ver_1.R
 import okhttp3.*
@@ -103,6 +105,8 @@ class KtPaymentDetailFragment : Fragment() {
     private fun formatPaymentData(apiResponse: KtPaymentApiResponse, context: Context): String {
         val bodyData = apiResponse.body?.firstOrNull()
 
+        val paymentsList = mutableListOf<KtPayment>()
+
         if (bodyData != null) {
             val stringBuilder = StringBuilder()
 
@@ -112,31 +116,18 @@ class KtPaymentDetailFragment : Fragment() {
                 val month = paymentDto.billMonth.substring(4, 6)
                 val formattedBillMonth = "${year}년 ${month}월"
 
-                val screenWidth = getScreenWidth(context)
-                val fixedWidth = 70
-                val availableWidth = screenWidth.coerceAtMost(fixedWidth)
-                val padding = (availableWidth - formattedBillMonth.length) / 2
-
-                val centeredBillMonth = " ".repeat(padding) + formattedBillMonth + " ".repeat(padding)
-
-                stringBuilder.append(centeredBillMonth)
-                stringBuilder.append("\n\n")
-
-                val titleWidth = 12 // Fixed width for the title section
-                val valueWidth = 12 // Arbitrary width for the value section
-
                 val formattedThisMonthAmount= formatToKoreanWon(paymentDto.thisMonth.toLong())
                 val formattedPastDueAmtAmount= formatToKoreanWon(paymentDto.pastDueAmt.toLong())
 
-                val formattedThisMonhth ="청구요금 $formattedThisMonthAmount".splitValueAndAlign(titleWidth,valueWidth )
-                stringBuilder.append(formattedThisMonhth)
-                stringBuilder.append("\n\n")
+                paymentsList.add(KtPayment(formattedBillMonth, formattedThisMonthAmount, formattedPastDueAmtAmount))
 
-                val formattedPastDueAmt ="미납요금 $formattedPastDueAmtAmount".splitValueAndAlign(titleWidth,valueWidth )
-                stringBuilder.append(formattedPastDueAmt)
-                stringBuilder.append("\n\n\n\n")
             }
-            return stringBuilder.toString()
+            // 어댑터에 데이터 전달 및 갱신 요청
+            val recyclerView = requireView().findViewById<RecyclerView>(R.id.recyclerView)
+            recyclerView.layoutManager = LinearLayoutManager(activity)
+            val adapter = KtPaymentAdapter(paymentsList)
+            recyclerView.adapter = adapter
+           //return stringBuilder.toString()
         }
         return "No payment data available"
     }
@@ -144,43 +135,6 @@ class KtPaymentDetailFragment : Fragment() {
     fun formatToKoreanWon(amount: Long): String {
         val formatter = NumberFormat.getNumberInstance(Locale.KOREA)
         return formatter.format(amount) + "원"
-    }
-
-    private fun getScreenWidth(context: Context): Int {
-        val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        val displayMetrics = DisplayMetrics()
-        windowManager.defaultDisplay.getMetrics(displayMetrics)
-        return displayMetrics.widthPixels
-    }
-
-    fun String.splitValueAndAlign(titleWidth: Int, valueWidth: Int): String {
-        val parts = this.split(" ")
-        val title = parts[0]
-        val value = parts[1]
-
-        val titlePadding = titleWidth - title.length
-        val valuePadding = valueWidth - value.length
-
-        val titlePaddingBuilder = StringBuilder()
-        val valuePaddingBuilder = StringBuilder()
-
-        for (i in 0 until titlePadding) {
-            titlePaddingBuilder.append("\t\t\t\t")
-        }
-        for (i in 0 until valuePadding) {
-            valuePaddingBuilder.append("\t")
-        }
-
-        return "$title$titlePaddingBuilder$valuePaddingBuilder$value"
-    }
-
-    private fun String.centerJustify(width: Int): String {
-        val padding = width - this.length
-        val leftPadding = padding / 2
-        val rightPadding = padding - leftPadding
-        val adjustedLeftPadding = maxOf(leftPadding, 0)
-        val adjustedRightPadding = maxOf(rightPadding, 0)
-        return " ".repeat(adjustedLeftPadding) + this + " ".repeat(adjustedRightPadding)
     }
 
     private fun getCurrentYearMonth(): String {
