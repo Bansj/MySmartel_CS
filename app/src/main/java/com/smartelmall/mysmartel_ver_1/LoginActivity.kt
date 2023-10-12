@@ -155,7 +155,7 @@ class LoginActivity : AppCompatActivity() {
 
     private var testPhoneNumber: String? = // 테스트계정 번호 생성
         // 아래에는 테스트 로그인할 번호 기입
-        "010-2969-5567"//"01059370011"
+        "01059370011"//"01059370011"
             .replace("-", "") // SKT, LG, KT
     private fun loginUser() {
         val phoneNumber = phoneNumberEditText.text.toString()

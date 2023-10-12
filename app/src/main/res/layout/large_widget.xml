@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     style="@style/Widget.MySmartel_ver_1.AppWidget.Container"
     android:layout_width="match_parent"
-    android:layout_height="150dp"
+    android:layout_height="130dp"
     android:id="@+id/wg_layout"
     android:theme="@style/Theme.MySmartel_ver_1.AppWidgetContainer">
 
@@ -28,50 +28,49 @@
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:layout_width="80dp"
             android:layout_height="8dp"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="70dp"
             android:indeterminate="false"
             android:max="100"
-            android:progress="55"
+            android:progress="50"
             android:progressDrawable="@drawable/progressbar_orange"
             android:progressTint="@color/blue_600"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"/>
+            android:layout_marginEnd="15dp"
+            android:layout_alignParentLeft="true" />
 
         <ProgressBar
             android:id="@+id/pgBar_Call"
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:layout_width="80dp"
             android:layout_height="8dp"
-            android:layout_marginTop="15dp"
-            android:layout_marginHorizontal="10dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="70dp"
             android:indeterminate="false"
             android:max="100"
             android:progress="80"
             android:progressDrawable="@drawable/progressbar_orange"
-            android:progressTint="@color/gold"
-            android:layout_centerInParent="true"/>
+            android:progressTint="@color/gold" />
 
         <ProgressBar
             android:id="@+id/pgBar_M"
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
             android:layout_width="80dp"
             android:layout_height="8dp"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginTop="15dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="70dp"
+            android:layout_marginStart="15dp"
             android:indeterminate="false"
             android:max="100"
             android:progress="60"
             android:progressDrawable="@drawable/progressbar_orange"
             android:progressTint="@color/lime_green"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"/>
+            android:layout_alignParentRight="true" />
 
         <TextView
             android:id="@+id/wg_data"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="DATA"
+            android:layout_marginStart="20dp"
             android:layout_below="@id/pgBar_leftData" />
 
         <TextView
@@ -79,14 +78,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Call"
-            android:layout_below="@id/pgBar_Call"
-            android:layout_centerHorizontal="true"/>
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/pgBar_Call"/>
 
         <TextView
             android:id="@+id/wg_M"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Message"
+            android:layout_marginEnd="10dp"
             android:layout_below="@id/pgBar_M"
             android:layout_alignRight="@id/pgBar_M"/>
 

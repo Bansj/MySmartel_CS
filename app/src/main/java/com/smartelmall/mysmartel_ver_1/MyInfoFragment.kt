@@ -2,6 +2,8 @@ package com.smartelmall.mysmartel_ver_1
 
 import android.animation.ObjectAnimator
 import android.animation.TimeInterpolator
+import android.appwidget.AppWidgetManager
+import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
 import android.os.Handler
@@ -1605,7 +1607,7 @@ class MyInfoFragment : Fragment() {
 
 
 
-    private fun SktFetchDeductData(serviceAcct: String?, telecom: String?) {// SKT 잔여량 조회 API
+    private fun SktFetchDeductData(serviceAcct: String?, telecom: String?) {// SKT 잔여량조회 API
 
        val phoneNumber = viewModel.phoneNumber ?: arguments?.getString("phoneNumber")?.also { viewModel.phoneNumber = it }?.also { viewModel.phoneNumber = it }
         GlobalScope.launch(Dispatchers.IO) {
@@ -1798,8 +1800,6 @@ class MyInfoFragment : Fragment() {
                     }
                 }
 
-
-
                 else if (displayName.contains("음성") || displayName.contains("전화")  ) {
                    if (!displayName.contains("데이터")) { // Handle the case where the values are "음성" or "전화"
 
@@ -1855,6 +1855,59 @@ class MyInfoFragment : Fragment() {
         } else {
             remainInfoTextView?.text = "No Remain Info found."
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        // 위젯에 데이터를 전송합니다.
+        val intent = Intent(context, LargeWidget::class.java)
+        Log.d("IntentCreation", "==================================================== Intent created with target LargeWidget =========================================")
+
+        intent.action = "android.appwidget.action.APPWIDGET_UPDATE"
+
+        val wgData = txtRefreshData?.text.toString()
+        intent.putExtra("widgetData", wgData)
+        Log.d("WidgetData", "MyInfoFragment (SKT) -> LargeWidgert: $wgData")
+
+        val wgCall = txtRefreshCall?.text.toString()
+        intent.putExtra("widgetCall", wgCall)
+        Log.d("WidgetCall", "MyInfoFragment (SKT) -> LargeWidgert: $wgCall")
+
+        val wgtMessage = txtRefreshM?.text.toString()
+        intent.putExtra("widgetMessage", wgtMessage)
+        Log.d("WidgetMessage", "MyInfoFragment (SKT) -> LargeWidgert: $wgtMessage")
+
+        context?.sendBroadcast(intent)
+        Log.d("BroadcastSent", "===================================================== Broadcast sent with the intent  =================================================")
+
     }
 
     private fun parseValueToGB(value: String): Double {   // KB를 GB로 변환하는 함수

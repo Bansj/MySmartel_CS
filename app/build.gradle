@@ -15,7 +15,7 @@ android {
         applicationId "com.smartelmall.mysmartel_ver_1"
         minSdk 27
         targetSdk 33
-        versionCode 10
+        versionCode 11
         versionName "1.0.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -44,6 +44,8 @@ android {
 }
 
 dependencies {
+
+
 
     implementation 'junit:junit:4.12'
     implementation 'androidx.test.ext:junit-ktx:1.1.5'
