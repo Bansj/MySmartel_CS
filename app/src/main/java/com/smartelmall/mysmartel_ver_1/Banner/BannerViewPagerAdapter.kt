@@ -3,6 +3,7 @@ package com.smartelmall.mysmartel_ver_1.Banner
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -11,6 +12,7 @@ import android.view.ViewGroup
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.smartelmall.mysmartel_ver_1.R
 
@@ -26,6 +28,7 @@ class BannerViewPagerAdapter(private val context: Context, private val bannerLis
             webView.settings.javaScriptEnabled = true
             webView.webViewClient = WebViewClient()
 
+
             webView.setOnTouchListener { v, event ->
                 if (event.action == MotionEvent.ACTION_UP) {
                     bannerList[adapterPosition].imageLink?.let { openUrlInBrowser(it) }
@@ -37,7 +40,25 @@ class BannerViewPagerAdapter(private val context: Context, private val bannerLis
 
         fun bind(bannerItem: BannerItem) {
             val imageUrl = bannerItem.imagePath
-            val htmlContent = "<html><head><style>img{max-width: 100%; height: auto;}</style></head><body><img src=\"$imageUrl\"></body></html>"
+            val htmlContent = """
+        <html>
+            <head>
+                <style>
+                    img {
+                        max-width: 100%;
+                        height: auto;
+                        border-radius: 15px; /* Add this line */
+                    }
+                    body {
+                        margin: 0;
+                        padding: 0;
+                    }
+                </style>
+            </head>
+            <body>
+                <img src="$imageUrl">
+            </body>
+        </html>"""
             webView.loadDataWithBaseURL(null, htmlContent, "text/html", "UTF-8", null)
         }
     }

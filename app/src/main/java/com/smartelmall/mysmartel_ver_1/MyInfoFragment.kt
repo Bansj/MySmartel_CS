@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator
 import android.animation.TimeInterpolator
 import android.appwidget.AppWidgetManager
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.os.Handler
@@ -18,6 +19,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.*
+import androidx.cardview.widget.CardView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -28,6 +30,7 @@ import com.google.gson.reflect.TypeToken
 import com.smartelmall.mysmartel_ver_1.Banner.BannerItem
 import com.smartelmall.mysmartel_ver_1.Banner.BannerViewPagerAdapter
 import com.smartelmall.mysmartel_ver_1.Banner.ZoomOutPageTransformer
+import com.smartelmall.mysmartel_ver_1.Banner.setPageChangeDuration
 import com.smartelmall.mysmartel_ver_1.KT.*
 import com.smartelmall.mysmartel_ver_1.KT.Bill.Body
 import com.smartelmall.mysmartel_ver_1.KT.Bill.KtBillApiResponse
@@ -156,7 +159,9 @@ class MyInfoFragment : Fragment() {
     private fun setupViewPager(bannerList: List<BannerItem>) { // 배너 뷰페이저 셋업
         viewPagerAdapter = BannerViewPagerAdapter(requireContext(), bannerList)
         viewPager2.adapter = viewPagerAdapter
+        viewPager2.setPageChangeDuration(5000)
         viewPager2.orientation = ViewPager2.ORIENTATION_HORIZONTAL
+        viewPager2.setBackgroundColor(Color.TRANSPARENT)
         viewPager2.setPageTransformer(ZoomOutPageTransformer())
 
         val handlers = Handler(Looper.getMainLooper())
@@ -167,10 +172,10 @@ class MyInfoFragment : Fragment() {
 
                 viewPager2.setCurrentItem(newItem, true)
 
-                handlers.postDelayed(this, 3000) // Scroll every 2 seconds
+                handlers.postDelayed(this, 3000) // Scroll every 3 seconds
             }
         }
-        handlers.postDelayed(runnable, 2000)
+        handlers.postDelayed(runnable, 8000)
     }
 
 
@@ -1901,9 +1906,9 @@ class MyInfoFragment : Fragment() {
         intent.putExtra("widgetCall", wgCall)
         Log.d("WidgetCall", "MyInfoFragment (SKT) -> LargeWidgert: $wgCall")
 
-        val wgtMessage = txtRefreshM?.text.toString()
-        intent.putExtra("widgetMessage", wgtMessage)
-        Log.d("WidgetMessage", "MyInfoFragment (SKT) -> LargeWidgert: $wgtMessage")
+        val wgMessage = txtRefreshM?.text.toString()
+        intent.putExtra("widgetMessage", wgMessage)
+        Log.d("WidgetMessage", "MyInfoFragment (SKT) -> LargeWidgert: $wgMessage")
 
         context?.sendBroadcast(intent)
         Log.d("BroadcastSent", "===================================================== Broadcast sent with the intent  =================================================")
