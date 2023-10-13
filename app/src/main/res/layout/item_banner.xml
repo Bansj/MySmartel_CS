@@ -7,13 +7,7 @@
 
 <!--    배너 이미지용 아이템 레이아웃-->
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardView_viewPager"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+
 
         <ImageView
             android:id="@+id/bannerImage"
@@ -26,6 +20,6 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@tools:sample/backgrounds/scenic" />
 
-    </androidx.cardview.widget.CardView>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
