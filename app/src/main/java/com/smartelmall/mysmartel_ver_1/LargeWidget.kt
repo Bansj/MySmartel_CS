@@ -42,15 +42,26 @@ class LargeWidget : AppWidgetProvider() {
             // 데이터 업데이트 함수 호출
             updateAppWithNewData(context, widgetData, widgetCall, widgetMessage)
         }
+
         // Update 버튼 클릭 시 동작 정의
         if(intent.action == ACTION_UPDATE_CLICK){
-            // TODO: 실제 앱에 맞게 변경해야 합니다.
-            val newData = "Updated Data"
-            val newCall = "Updated Call"
-            val newMessage = "Updated Message"
+            // MyInfoFragment에서 보낸 데이터를 받아옵니다.
+            val newData = intent.getStringExtra("widgetData")
+            val newCall = intent.getStringExtra("widgetCall")
+            val newMessage = intent.getStringExtra("widgetMessage")
 
-            updateAppWithNewData(context, newData, newCall, newMessage)
             Log.d(TAG,"Update button clicked!")
+
+            if (newData != null && newCall != null && newMessage != null) {
+                Log.d("ReceivedData", "LargeWidget <- MyInfoFragment (SKT): $newData")
+                Log.d("ReceivedCall", "LargeWidget <- MyInfoFragment (SKT): $newCall")
+                Log.d("ReceivedMessage", "LargeWidget <- MyInfoFragment (SKT): $newMessage")
+
+                // 데이터 업데이트 함수 호출
+                updateAppWithNewData(context, newData, newCall, newMessage)
+            } else {
+                // TODO: 데이터가 없는 경우의 처리. 예를 들어 기본값을 사용하거나 오류 메시지를 표시하는 등의 작업을 수행할 수 있습니다.
+            }
         }
 
         // Widget 클릭 시 앱으로 이동하게 하는 동작 정의

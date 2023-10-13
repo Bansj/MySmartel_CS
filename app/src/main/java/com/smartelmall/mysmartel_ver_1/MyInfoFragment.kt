@@ -880,6 +880,29 @@ class MyInfoFragment : Fragment() {
 
         txtRefreshM?.text = displayM
         Log.d("---------------------Check Call", "$displayM--------------")
+
+
+        // 위젯에 데이터를 전송합니다.
+        val intent = Intent(context, LargeWidget::class.java)
+        Log.d("IntentCreation", "==================================================== Intent created with target LargeWidget =========================================")
+
+        intent.action = "android.appwidget.action.APPWIDGET_UPDATE"
+
+        val wgData = txtRefreshData?.text.toString()
+        intent.putExtra("widgetData", wgData)
+        Log.d("WidgetData", "MyInfoFragment (SKT) -> LargeWidgert: $wgData")
+
+        val wgCall = txtRefreshCall?.text.toString()
+        intent.putExtra("widgetCall", wgCall)
+        Log.d("WidgetCall", "MyInfoFragment (SKT) -> LargeWidgert: $wgCall")
+
+        val wgMessage = txtRefreshM?.text.toString()
+        intent.putExtra("widgetMessage", wgMessage)
+        Log.d("WidgetMessage", "MyInfoFragment (SKT) -> LargeWidgert: $wgMessage")
+
+        context?.sendBroadcast(intent)
+        Log.d("BroadcastSent", "===================================================== Broadcast sent with the intent  =================================================")
+
     }
 
     private fun formatValue(value: String): String {
@@ -1288,6 +1311,31 @@ class MyInfoFragment : Fragment() {
 
         txtRefreshM?.text = displayM
         Log.d("-----------------문자량 ", "총합: $displayM -----------")
+
+
+
+
+        // 위젯에 데이터를 전송합니다.
+        val intent = Intent(context, LargeWidget::class.java)
+        Log.d("IntentCreation", "==================================================== Intent created with target LargeWidget =========================================")
+
+        intent.action = "android.appwidget.action.APPWIDGET_UPDATE"
+
+        val wgData = txtRefreshData?.text.toString()
+        intent.putExtra("widgetData", wgData)
+        Log.d("WidgetData", "MyInfoFragment (SKT) -> LargeWidgert: $wgData")
+
+        val wgCall = txtRefreshCall?.text.toString()
+        intent.putExtra("widgetCall", wgCall)
+        Log.d("WidgetCall", "MyInfoFragment (SKT) -> LargeWidgert: $wgCall")
+
+        val wgMessage = txtRefreshM?.text.toString()
+        intent.putExtra("widgetMessage", wgMessage)
+        Log.d("WidgetMessage", "MyInfoFragment (SKT) -> LargeWidgert: $wgMessage")
+
+        context?.sendBroadcast(intent)
+        Log.d("BroadcastSent", "===================================================== Broadcast sent with the intent  =================================================")
+
     }
     private fun Double.format(decimalPlaces: Int): String {
         return String.format("%.${decimalPlaces}f", this)
